@@ -4,7 +4,7 @@
 namespace py = pybind11;
 
 PYBIND11_MODULE(pathfinder, m){
-  py::class_<graph>(m, "graph")
+  py::class_<Graph>(m, "Graph")
     .def(py::init<int, int>())
-    .def("numVertices", &graph::numVertices);
+    .def("numVertices", &Graph::numVertices);
 }

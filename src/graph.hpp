@@ -1,24 +1,24 @@
-class vertex3d;
-class tetrahedron;
+class Vertex3d;
+class Tetrahedron;
 
-class graph {
-    vertex3d *vertices;
-    tetrahedron *tetrahedrons;
+class Graph {
+    Vertex3d **vertices;
+    Tetrahedron **tetrahedrons;
   public:
-    graph (int, int);
+    Graph (int, int);
     int numVertices();
 };
 
-class vertex3d {
+class Vertex3d {
     float x, y, z;
-    tetrahedron *tetrahedrons;
+    Tetrahedron **tetrahedrons;
   public:
-    vertex3d (float, float, float);
+    Vertex3d (float, float, float);
 };
 
-class tetrahedron {
-    vertex3d *vertices;
-    tetrahedron *neighbors;
+class Tetrahedron {
+    Vertex3d **vertices;
+    Tetrahedron **neighbors;
   public:
-    tetrahedron (std::array<int, 4>, std::array<int, 4>);
+    Tetrahedron ();
 };

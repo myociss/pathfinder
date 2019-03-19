@@ -23,7 +23,8 @@ class get_pybind_include(object):
 ext_modules = [
     Extension(
         'pathfinder',
-        ['src/bindings.cpp'],
+        ['src/graph.cpp',
+	 'src/bindings.cpp'],
         include_dirs=[
             # Path to pybind11 headers
             get_pybind_include(),

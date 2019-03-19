@@ -1,11 +1,11 @@
 #include "graph.hpp"
 
 
-graph::graph(int vertices_len, int tets_len) {
-    vertices = vertex3d* [vertices_len];
-    tetrahedrons = tetrahedron* [tets_len];
+Graph::Graph(int vertices_len, int tets_len) {
+    vertices = new Vertex3d*[vertices_len];
+    tetrahedrons = new Tetrahedron*[tets_len];
 }
 
-graph::numVertices(){
-    return sizeof(graph.vertices)
+int Graph::numVertices(){
+    return sizeof(vertices)/sizeof(vertices[0]);
 }
