@@ -1,24 +1,39 @@
 #include "graph.hpp"
-//#include <vector>
+#include <map>
+#include <string>
+#include <vector>
 
+Graph::Graph(const int numVertices, const int numFaces, const int numCells){
+    vertices.reserve(numVertices);
+    faces.reserve(numFaces);
+    tetrahedrons.reserve(numCells);
+}
 
-Graph::Graph(const std::vector<std::array<float, 3>> & _vertices) {
-    vertices = new Vertex3d*[_vertices.size()];
-    for (std::vector<std::array<float, 3>>::size_type i=0; i < _vertices.size(); i++) {
-        Vertex3d pt(_vertices[i][0],
-	    _vertices[i][1], _vertices[i][2]);
-	vertices[i] = &pt;
+void Graph::setVertices(const std::vector<std::array<float, 3>> & _vertices){
+    for(auto const& value: _vertices) {
+	Vertex3d pt(value);
+	vertices.push_back(&pt);
     }
-    //vertices = new Vertex3d*[vertices_len];
+}
+/*Graph::Graph(const std::vector<std::array<float, 3>> & _vertices,
+	const std::vector<std::map<std::string) {
+    vertices.reserve(_vertices.size());
+    for(auto const& value: _vertices) {
+	Vertex3d pt(value);
+	vertices.push_back(&pt);
+    }
     //tetrahedrons = new Tetrahedron*[tets_len];
 }
 
-Vertex3d::Vertex3d(float _x, float _y, float _z) {
-    x = _x;
-    y = _y;
-    z = _z;
+std::vector<Vertex3d *> Graph::Vertices(){
+    return vertices;
+}
+*/
+Vertex3d::Vertex3d(const std::array<float, 3> _vec) {
+    vec = _vec;
 }
 
-//int Graph::numVertices(){
-//    return sizeof(vertices)/sizeof(vertices[0]);
-//}
+std::array<float, 3> Vertex3d::Vec(){
+    return vec;
+}
+

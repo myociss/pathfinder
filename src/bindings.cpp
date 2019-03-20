@@ -6,6 +6,13 @@ namespace py = pybind11;
 
 PYBIND11_MODULE(pathfinder, m){
   py::class_<Graph>(m, "Graph")
-    .def(py::init<const std::vector<std::array<float, 3>> &>());
-    //.def("numVertices", &Graph::numVertices);
+    .def(py::init<const int,const int,const int>(), 
+	py::arg("num_vertices"), 
+	py::arg("num_faces"),
+	py::arg("num_tetrahedrons"))
+    .def("set_vertices", &Graph::setVertices);
+   // .def("vertices", &Graph::Vertices);
+
+  //py::class_<Vertex3d>(m, "Vertex3d")
+  //  .def("vec", &Vertex3d::Vec);
 }
