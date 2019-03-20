@@ -97,6 +97,7 @@ setup(
     long_description='',
     ext_modules=ext_modules,
     install_requires=['pybind11>=2.2'],
+    test_suite='test',
     cmdclass={'build_ext': BuildExt},
     zip_safe=False,
 )

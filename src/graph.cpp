@@ -18,6 +18,7 @@ Vertex3d::Vertex3d(float _x, float _y, float _z) {
     y = _y;
     z = _z;
 }
+
 //int Graph::numVertices(){
 //    return sizeof(vertices)/sizeof(vertices[0]);
 //}
