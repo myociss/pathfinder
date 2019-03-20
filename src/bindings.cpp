@@ -10,9 +10,10 @@ PYBIND11_MODULE(pathfinder, m){
 	py::arg("num_vertices"), 
 	py::arg("num_faces"),
 	py::arg("num_tetrahedrons"))
-    .def("set_vertices", &Graph::setVertices);
-   // .def("vertices", &Graph::Vertices);
+    .def("set_vertices", &Graph::setVertices)
+    .def("add_tetrahedron", &Graph::addTetrahedron,
+	py::arg("vertex_ids"),
+	py::arg("neighbor_ids"),
+	py::arg("weight"));
 
-  //py::class_<Vertex3d>(m, "Vertex3d")
-  //  .def("vec", &Vertex3d::Vec);
 }
