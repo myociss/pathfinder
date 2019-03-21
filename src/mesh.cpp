@@ -64,6 +64,29 @@ Face::Face(const std::array<Vertex3d *, 3> _vertices, const Tetrahedron * tet){
 Tetrahedron::Tetrahedron(const std::array<Vertex3d *, 4> _vertices, const float 	_weight, const unsigned int cores){
     vertices = _vertices;
     weight = _weight;
+
+    std::array<std::array<float, 3>, 2> edge0 = {vertices[0]->Vec(), vertices[1]->Vec()};
+    std::array<std::array<float, 3>, 2> edge1 = {vertices[0]->Vec(), vertices[2]->Vec()}; 
+    std::array<std::array<float, 3>, 2> edge2 = {vertices[0]->Vec(), vertices[3]->Vec()};
+
+
+    std::array<float, 3> midpt0 = {(edge0[0][0] + edge0[1][0]) / 2, (edge0[0][1] + edge0[1][1]) / 2, (edge0[0][2] + edge0[1][2]) / 2};
+
+    std::array<float, 3> edge0_vec = {edge0[0][0] - midpt0[0], edge0[0][1] - midpt0[1], edge0[0][2] - midpt0[2]};
+
+    float mag_0 = sqrt((edge0_vec[0] * edge0_vec[0]) + (edge0_vec[1] * edge0_vec[1]) + (edge0_vec[2] * edge0_vec[2]));
+
+    std::array<float, 3> n0 = {edge0_vec[0] / mag_0[0], edge0_vec[1] / mag_0[1], edge0_vec[2] / mag_0[2]};
+
+    float d0 = midpt0[0] * n0[0] + midpt0[1] * n0[1] + midpt0[2] * n0[2];
+
+
+
+
+    std::array<float, 3> midpt1 = {(edge1[0][0] + edge1[1][0]) / 2, (edge1[0][1] + edge1[1][1]) / 2, (edge1[0][2] + edge1[1][2]) / 2};
+
+   std::array<float, 3> midpt2 = {(edge2[0][0] + edge2[1][0]) / 2, (edge2[0][1] + edge2[1][1]) / 2, (edge2[0][2] + edge2[1][2]) / 2};
+   
     //neighbors.reserve(4);
 
     /*checkedThreadId.reserve(cores);
