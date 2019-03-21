@@ -98,12 +98,17 @@ Tetrahedron::Tetrahedron(const std::array<Vertex3d *, 4> _vertices, const float 
 
     std::array<float, 3> edge0_vec = {edge0[0][0] - midpt0[0], edge0[0][1] - midpt0[1], edge0[0][2] - midpt0[2]};
 
+
+    float mag0 = sqrt( (edge0_vec[0] * edge0_vec[0]) + (edge0_vec[1] * edge0_vec[1]) + (edge0_vec[2] * edge0_vec[2]));
+ 
+    std::array<float, 3> n0 = {edge0_vec[0]/mag0, edge0_vec[1]/mag0, edge0_vec[2]/mag0};
+
     //std::cout << edge0_vec << std::endl;
 
     
 
 
-    float d0 = midpt0[0] * edge0_vec[0] + midpt0[1] * edge0_vec[1] + midpt0[2] * edge0_vec[2];
+    float d0 = midpt0[0] * n0[0] + midpt0[1] * n0[1] + midpt0[2] * n0[2];
     
 //std::cout << d0 << std::endl;
 
@@ -113,7 +118,13 @@ Tetrahedron::Tetrahedron(const std::array<Vertex3d *, 4> _vertices, const float 
     std::array<float, 3> edge1_vec = {edge1[0][0] - midpt1[0], edge1[0][1] - midpt1[1], edge1[0][2] - midpt1[2]};
 
 
-    float d1 = midpt1[0] * edge1_vec[0] + midpt1[1] * edge1_vec[1] + midpt1[2] * edge1_vec[2];
+    float mag1 = sqrt( (edge1_vec[0] * edge1_vec[0]) + (edge1_vec[1] * edge1_vec[1]) + (edge1_vec[2] * edge1_vec[2]));
+ 
+    std::array<float, 3> n1 = {edge1_vec[0]/mag1, edge1_vec[1]/mag1, edge1_vec[2]/mag1};
+
+
+
+    float d1 = midpt1[0] * n1[0] + midpt1[1] * n1[1] + midpt1[2] * n1[2];
 
 
 
@@ -123,8 +134,11 @@ Tetrahedron::Tetrahedron(const std::array<Vertex3d *, 4> _vertices, const float 
     std::array<float, 3> edge2_vec = {edge2[0][0] - midpt2[0], edge2[0][1] - midpt2[1], edge2[0][2] - midpt2[2]};
 
 
+    float mag2 = sqrt( (edge2_vec[0] * edge2_vec[0]) + (edge2_vec[1] * edge2_vec[1]) + (edge2_vec[2] * edge2_vec[2]));
+ 
+    std::array<float, 3> n2 = {edge2_vec[0]/mag2, edge2_vec[1]/mag2, edge2_vec[2]/mag2};
 
-    float d2 = midpt2[0] * edge2_vec[0] + midpt2[1] * edge2_vec[1] + midpt2[2] * edge2_vec[2];
+    float d2 = midpt2[0] * n2[0] + midpt2[1] * n2[1] + midpt2[2] * n2[2];
 
    //std::cout << d0 << std::endl;
    //std::cout << d1 << std::endl;
@@ -137,7 +151,7 @@ Tetrahedron::Tetrahedron(const std::array<Vertex3d *, 4> _vertices, const float 
     A << midpt0[0], midpt0[1], midpt0[2], midpt1[0], midpt1[1], midpt1[2], midpt2[0], midpt2[1], midpt2[2];
    
 
-    b << -d0, -d1, -d2;
+    b << d0, d1, d2;
 
     Vector3f circumcenter = A.colPivHouseholderQr().solve(b);
 
