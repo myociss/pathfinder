@@ -9,10 +9,11 @@ class Mesh {
     std::vector<Vertex3d *> vertices;
     std::vector<Face *> faces;
     std::vector<Tetrahedron *> tetrahedrons;
-    unsigned int cores;
+    int numThreads;
+    //unsigned int cores;
   public:
-    Mesh (const int numVertices, const int numFaces, const int numCells);
-    void setVertices(const std::vector<std::array<float, 3>> & _vertices);
+    Mesh (const int numVertices, const int numFaces, const int numCells, const int _numThreads);
+    void setVertices(const std::vector<std::array<float, 3>> _vertices);
     void addTetrahedron(const std::array<int, 4> vertexIds, 
 	const std::vector<int> neighborIds, const float weight);
     //std::vector<Vertex3d *> Vertices();
@@ -37,11 +38,11 @@ class Face {
 class Tetrahedron {
     std::array<Vertex3d *, 4> vertices;
     std::vector<Tetrahedron *> neighbors;
-    std::vector<int> checkedThreadId;
+    std::vector<int> threads;
     std::array<float, 3> circumsphereCenter;
     float circumsphereRadius;
     float weight;
   public:
-    Tetrahedron (const std::array<Vertex3d *, 4> _vertices, const float 	  _weight);
+    Tetrahedron (const std::array<Vertex3d *, 4> _vertices, const float 	  _weight, const int numThreads);
     void addNeighbor(Tetrahedron * neighbor);
 };
