@@ -2,11 +2,19 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <thread>
 
 Mesh::Mesh(const int numVertices, const int numFaces, const int numCells){
     vertices.reserve(numVertices);
     faces.reserve(numFaces);
     tetrahedrons.reserve(numCells);
+    cores = std::thread::hardware_concurrency;
+}
+
+Mesh::setTarget(std::array<float, 3> _target){
+    //check each tetrahedron to see if target is in circumsphere
+    //if so, tetrahedron goes on stack
+    //also set each tetrahedron's checked list to 0
 }
 
 void Mesh::setVertices(const std::vector<std::array<float, 3>> & _vertices){
@@ -24,7 +32,7 @@ void Mesh::addTetrahedron(const std::array<int, 4> vertexIds,
 	tet_vertices[i] = vertices[vertexIds[i]];
     }
 
-    Tetrahedron tet(tet_vertices, weight);
+    Tetrahedron tet(tet_vertices, weight, cores);
     tetrahedrons.push_back(&tet);
 
     int current_size = tetrahedrons.size();
@@ -53,10 +61,15 @@ Face::Face(const std::array<Vertex3d *, 3> _vertices, const Tetrahedron * tet){
 }*/
 
 
-Tetrahedron::Tetrahedron(const std::array<Vertex3d *, 4> _vertices, const float 	_weight){
+Tetrahedron::Tetrahedron(const std::array<Vertex3d *, 4> _vertices, const float 	_weight, const unsigned int cores){
     vertices = _vertices;
     weight = _weight;
-    neighbors.reserve(4);
+    //neighbors.reserve(4);
+
+    /*checkedThreadId.reserve(cores);
+    for (int i=0; i < cores; i++) {
+	checkedThreadId = -1;
+    }*/
 }
 
 void Tetrahedron::addNeighbor(Tetrahedron * neighbor){
