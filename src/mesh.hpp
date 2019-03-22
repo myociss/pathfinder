@@ -10,12 +10,13 @@ class Mesh {
     std::vector<Face *> faces;
     std::vector<Tetrahedron *> tetrahedrons;
     int numThreads;
+    std::array<float, 3> target;
+    Tetrahedron * targetTet;
     //unsigned int cores;
   public:
     Mesh (const int numVertices, const int numFaces, const int numCells, const int _numThreads);
     void setVertices(const std::vector<std::array<float, 3>> & _vertices);
-    void addTetrahedron(const std::array<int, 4> vertexIds, 
-	const std::vector<int> neighborIds, const float weight);
+    void addTetrahedron(const std::array<int, 4> vertexIds, const std::vector<int> neighborIds, const float weight);
     bool setTarget(const std::array<float, 3> _target);
     //std::vector<Vertex3d *> Vertices();
 };
@@ -29,12 +30,13 @@ class Vertex3d {
     std::array<float, 3> Vec();
 };
 
+/*
 class Face {
     std::array<Vertex3d *, 3> vertices;
     Tetrahedron * tetrahedron;
   public:
     Face ();
-};
+};*/
 
 class Tetrahedron {
     std::array<Vertex3d *, 4> vertices;
@@ -46,4 +48,5 @@ class Tetrahedron {
   public:
     Tetrahedron (const std::array<Vertex3d *, 4> _vertices, const float 	  _weight, const int numThreads);
     void addNeighbor(Tetrahedron * neighbor);
+    bool contains(const std::array<float, 3>);
 };

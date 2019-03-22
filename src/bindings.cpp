@@ -15,6 +15,7 @@ PYBIND11_MODULE(pathfinder, m){
     .def("add_tetrahedron", &Mesh::addTetrahedron,
 	py::arg("vertex_ids"),
 	py::arg("neighbor_ids"),
-	py::arg("weight"));
+	py::arg("weight"))
+    .def("set_target", &Mesh::setTarget);
 
 }
