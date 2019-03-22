@@ -13,9 +13,10 @@ class Mesh {
     //unsigned int cores;
   public:
     Mesh (const int numVertices, const int numFaces, const int numCells, const int _numThreads);
-    void setVertices(const std::vector<std::array<float, 3>> _vertices);
+    void setVertices(const std::vector<std::array<float, 3>> & _vertices);
     void addTetrahedron(const std::array<int, 4> vertexIds, 
 	const std::vector<int> neighborIds, const float weight);
+    bool setTarget(const std::array<float, 3> _target);
     //std::vector<Vertex3d *> Vertices();
 };
 
@@ -39,8 +40,8 @@ class Tetrahedron {
     std::array<Vertex3d *, 4> vertices;
     std::vector<Tetrahedron *> neighbors;
     std::vector<int> threads;
-    std::array<float, 3> circumsphereCenter;
-    float circumsphereRadius;
+    std::array<float, 3> sphereCenter;
+    float sphereRadius;
     float weight;
   public:
     Tetrahedron (const std::array<Vertex3d *, 4> _vertices, const float 	  _weight, const int numThreads);
