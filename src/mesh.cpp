@@ -23,54 +23,40 @@ bool Mesh::setTarget(std::array<float, 3> _target){
 	if (tetrahedrons[i]->contains(_target)){
 	    target=_target;
 	    targetTet=tetrahedrons[i];
-	    std::cout << "tetrahedron: " << std::endl;
-	    std::cout << i << std::endl;
 	    return true;
 	}
-	//std::array<float, 3> centroid = tetrahedrons[i]->SphereCenter();
-	//float radius = tetrahedrons.at(i)->Radius();
-	//check equal to radius maybe?
-	//if (sqrt( std::pow(_target[0] - centroid[0], 2) + std::pow(_target[1] - centroid[1], 2) + std::pow(_target[2] - centroid[2], 2)) < radius){
-	    
-	    //check if target inside tetrahedron
-
-	//}
     }
     return false;
 }
 
 void Mesh::setVertices(const std::vector<std::array<float, 3>> & _vertices){
-    std::cout << "here" << std::endl;
+
     for(int i=0; i < _vertices.size(); i++){
 	Vertex3d* pt = new Vertex3d(_vertices[i]);
 	
 	vertices.push_back(pt);
-	//std::cout << pt << std::endl;
+
     }
 
 }
 
 
 
-void Mesh::addTetrahedron(const std::array<int, 4> vertexIds, 
+void Mesh::addTetrahedron(const int id, const std::array<int, 4> vertexIds, 
 	const std::vector<int> neighborIds, const float weight){
 
     std::array<Vertex3d *, 4> tet_vertices;
     for(int i=0; i<4; i++){
 	tet_vertices[i] = vertices[vertexIds[i]];
-	//std::cout << vertexIds[i] << std::endl;
-	//std::cout << vertices.at(vertexIds[i]) << std::endl;
     }
 
-    Tetrahedron* tet = new Tetrahedron(tet_vertices, weight, numThreads);
-    //std::cout << tet << std::endl;
+    Tetrahedron* tet = new Tetrahedron(id, tet_vertices, weight, numThreads);
     tetrahedrons.push_back(tet);
 
     int current_size = tetrahedrons.size();
 
     for(auto const& value: neighborIds){
 	if (value < current_size) {
-	    //std::cout << value << std::endl;
 	    Tetrahedron * neighbor = tetrahedrons[value];
 	    neighbor->addNeighbor(tet);
 	    tet->addNeighbor(neighbor);
@@ -80,16 +66,13 @@ void Mesh::addTetrahedron(const std::array<int, 4> vertexIds,
 
 
 
-Tetrahedron::Tetrahedron(const std::array<Vertex3d *, 4> _vertices, const float 	_weight, const int numThreads){
+Tetrahedron::Tetrahedron(const int _id, const std::array<Vertex3d *, 4> _vertices, const float 	_weight, const int numThreads){
+    id = _id;
     vertices = _vertices;
     weight = _weight;
 
     std::array<float, 3> faceCentroid = {(vertices[0]->Vec()[0] + vertices[1]->Vec()[0] + vertices[2]->Vec()[0]) / 3, (vertices[0]->Vec()[1] + vertices[1]->Vec()[1] + vertices[2]->Vec()[1]) / 3, (vertices[0]->Vec()[2] + vertices[1]->Vec()[2] + vertices[2]->Vec()[2]) / 3};
 
- 
-    ///std::array<float, 3> pt0 = vertices[0]->Vec();
-    //std::array<float, 3> pt1 = vertices[1]->Vec();
-    //std::array<float, 3> pt2 = vertices[2]->Vec();
     std::array<float, 3> pt3 = vertices[3]->Vec();
 
     sphereCenter = { (3 * faceCentroid[0] + pt3[0])/4, (3 * faceCentroid[1] + pt3[1])/4, (3 * faceCentroid[2] + pt3[2])/4};
@@ -104,20 +87,6 @@ Tetrahedron::Tetrahedron(const std::array<Vertex3d *, 4> _vertices, const float 
     }
 
     sphereRadius = r;
-
-
-    /*std::cout << "sphereCenter:\n" << std::endl;
-    std::cout << sphereCenter[0] << std::endl;
-    std::cout << sphereCenter[1] << std::endl;
-    std::cout << sphereCenter[2] << std::endl;
-
-    std::cout << "sphereRadius:\n" << std::endl;
-    std::cout << sphereRadius << std::endl;*/
-
-
-    
-
-    //std::cout << vertices[0]->Vec()[0] << std::endl;
    
 }
 
@@ -179,17 +148,21 @@ void Tetrahedron::addNeighbor(Tetrahedron * neighbor){
     neighbors.push_back(neighbor);
 }
 
+int Mesh::getTargetTetId(){
+    return targetTet->getId();
+}
+
+int Tetrahedron::getId(){
+    return id;
+}
 
 Vertex3d::Vertex3d(const std::array<float, 3> _vec) {
     vec = _vec;
-    //std::cout << vec[0] << std::endl;
-    //std::cout << vec[1] << std::endl;
-    //std::cout << vec[2] << std::endl;
 }
 
 
 std::array<float, 3> Vertex3d::Vec(){
-    //std::cout << "this happens" << std::endl;
+
     return vec;
 }
 

@@ -13,9 +13,11 @@ PYBIND11_MODULE(pathfinder, m){
 	py::arg("num_threads"))
     .def("set_vertices", &Mesh::setVertices)
     .def("add_tetrahedron", &Mesh::addTetrahedron,
+	py::arg("tetrahedron_id"),
 	py::arg("vertex_ids"),
 	py::arg("neighbor_ids"),
 	py::arg("weight"))
-    .def("set_target", &Mesh::setTarget);
+    .def("set_target", &Mesh::setTarget)
+    .def("get_target_idx", &Mesh::getTargetTetId);
 
 }

@@ -16,8 +16,10 @@ class Mesh {
   public:
     Mesh (const int numVertices, const int numFaces, const int numCells, const int _numThreads);
     void setVertices(const std::vector<std::array<float, 3>> & _vertices);
-    void addTetrahedron(const std::array<int, 4> vertexIds, const std::vector<int> neighborIds, const float weight);
+    void addTetrahedron(const int id, const std::array<int, 4> vertexIds, const std::vector<int> neighborIds, const float weight);
     bool setTarget(const std::array<float, 3> _target);
+    //this function is used for testing; it is unlikely that it will be useful in python code
+    int getTargetTetId();
     //std::vector<Vertex3d *> Vertices();
 };
 
@@ -39,6 +41,7 @@ class Face {
 };*/
 
 class Tetrahedron {
+    int id;
     std::array<Vertex3d *, 4> vertices;
     std::vector<Tetrahedron *> neighbors;
     std::vector<int> threads;
@@ -46,7 +49,8 @@ class Tetrahedron {
     float sphereRadius;
     float weight;
   public:
-    Tetrahedron (const std::array<Vertex3d *, 4> _vertices, const float 	  _weight, const int numThreads);
+    Tetrahedron (const int id, const std::array<Vertex3d *, 4> _vertices, const float 	  _weight, const int numThreads);
     void addNeighbor(Tetrahedron * neighbor);
     bool contains(const std::array<float, 3>);
+    int getId();
 };
