@@ -23,6 +23,8 @@ bool Mesh::setTarget(std::array<float, 3> _target){
 	if (tetrahedrons[i]->contains(_target)){
 	    target=_target;
 	    targetTet=tetrahedrons[i];
+	    std::cout << "tetrahedron: " << std::endl;
+	    std::cout << i << std::endl;
 	    return true;
 	}
 	//std::array<float, 3> centroid = tetrahedrons[i]->SphereCenter();
@@ -43,7 +45,7 @@ void Mesh::setVertices(const std::vector<std::array<float, 3>> & _vertices){
 	Vertex3d* pt = new Vertex3d(_vertices[i]);
 	
 	vertices.push_back(pt);
-	std::cout << pt << std::endl;
+	//std::cout << pt << std::endl;
     }
 
 }
@@ -104,13 +106,13 @@ Tetrahedron::Tetrahedron(const std::array<Vertex3d *, 4> _vertices, const float 
     sphereRadius = r;
 
 
-    std::cout << "sphereCenter:\n" << std::endl;
+    /*std::cout << "sphereCenter:\n" << std::endl;
     std::cout << sphereCenter[0] << std::endl;
     std::cout << sphereCenter[1] << std::endl;
     std::cout << sphereCenter[2] << std::endl;
 
     std::cout << "sphereRadius:\n" << std::endl;
-    std::cout << sphereRadius << std::endl;
+    std::cout << sphereRadius << std::endl;*/
 
 
     
