@@ -120,13 +120,19 @@ bool intersectsVertices(Plane3d plane, std::vector<Vertex3d *> vertices){
 	dotProducts[i] = diffVec.dot(plane.getNormal());
     }*/
 
-    for(int i=0; i < vertices.size(); i++){
+    /*for(int i=0; i < vertices.size(); i++){
 	int next = i+1;
 	if(next==vertices.size()){
 	    next = 0;
 	}
 	//if(dotProducts[i] * dotProducts[next] < 0){
 	if(plane.intersects(vertices[i]->Vec(), vertices[next]->Vec())){ 
+	    return true;
+	}
+    }*/
+    for(int i=0; i<vertices.size(); i++){
+	for(int j=i+1; j<vertices.size(); j++){
+	     if(plane.intersects(vertices[i]->Vec(), vertices[next]->Vec())){ 
 	    return true;
 	}
     }
