@@ -1,5 +1,10 @@
 #include <array>
 #include <vector>
+#include "plane3d.hpp"
+#include <Eigen/Dense>
+
+using namespace Eigen;
+//using namespace plane3d;
 
 class Vertex3d;
 class Face;
@@ -20,6 +25,8 @@ class Mesh {
     bool setTarget(const std::array<float, 3> _target);
     //this function is used for testing; it is unlikely that it will be useful in python code
     int getTargetTetId();
+    //std::vector<std::array<float, 3>> getIntersectionWith(float alpha, float theta);s
+    void addFace(const std::array<int, 3> vertexIds, const int tetId);
     //std::vector<Vertex3d *> Vertices();
 };
 
@@ -32,13 +39,14 @@ class Vertex3d {
     std::array<float, 3> Vec();
 };
 
-/*
+
 class Face {
     std::array<Vertex3d *, 3> vertices;
     Tetrahedron * tetrahedron;
   public:
-    Face ();
-};*/
+    Face (std::array<Vertex3d *, 3> _vertices, Tetrahedron * tetrahdron);
+    bool intersects(Plane3d plane, Vector3f target);
+};
 
 class Tetrahedron {
     int id;

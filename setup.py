@@ -24,6 +24,7 @@ ext_modules = [
     Extension(
         'pathfinder',
         ['src/mesh.cpp',
+	 'src/plane3d.cpp',
 	 'src/bindings.cpp'],
         include_dirs=[
             # Path to pybind11 headers

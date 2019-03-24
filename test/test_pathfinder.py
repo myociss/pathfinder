@@ -9,7 +9,8 @@ class TestGraph(TestCase):
             self.test_mesh = json.load(mesh_file)
     
     def test_target_set(self):
-        #print(self.mesh['vertices'])
+        # should probably also include a test for a point that definitely lies in more than one sphere
+
         mesh = pathfinder.Mesh(num_vertices=len(self.test_mesh['vertices']), num_faces=len(self.test_mesh['faces']), num_tetrahedrons=len(self.test_mesh['tetrahedrons']), num_threads=8)
 
         mesh.set_vertices(self.test_mesh['vertices'])

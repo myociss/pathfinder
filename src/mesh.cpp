@@ -1,4 +1,5 @@
 #include "mesh.hpp"
+#include "plane3d.hpp"
 #include <iostream>
 #include <map>
 #include <string>
@@ -8,6 +9,7 @@
 #include <Eigen/Dense>
 
 using namespace Eigen;
+//using namespace plane3d;
 
 Mesh::Mesh(const int numVertices, const int numFaces, const int numCells, const int _numThreads){
     vertices.reserve(numVertices);
@@ -29,6 +31,14 @@ bool Mesh::setTarget(std::array<float, 3> _target){
     return false;
 }
 
+//std::vector<std::array<float, 3>> Mesh::getIntersectionWith(float alpha, float theta){
+//    Plane3d plane3d(alpha, theta);
+
+    //for(int i=0; i < faces.size(); i++){
+	//if face intersects plane
+	
+//}
+
 void Mesh::setVertices(const std::vector<std::array<float, 3>> & _vertices){
 
     for(int i=0; i < _vertices.size(); i++){
@@ -40,7 +50,15 @@ void Mesh::setVertices(const std::vector<std::array<float, 3>> & _vertices){
 
 }
 
-
+void Mesh::addFace(const std::array<int, 3> vertexIds, const int tetId){
+    std::array<Vertex3d *, 3> face_vertices;
+    for(int i=0; i<3; i++){
+	face_vertices[i] = vertices[vertexIds[i]];
+    }
+    Face* face = new Face(face_vertices, tetrahedrons[tetId]);
+    faces.push_back(face);
+}
+    
 
 void Mesh::addTetrahedron(const int id, const std::array<int, 4> vertexIds, 
 	const std::vector<int> neighborIds, const float weight){
@@ -63,6 +81,35 @@ void Mesh::addTetrahedron(const int id, const std::array<int, 4> vertexIds,
 	}
     }
 }
+
+Face::Face(const std::array<Vertex3d *, 3> _vertices, Tetrahedron * _tetrahedron){
+    vertices=_vertices;
+    tetrahedron=_tetrahedron;
+}
+
+bool Face::intersects(Plane3d plane, Vector3f target){
+    std::array<float, 3> dotProducts;
+    for(int i=0; i < 3; i++){
+	std::array<float, 3> pt = vertices[i]->Vec();
+	Vector3f v0;
+	v0 << pt[0], pt[1], pt[2];
+	Vector3f diffVec = v0 - target;
+	 
+	dotProducts[i] = diffVec.dot(plane.getNormal());
+    }
+
+    for(int i=0; i < 3; i++){
+	int next = i+1;
+	if(next==3){
+	    next = 0;
+	}
+	if(dotProducts[i] * dotProducts[next] < 0){
+	    return true;
+	}
+    }
+    return false;
+}
+
 
 
 
