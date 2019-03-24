@@ -23,7 +23,8 @@ bool Mesh::setTarget(std::array<float, 3> _target){
 
     for(int i=0; i < tetrahedrons.size(); i++){
 	if (tetrahedrons[i]->contains(_target)){
-	    target=_target;
+	    Vector3f t(_target[0], _target[1], _target[2]);
+	    target = t;
 	    targetTet=tetrahedrons[i];
 	    return true;
 	}
@@ -82,9 +83,26 @@ void Mesh::addTetrahedron(const int id, const std::array<int, 4> vertexIds,
     }
 }
 
+std::vector<Tetrahedron *> Mesh::findIntersectingFaces(float alpha, float theta){
+    std::vector<Tetrahedron *> intersectingFaces;
+    Plane3d plane(alpha, theta);
+
+    for(int i=0; i<faces.size(); i++){
+	if(faces[i]->intersects(plane, target)){
+	    intersectingFaces.push_back(faces[i]->getTetrahedron());
+	}
+    }
+    intersectingFaces.push_back(targetTet);
+    return intersectingFaces;
+}
+
 Face::Face(const std::array<Vertex3d *, 3> _vertices, Tetrahedron * _tetrahedron){
     vertices=_vertices;
     tetrahedron=_tetrahedron;
+}
+
+Tetrahedron* Face::getTetrahedron(){
+    return tetrahedron;
 }
 
 bool Face::intersects(Plane3d plane, Vector3f target){

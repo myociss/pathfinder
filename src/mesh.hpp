@@ -15,23 +15,21 @@ class Mesh {
     std::vector<Face *> faces;
     std::vector<Tetrahedron *> tetrahedrons;
     int numThreads;
-    std::array<float, 3> target;
+    Vector3f target;
     Tetrahedron * targetTet;
-    //unsigned int cores;
   public:
     Mesh (const int numVertices, const int numFaces, const int numCells, const int _numThreads);
     void setVertices(const std::vector<std::array<float, 3>> & _vertices);
     void addTetrahedron(const int id, const std::array<int, 4> vertexIds, const std::vector<int> neighborIds, const float weight);
     bool setTarget(const std::array<float, 3> _target);
-    //this function is used for testing; it is unlikely that it will be useful in python code
-    int getTargetTetId();
-    //std::vector<std::array<float, 3>> getIntersectionWith(float alpha, float theta);s
     void addFace(const std::array<int, 3> vertexIds, const int tetId);
-    //std::vector<Vertex3d *> Vertices();
+    std::vector<Tetrahedron *> findIntersectingFaces(float alpha, float theta);
+
+    //these functions are primarily exposed to Python for testing
+    int getTargetTetId();
 };
 
 class Vertex3d {
-    //float x, y, z;
     std::array<float, 3> vec;
     std::vector<Tetrahedron *> tetrahedrons;
   public:
@@ -46,6 +44,7 @@ class Face {
   public:
     Face (std::array<Vertex3d *, 3> _vertices, Tetrahedron * tetrahdron);
     bool intersects(Plane3d plane, Vector3f target);
+    Tetrahedron* getTetrahedron();
 };
 
 class Tetrahedron {
