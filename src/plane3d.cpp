@@ -4,7 +4,7 @@
 
 using namespace Eigen;
 
-Plane3d::Plane3d(float alpha, float theta){
+Plane3d::Plane3d(float alpha, float theta, Vector3f _target){
     Vector3f u0(1, 0, 0);
     Vector3f v0(0, cos(alpha), sin(alpha));
     Vector3f w0(0, -sin(alpha), cos(alpha));
@@ -24,12 +24,25 @@ Plane3d::Plane3d(float alpha, float theta){
 		 w1[0], w1[1], w1[2];
 
     rotation = rotationX * rotationY;
+    target = _target;
+
+    //normalDist = target.dot(getNormal());
 
     //axisX = totalRotation[0];
     //axisY = totalRotation[1];
     //normal = totalRotation[2];
 
     //rotationInverse = totalRotation.inverse();
+}
+
+bool Plane3d::intersects(Vector3f v0, Vector3f v1){
+    Vector3f diffVec0 = v0 - target;
+    float dotProduct0 = diffVec0.dot(getNormal());
+
+    Vector3f diffVec1 = v1 - target;	 
+    float dotProduct1 = diffVec1.dot(getNormal());
+
+    return dotProduct0 * dotProduct1 < 0;
 }
 
 Vector3f Plane3d::getNormal(){

@@ -85,10 +85,10 @@ void Mesh::addTetrahedron(const int id, const std::array<int, 4> vertexIds,
 
 std::vector<Tetrahedron *> Mesh::findIntersectingFaces(float alpha, float theta){
     std::vector<Tetrahedron *> intersectingFaces;
-    Plane3d plane(alpha, theta);
+    Plane3d plane(alpha, theta, target);
 
     for(int i=0; i<faces.size(); i++){
-	if(faces[i]->intersects(plane, target)){
+	if(intersectsVertices(plane, faces[i]->Vertices())){
 	    intersectingFaces.push_back(faces[i]->getTetrahedron());
 	}
     }
@@ -97,7 +97,10 @@ std::vector<Tetrahedron *> Mesh::findIntersectingFaces(float alpha, float theta)
 }
 
 Face::Face(const std::array<Vertex3d *, 3> _vertices, Tetrahedron * _tetrahedron){
-    vertices=_vertices;
+    vertices.reserve(3);
+    for(int i=0; i<3; i++){
+	vertices[i]=_vertices[i];
+    }
     tetrahedron=_tetrahedron;
 }
 
@@ -105,40 +108,47 @@ Tetrahedron* Face::getTetrahedron(){
     return tetrahedron;
 }
 
-bool Face::intersects(Plane3d plane, Vector3f target){
-    std::array<float, 3> dotProducts;
+bool intersectsVertices(Plane3d plane, std::vector<Vertex3d *> vertices){
+
+    /*std::array<float, 3> dotProducts;
     for(int i=0; i < 3; i++){
 	std::array<float, 3> pt = vertices[i]->Vec();
 	Vector3f v0;
 	v0 << pt[0], pt[1], pt[2];
-	Vector3f diffVec = v0 - target;
+	Vector3f diffVec = v0 - plane.getTarget();
 	 
 	dotProducts[i] = diffVec.dot(plane.getNormal());
-    }
+    }*/
 
-    for(int i=0; i < 3; i++){
+    for(int i=0; i < vertices.size(); i++){
 	int next = i+1;
-	if(next==3){
+	if(next==vertices.size()){
 	    next = 0;
 	}
-	if(dotProducts[i] * dotProducts[next] < 0){
+	//if(dotProducts[i] * dotProducts[next] < 0){
+	if(plane.intersects(vertices[i]->Vec(), vertices[next]->Vec())){ 
 	    return true;
 	}
     }
     return false;
 }
 
-
+std::vector<Vertex3d *> Face::Vertices(){
+    return vertices;
+}
 
 
 Tetrahedron::Tetrahedron(const int _id, const std::array<Vertex3d *, 4> _vertices, const float 	_weight, const int numThreads){
+    vertices.reserve(4);
     id = _id;
-    vertices = _vertices;
+    for(int i=0; i<4;i++){
+	vertices[i] = _vertices[i];
+    }
     weight = _weight;
 
     std::array<float, 3> faceCentroid = {(vertices[0]->Vec()[0] + vertices[1]->Vec()[0] + vertices[2]->Vec()[0]) / 3, (vertices[0]->Vec()[1] + vertices[1]->Vec()[1] + vertices[2]->Vec()[1]) / 3, (vertices[0]->Vec()[2] + vertices[1]->Vec()[2] + vertices[2]->Vec()[2]) / 3};
 
-    std::array<float, 3> pt3 = vertices[3]->Vec();
+    Vector3f pt3 = vertices[3]->Vec();
 
     sphereCenter = { (3 * faceCentroid[0] + pt3[0])/4, (3 * faceCentroid[1] + pt3[1])/4, (3 * faceCentroid[2] + pt3[2])/4};
 
@@ -158,10 +168,10 @@ Tetrahedron::Tetrahedron(const int _id, const std::array<Vertex3d *, 4> _vertice
 bool Tetrahedron::contains(const std::array<float, 3> pt_target){
     if (sqrt( std::pow(pt_target[0] - sphereCenter[0], 2) + std::pow(pt_target[1] - sphereCenter[1], 2) + std::pow(pt_target[2] - sphereCenter[2], 2)) < sphereRadius){
 
-	std::array<float, 3> pt0 = {(vertices[0])->Vec()};
-	std::array<float, 3> pt1 = {(vertices[1])->Vec()};
-	std::array<float, 3> pt2 = {(vertices[2])->Vec()};
-	std::array<float, 3> pt3 = {(vertices[3])->Vec()};
+	Vector3f pt0 = {(vertices[0])->Vec()};
+	Vector3f pt1 = {(vertices[1])->Vec()};
+	Vector3f pt2 = {(vertices[2])->Vec()};
+	Vector3f pt3 = {(vertices[3])->Vec()};
 
 	Matrix4f m0;
 	Matrix4f m1;
@@ -222,11 +232,13 @@ int Tetrahedron::getId(){
 }
 
 Vertex3d::Vertex3d(const std::array<float, 3> _vec) {
-    vec = _vec;
+    //Vertex3f vec;
+    //vec = _vec;
+    vec << _vec[0], _vec[1], _vec[2];
 }
 
 
-std::array<float, 3> Vertex3d::Vec(){
+Vector3f Vertex3d::Vec(){
 
     return vec;
 }

@@ -10,6 +10,8 @@ class Vertex3d;
 class Face;
 class Tetrahedron;
 
+bool intersectsVertices(Plane3d plane, std::vector<Vertex3d *> vertices);
+
 class Mesh {
     std::vector<Vertex3d *> vertices;
     std::vector<Face *> faces;
@@ -30,26 +32,27 @@ class Mesh {
 };
 
 class Vertex3d {
-    std::array<float, 3> vec;
+    Vector3f vec;
     std::vector<Tetrahedron *> tetrahedrons;
   public:
     Vertex3d (std::array<float, 3>);
-    std::array<float, 3> Vec();
+    Vector3f Vec();
 };
 
 
 class Face {
-    std::array<Vertex3d *, 3> vertices;
+    std::vector<Vertex3d *> vertices;
     Tetrahedron * tetrahedron;
   public:
     Face (std::array<Vertex3d *, 3> _vertices, Tetrahedron * tetrahdron);
-    bool intersects(Plane3d plane, Vector3f target);
+    //bool intersects(Plane3d plane, Vector3f target);
+    std::vector<Vertex3d *> Vertices();
     Tetrahedron* getTetrahedron();
 };
 
 class Tetrahedron {
     int id;
-    std::array<Vertex3d *, 4> vertices;
+    std::vector<Vertex3d *> vertices;
     std::vector<Tetrahedron *> neighbors;
     std::vector<int> threads;
     std::array<float, 3> sphereCenter;
