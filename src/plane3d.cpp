@@ -23,7 +23,7 @@ Plane3d::Plane3d(float alpha, float theta, Vector3f _target){
 		 v1[0], v1[1], v1[2],
 		 w1[0], w1[1], w1[2];
 
-    //rotation = rotationX * rotationY;
+    Matrix3f rotation = rotationX * rotationY;
     axisX = Vector3f(rotation.row(0)[0], rotation.row(0)[2], rotation.row(0)[2]);
     axisY = Vector3f(rotation.row(1)[0], rotation.row(1)[2], rotation.row(1)[2]);
     normal = Vector3f(rotation.row(2)[0], rotation.row(2)[2], rotation.row(2)[2]);
@@ -40,10 +40,10 @@ Plane3d::Plane3d(float alpha, float theta, Vector3f _target){
 
 bool Plane3d::intersects(Vector3f v0, Vector3f v1){
     Vector3f diffVec0 = v0 - target;
-    float dotProduct0 = diffVec0.dot(getNormal());
+    float dotProduct0 = diffVec0.dot(normal);
 
     Vector3f diffVec1 = v1 - target;	 
-    float dotProduct1 = diffVec1.dot(getNormal());
+    float dotProduct1 = diffVec1.dot(normal);
 
     return dotProduct0 * dotProduct1 < 0;
 }

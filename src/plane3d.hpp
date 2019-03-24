@@ -18,8 +18,7 @@ class Plane3d {
     //float normalDist;
   public:
     Plane3d (float alpha, float theta, Vector3f _target);
-    //Vector3f getNormal();
-    //Vector3f getTarget();
     bool intersects(Vector3f v0, Vector3f v1);
+    std::array<float, 3> findIntersection(Vector3f v0, Vector3f v1);
 };
 #endif

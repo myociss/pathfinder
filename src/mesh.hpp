@@ -25,7 +25,7 @@ class Mesh {
     void addTetrahedron(const int id, const std::array<int, 4> vertexIds, const std::vector<int> neighborIds, const float weight);
     bool setTarget(const std::array<float, 3> _target);
     void addFace(const std::array<int, 3> vertexIds, const int tetId);
-    std::vector<Tetrahedron *> findIntersectingFaces(float alpha, float theta);
+    std::vector<Tetrahedron *> findIntersectingOuterTets(float alpha, float theta);
 
     //these functions are primarily exposed to Python for testing
     int getTargetTetId();
