@@ -57,6 +57,8 @@ std::array<float, 3> Plane3d::findIntersection(Vector3f v0, Vector3f v1){
 
     Vector3f coords3d(v1[0] + (N/D) * u[0], v1[1] + (N/D) * u[1], v1[2] + (N/D) * u[2]);
 
+    //return coords3d;
+
     Vector3f dist = coords3d-target;
     float x2d = dist.dot(axisX);
     float y2d = dist.dot(axisY);
