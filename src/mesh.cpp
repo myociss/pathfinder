@@ -134,12 +134,8 @@ std::vector<std::vector<std::array<float, 3>>> Mesh::slice(float alpha, float th
 
 std::vector<Tetrahedron *> Mesh::findIntersectingOuterTets(Plane3d plane){
     std::vector<Tetrahedron *> intersectingTets;
-    //Plane3d plane(alpha, theta, target);
 
     for(int i=0; i<faces.size(); i++){
-	//if(intersectsVertices(plane, faces[i]->Vertices())){
-	//    intersectingTets.push_back(faces[i]->getTetrahedron());
-	//}
 	std::vector<Vertex3d *> vertices = faces[i]->Vertices();
 	Vector3f v0 = vertices[0]->Vec();
 	Vector3f v1 = vertices[1]->Vec();
@@ -151,38 +147,6 @@ std::vector<Tetrahedron *> Mesh::findIntersectingOuterTets(Plane3d plane){
     }
     intersectingTets.push_back(targetTet);
     return intersectingTets;
-}
-
-bool intersectsVertices(Plane3d plane, std::vector<Vertex3d *> vertices){
-
-    /*std::array<float, 3> dotProducts;
-    for(int i=0; i < 3; i++){
-	std::array<float, 3> pt = vertices[i]->Vec();
-	Vector3f v0;
-	v0 << pt[0], pt[1], pt[2];
-	Vector3f diffVec = v0 - plane.getTarget();
-	 
-	dotProducts[i] = diffVec.dot(plane.getNormal());
-    }*/
-
-    /*for(int i=0; i < vertices.size(); i++){
-	int next = i+1;
-	if(next==vertices.size()){
-	    next = 0;
-	}
-	//if(dotProducts[i] * dotProducts[next] < 0){
-	if(plane.intersects(vertices[i]->Vec(), vertices[next]->Vec())){ 
-	    return true;
-	}
-    }*/
-    for(int i=0; i<vertices.size(); i++){
-	for(int j=i+1; j<vertices.size(); j++){
-	    if(plane.intersects(vertices[i]->Vec(), vertices[j]->Vec())){ 
-		return true;
-	    }
-	}
-    }
-    return false;
 }
 
 int Mesh::getTargetTetId(){

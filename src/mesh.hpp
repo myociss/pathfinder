@@ -5,13 +5,6 @@
 #include <Eigen/Dense>
 
 using namespace Eigen;
-//using namespace plane3d;
-
-//class Vertex3d;
-//class Face;
-//class Tetrahedron;
-
-bool intersectsVertices(Plane3d plane, std::vector<Vertex3d *> vertices);
 
 class Mesh {
     std::vector<Vertex3d *> vertices;
