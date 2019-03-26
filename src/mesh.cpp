@@ -87,6 +87,7 @@ std::vector<std::vector<std::array<float, 3>>> Mesh::slice(float alpha, float th
     }
 
     std::vector<Tetrahedron *> tetStack = findIntersectingOuterTets(plane);
+    std::cout << tetStack.size() << std::endl;
     std::vector<std::vector<std::array<float, 3>>> allPoints;
 
     while(tetStack.size() > 0){

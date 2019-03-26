@@ -21,6 +21,9 @@ PYBIND11_MODULE(pathfinder, m){
 	py::arg("vertex_ids"),
 	py::arg("tetrahedron_id"))
     .def("set_target", &Mesh::setTarget)
-    .def("get_target_idx", &Mesh::getTargetTetId);
+    .def("get_target_idx", &Mesh::getTargetTetId)
+    .def("slice", &Mesh::slice,
+	py::arg("alpha"),
+	py::arg("theta"));
 
 }

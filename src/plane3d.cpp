@@ -1,4 +1,5 @@
 #include <Eigen/Dense>
+#include <iostream>
 #include <math.h>
 #include "plane3d.hpp"
 
@@ -14,6 +15,7 @@ Plane3d::Plane3d(float alpha, float theta, Vector3f _target){
 		 v0[0], v0[1], v0[2],
 		 w0[0], w0[1], w0[2];
 
+
     Vector3f u1(cos(theta), 0, sin(theta));
     Vector3f v1(0, 1, 0);
     Vector3f w1(-sin(theta), 0, cos(theta));
@@ -23,7 +25,9 @@ Plane3d::Plane3d(float alpha, float theta, Vector3f _target){
 		 v1[0], v1[1], v1[2],
 		 w1[0], w1[1], w1[2];
 
+
     Matrix3f rotation = rotationX * rotationY;
+
     axisX = Vector3f(rotation.row(0)[0], rotation.row(0)[2], rotation.row(0)[2]);
     axisY = Vector3f(rotation.row(1)[0], rotation.row(1)[2], rotation.row(1)[2]);
     normal = Vector3f(rotation.row(2)[0], rotation.row(2)[2], rotation.row(2)[2]);
@@ -52,12 +56,12 @@ bool Plane3d::containsEdge(Vector3f v0, Vector3f v1){
 
 std::array<float, 3> Plane3d::findIntersection(Vector3f v0, Vector3f v1){
     Vector3f w = v0 - target;
-    Vector3f u = v1 - target;
+    Vector3f u = v1 - v0;
 
     float N = -normal.dot(w);
     float D = normal.dot(u);
 
-    std::array<float, 3> coords3d = {v1[0] + (N/D) * u[0], v1[1] + (N/D) * u[1], v1[2] + (N/D) * u[2]};
+    std::array<float, 3> coords3d = {v0[0] + (N/D) * u[0], v0[1] + (N/D) * u[1], v0[2] + (N/D) * u[2]};
 
     return coords3d;
 
