@@ -32,14 +32,6 @@ bool Mesh::setTarget(std::array<float, 3> _target){
     return false;
 }
 
-//std::vector<std::array<float, 3>> Mesh::getIntersectionWith(float alpha, float theta){
-//    Plane3d plane3d(alpha, theta);
-
-    //for(int i=0; i < faces.size(); i++){
-	//if face intersects plane
-	
-//}
-
 void Mesh::setVertices(const std::vector<std::array<float, 3>> & _vertices){
 
     for(int i=0; i < _vertices.size(); i++){
@@ -100,23 +92,10 @@ std::vector<std::vector<std::array<float, 3>>> Mesh::slice(float alpha, float th
     while(tetStack.size() > 0){
 	Tetrahedron* tet = tetStack.back();
 	tetStack.pop_back();
-
-	std::vector<std::array<float, 3>> intersectionPoints;
 	
 	if(!tetsChecked[tet->getId()]){
-	    std::vector<Vertex3d *> tetVertices = tet->Vertices();
 
-	    for(int i=0; i<4; i++){
-		for(int j=i+1; j<4; j++){
-		    Vector3f v0 = tetVertices[i]->Vec();
-		    Vector3f v1 = tetVertices[j]->Vec();
-		    if(plane.intersects(v0, v1)){
-			intersectionPoints.push_back(plane.findIntersection(v0,v1));
-		    }
-		}
-	    }
-	    //need to switch indices 2 and 3 if length==4
-	    //this part should probably be member of tet class
+	    std::vector<std::array<float, 3>> intersectionPoints = tet->intersectsPlane(plane);
 
 	    if(intersectionPoints.size()>2){
 		allPoints.push_back(intersectionPoints);

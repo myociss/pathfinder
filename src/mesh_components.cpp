@@ -1,4 +1,5 @@
 #include "mesh_components.hpp"
+#include "plane3d.hpp"
 #include <vector>
 #include <array>
 #include <Eigen/Dense>
@@ -84,6 +85,34 @@ bool Tetrahedron::contains(const std::array<float, 3> pt_target){
 	return (d0<0 && d1<0 && d2<0 && d3<0 && d4<0) || (d0>0 && d1>0 && d2>0 && d3>0 && d4>0);
     }
     return false;
+}
+
+std::vector<std::array<float, 3>> Tetrahedron::intersectsPlane(Plane3d plane){
+    std::vector<std::array<float, 3>> intersectionPoints;
+
+    for(int i=0; i<4; i++){
+	for(int j=i+1; j<4; j++){
+	    Vector3f v0 = vertices[i]->Vec();
+	    Vector3f v1 = vertices[j]->Vec();
+	    if(plane.containsEdge(v0, v1)){
+		std::array<float, 3> v0Pt = {v0[0], v0[1], v0[2]};
+		std::array<float, 3> v1Pt = {v1[0], v1[1], v1[2]};
+		intersectionPoints.push_back(v0Pt);
+		intersectionPoints.push_back(v1Pt);
+	    } else{
+	        if(plane.intersects(v0, v1)){
+		    intersectionPoints.push_back(plane.findIntersection(v0,v1));
+		}
+	    }
+	}
+    }
+
+    if(intersectionPoints.size()==4){
+	intersectionPoints = {intersectionPoints[0], intersectionPoints[1], intersectionPoints[3], intersectionPoints[2]};
+    }
+
+    return intersectionPoints;
+
 }
 
 void Tetrahedron::addNeighbor(Tetrahedron * neighbor){

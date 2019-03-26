@@ -19,6 +19,7 @@ class Plane3d {
   public:
     Plane3d (float alpha, float theta, Vector3f _target);
     bool intersects(Vector3f v0, Vector3f v1);
+    bool containsEdge(Vector3f v0, Vector3f v1);
     std::array<float, 3> findIntersection(Vector3f v0, Vector3f v1);
 };
 #endif

@@ -1,6 +1,7 @@
 #include <Eigen/Dense>
 #include <vector>
 #include <array>
+#include "plane3d.hpp"
 
 using namespace Eigen;
 
@@ -29,6 +30,7 @@ class Tetrahedron {
     void addNeighbor(Tetrahedron * neighbor);
     std::vector<Vertex3d *> Vertices();
     std::vector<Tetrahedron *> getNeighbors();
+    std::vector<std::array<float, 3>> intersectsPlane(Plane3d plane);
     bool contains(const std::array<float, 3>);
     int getId();
 };
