@@ -66,29 +66,36 @@ void Mesh::addTetrahedron(const int id, const std::array<int, 4> vertexIds,
 
     int current_size = tetrahedrons.size();
 
-    for(auto const& value: neighborIds){
+    for(int i=0; i<neighborIds.size(); i++){
+	if(neighborIds[i]<current_size){
+	    Tetrahedron* neighbor = tetrahedrons[neighborIds[i]];
+	    neighbor->addNeighbor(tet);
+	    tet->addNeighbor(neighbor);
+	}
+    }
+
+    /*for(auto const& value: neighborIds){
 	if (value < current_size) {
 	    Tetrahedron * neighbor = tetrahedrons[value];
 	    neighbor->addNeighbor(tet);
 	    tet->addNeighbor(neighbor);
 	}
-    }
+    }*/
 }
 
 //this and the concurrent generation for the algorithm will be very similar
 
 std::vector<std::vector<std::array<float, 3>>> Mesh::slice(float alpha, float theta){
     Plane3d plane(alpha, theta, target);
+    std::vector<Tetrahedron *> tetStack = findIntersectingOuterTets(plane);
+    
     std::vector<bool> tetsChecked;
-
+    std::vector<std::vector<std::array<float, 3>>> allPoints;
     for(int i=0; i<tetrahedrons.size(); i++){
-	//tetsChecked[i]=false;
 	tetsChecked.push_back(false);
     }
 
-    std::vector<Tetrahedron *> tetStack = findIntersectingOuterTets(plane);
-    std::cout << tetStack.size() << std::endl;
-    std::vector<std::vector<std::array<float, 3>>> allPoints;
+    sliceIds.clear();
 
     while(tetStack.size() > 0){
 	Tetrahedron* tet = tetStack.back();
@@ -99,8 +106,10 @@ std::vector<std::vector<std::array<float, 3>>> Mesh::slice(float alpha, float th
 	    std::vector<std::array<float, 3>> intersectionPoints = tet->intersectsPlane(plane);
 
 	    if(intersectionPoints.size()>2){
+		sliceIds.push_back(tet->getId());
 		allPoints.push_back(intersectionPoints);
 		std::vector<Tetrahedron *> neighbors = tet->getNeighbors();
+
 		for(int i=0; i<neighbors.size();i++){
 		    tetStack.push_back(neighbors[i]);
 		}
@@ -109,17 +118,27 @@ std::vector<std::vector<std::array<float, 3>>> Mesh::slice(float alpha, float th
 	    tetsChecked[tet->getId()]=true;
 	}
     }
+
     return allPoints;
+}
+
+std::vector<int> Mesh::getSliceIds(){
+    return sliceIds;
 }
 
 std::vector<Tetrahedron *> Mesh::findIntersectingOuterTets(Plane3d plane){
     std::vector<Tetrahedron *> intersectingTets;
 
     for(int i=0; i<faces.size(); i++){
+	//this isn't working because faces are never added
 	std::vector<Vertex3d *> vertices = faces[i]->Vertices();
 	Vector3f v0 = vertices[0]->Vec();
 	Vector3f v1 = vertices[1]->Vec();
 	Vector3f v2 = vertices[2]->Vec();
+
+	std::cout << v0 << std::endl;
+	std::cout << v1 << std::endl;
+	std::cout << v2 << std::endl;
 
 	if(plane.intersects(v0, v1) || plane.intersects(v1,v2) || plane.intersects(v0,v2)){
 	    intersectingTets.push_back(faces[i]->getTetrahedron());

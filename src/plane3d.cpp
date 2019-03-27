@@ -28,9 +28,9 @@ Plane3d::Plane3d(float alpha, float theta, Vector3f _target){
 
     Matrix3f rotation = rotationX * rotationY;
 
-    axisX = Vector3f(rotation.row(0)[0], rotation.row(0)[2], rotation.row(0)[2]);
-    axisY = Vector3f(rotation.row(1)[0], rotation.row(1)[2], rotation.row(1)[2]);
-    normal = Vector3f(rotation.row(2)[0], rotation.row(2)[2], rotation.row(2)[2]);
+    axisX = Vector3f(rotation.row(0)[0], rotation.row(0)[1], rotation.row(0)[2]);
+    axisY = Vector3f(rotation.row(1)[0], rotation.row(1)[1], rotation.row(1)[2]);
+    normal = Vector3f(rotation.row(2)[0], rotation.row(2)[1], rotation.row(2)[2]);
     target = _target;
 }
 
@@ -58,7 +58,7 @@ std::array<float, 3> Plane3d::findIntersection(Vector3f v0, Vector3f v1){
     Vector3f w = v0 - target;
     Vector3f u = v1 - v0;
 
-    float N = -normal.dot(w);
+    float N = -(normal.dot(w));
     float D = normal.dot(u);
 
     std::array<float, 3> coords3d = {v0[0] + (N/D) * u[0], v0[1] + (N/D) * u[1], v0[2] + (N/D) * u[2]};

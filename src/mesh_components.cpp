@@ -100,6 +100,9 @@ std::vector<std::array<float, 3>> Tetrahedron::intersectsPlane(Plane3d plane){
 		intersectionPoints.push_back(v0Pt);
 		intersectionPoints.push_back(v1Pt);
 	    } else{
+		if(id==2){
+		    plane.intersects(v0,v1);
+		}
 	        if(plane.intersects(v0, v1)){
 		    intersectionPoints.push_back(plane.findIntersection(v0,v1));
 		}
@@ -110,6 +113,7 @@ std::vector<std::array<float, 3>> Tetrahedron::intersectsPlane(Plane3d plane){
     if(intersectionPoints.size()==4){
 	intersectionPoints = {intersectionPoints[0], intersectionPoints[1], intersectionPoints[3], intersectionPoints[2]};
     }
+
 
     return intersectionPoints;
 

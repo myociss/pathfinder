@@ -13,6 +13,8 @@ class Mesh {
     int numThreads;
     Vector3f target;
     Tetrahedron * targetTet;
+    //used for testing
+    std::vector<int> sliceIds;
   public:
     Mesh (const int numVertices, const int numFaces, const int numCells, const int _numThreads);
     void setVertices(const std::vector<std::array<float, 3>> & _vertices);
@@ -21,7 +23,8 @@ class Mesh {
     void addFace(const std::array<int, 3> vertexIds, const int tetId);
     std::vector<Tetrahedron *> findIntersectingOuterTets(Plane3d plane);
     std::vector<std::vector<std::array<float, 3>>> slice(float alpha, float theta);
-    //these functions are primarily exposed to Python for testing
+    //these functions are exposed to Python for testing purposes; while it is possible that a python application may require them, they are not required for any other purpose in this application
     int getTargetTetId();
+    std::vector<int> getSliceIds();
 };
 

@@ -26,7 +26,7 @@ class Tetrahedron {
     float sphereRadius;
     float weight;
   public:
-    Tetrahedron (const int id, const std::array<Vertex3d *, 4> _vertices, const float 	  _weight, const int numThreads);
+    Tetrahedron (const int id, const std::array<Vertex3d *, 4> _vertices, const float _weight, const int numThreads);
     void addNeighbor(Tetrahedron * neighbor);
     std::vector<Vertex3d *> Vertices();
     std::vector<Tetrahedron *> getNeighbors();

@@ -24,6 +24,7 @@ PYBIND11_MODULE(pathfinder, m){
     .def("get_target_idx", &Mesh::getTargetTetId)
     .def("slice", &Mesh::slice,
 	py::arg("alpha"),
-	py::arg("theta"));
+	py::arg("theta"))
+    .def("get_slice_ids", &Mesh::getSliceIds);
 
 }
