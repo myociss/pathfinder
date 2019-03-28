@@ -34,7 +34,7 @@ void Mesh::findPaths(const int epsilon, const int numThreads){
 
     int subarraySize = ((epsilon * epsilon) + numThreads - 1) / numThreads;
     
-    for(int i=0; i<(epsilon*epsilon); i+=subarraySize){
+    /*for(int i=0; i<(epsilon*epsilon); i+=subarraySize){
 	int end=(epsilon*epsilon);
 	if(end>(epsilon*epsilon)){
 	    end=(epsilon*epsilon);
@@ -46,16 +46,32 @@ void Mesh::findPaths(const int epsilon, const int numThreads){
 	    planeVector.push_back(planes[idx]);
 	}
 	t[i]=std::thread(&Mesh::computeManySlices, this, planeVector);
+    }*/
+    for(int i=0; i<numThreads; i++){
+	int start=i*subarraySize;
+	int end=i+subarraySize;
+	if(end>(epsilon*epsilon)){
+	    end=epsilon*epsilon;
+	}
+
+	std::vector<std::array<float, 2>> planeVector;
+
+	for(int idx=start; idx<end; idx++){
+	    planeVector.push_back(planes[idx]);
+	}
+	t[i]=std::thread(&Mesh::computeManySlices, this, planeVector);
     }
 
     for(int i=0; i<numThreads; i++){
+	std::cout << i << std::endl;
 	t[i].join();
     }
 }
 
 void Mesh::computeManySlices(std::vector<std::array<float, 2>> planeVector){
     for(int i=0; i<planeVector.size(); i++){
-	slice(planeVector[i]);
+	std::vector<std::vector<std::array<float, 3>>> ret= slice(planeVector[i]);
+	std::cout << ret.size() << std::endl;
     }
 }
 
