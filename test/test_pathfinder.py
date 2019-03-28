@@ -2,6 +2,7 @@ from unittest import TestCase
 import json
 import pathfinder
 import numpy as np
+import multiprocessing
 import math
 
 class TestGraph(TestCase):
@@ -9,7 +10,7 @@ class TestGraph(TestCase):
     def setUp(self):
         with open('fixtures/test_mesh.json', 'r') as mesh_file:
             self.test_mesh=json.load(mesh_file)
-        self.mesh=pathfinder.Mesh(num_vertices=len(self.test_mesh['vertices']), num_faces=len(self.test_mesh['faces']), num_tetrahedrons=len(self.test_mesh['tetrahedrons']), num_threads=8)
+        self.mesh=pathfinder.Mesh(num_vertices=len(self.test_mesh['vertices']), num_faces=len(self.test_mesh['faces']), num_tetrahedrons=len(self.test_mesh['tetrahedrons']))
 
         self.mesh.set_vertices(self.test_mesh['vertices'])
 
@@ -32,7 +33,7 @@ class TestGraph(TestCase):
 
         alpha=0.25
         theta=0.25
-        plane_intersection=self.mesh.slice(alpha=alpha, theta=theta)
+        plane_intersection=self.mesh.slice(rotation=[alpha,theta])
         tet_ids=self.mesh.get_slice_ids()
 
         rotation_x=np.array([[1,0,0], [0,math.cos(alpha),math.sin(alpha)], [0,-math.sin(alpha),math.cos(alpha)]])

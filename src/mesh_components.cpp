@@ -6,7 +6,7 @@
 
 using namespace Eigen;
 
-Tetrahedron::Tetrahedron(const int _id, const std::array<Vertex3d *, 4> _vertices, const float _weight, const int numThreads){
+Tetrahedron::Tetrahedron(const int _id, const std::array<Vertex3d *, 4> _vertices, const float _weight){
     vertices.reserve(4);
     id = _id;
     for(int i=0; i<4;i++){

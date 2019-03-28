@@ -21,12 +21,11 @@ class Tetrahedron {
     int id;
     std::vector<Vertex3d *> vertices;
     std::vector<Tetrahedron *> neighbors;
-    std::vector<int> threads;
     std::array<float, 3> sphereCenter;
     float sphereRadius;
     float weight;
   public:
-    Tetrahedron (const int id, const std::array<Vertex3d *, 4> _vertices, const float _weight, const int numThreads);
+    Tetrahedron (const int id, const std::array<Vertex3d *, 4> _vertices, const float _weight);
     void addNeighbor(Tetrahedron * neighbor);
     std::vector<Vertex3d *> Vertices();
     std::vector<Tetrahedron *> getNeighbors();

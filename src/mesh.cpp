@@ -1,9 +1,12 @@
+#define _USE_MATH_DEFINES
+
 #include "mesh.hpp"
 #include "plane3d.hpp"
 #include <iostream>
 #include <map>
 #include <string>
 #include <vector>
+#include <cmath>
 #include <thread>
 
 #include <Eigen/Dense>
@@ -11,12 +14,49 @@
 using namespace Eigen;
 //using namespace plane3d;
 
-Mesh::Mesh(const int numVertices, const int numFaces, const int numCells, const int _numThreads){
+Mesh::Mesh(const int numVertices, const int numFaces, const int numCells){
     vertices.reserve(numVertices);
     faces.reserve(numFaces);
     tetrahedrons.reserve(numCells);
-    numThreads = _numThreads;
+}
 
+void Mesh::findPaths(const int epsilon, const int numThreads){
+    std::thread t[numThreads];
+    std::vector<std::array<float, 2>> planes;
+    planes.reserve(epsilon*epsilon);
+
+    for(int i=0; i<epsilon; i++){
+	for(int j=0; j<epsilon; j++){
+	    //planes[epsilon*i + j]={i*M_PI/epsilon, j*M_PI/epsilon};
+	    planes.push_back({i*M_PI/epsilon, j*M_PI/epsilon});
+	}
+    }
+
+    int subarraySize = ((epsilon * epsilon) + numThreads - 1) / numThreads;
+    
+    for(int i=0; i<(epsilon*epsilon); i+=subarraySize){
+	int end=(epsilon*epsilon);
+	if(end>(epsilon*epsilon)){
+	    end=(epsilon*epsilon);
+	}
+
+	std::vector<std::array<float, 2>> planeVector;
+
+	for(int idx=i; idx<end; idx++){
+	    planeVector.push_back(planes[idx]);
+	}
+	t[i]=std::thread(&Mesh::computeManySlices, this, planeVector);
+    }
+
+    for(int i=0; i<numThreads; i++){
+	t[i].join();
+    }
+}
+
+void Mesh::computeManySlices(std::vector<std::array<float, 2>> planeVector){
+    for(int i=0; i<planeVector.size(); i++){
+	slice(planeVector[i]);
+    }
 }
 
 bool Mesh::setTarget(std::array<float, 3> _target){
@@ -61,7 +101,7 @@ void Mesh::addTetrahedron(const int id, const std::array<int, 4> vertexIds,
 	tet_vertices[i] = vertices[vertexIds[i]];
     }
 
-    Tetrahedron* tet = new Tetrahedron(id, tet_vertices, weight, numThreads);
+    Tetrahedron* tet = new Tetrahedron(id, tet_vertices, weight);
     tetrahedrons.push_back(tet);
 
     int current_size = tetrahedrons.size();
@@ -73,20 +113,11 @@ void Mesh::addTetrahedron(const int id, const std::array<int, 4> vertexIds,
 	    tet->addNeighbor(neighbor);
 	}
     }
-
-    /*for(auto const& value: neighborIds){
-	if (value < current_size) {
-	    Tetrahedron * neighbor = tetrahedrons[value];
-	    neighbor->addNeighbor(tet);
-	    tet->addNeighbor(neighbor);
-	}
-    }*/
 }
 
-//this and the concurrent generation for the algorithm will be very similar
-
-std::vector<std::vector<std::array<float, 3>>> Mesh::slice(float alpha, float theta){
-    Plane3d plane(alpha, theta, target);
+std::vector<std::vector<std::array<float, 3>>> Mesh::slice(std::array<float, 2> rotations){
+    Plane3d plane(rotations[0], rotations[1], target);
+    //this should maybe be an argument to this function
     std::vector<Tetrahedron *> tetStack = findIntersectingOuterTets(plane);
     
     std::vector<bool> tetsChecked;
