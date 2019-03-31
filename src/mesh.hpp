@@ -20,7 +20,7 @@ class Mesh {
     vector<int> sliceIds;
   public:
     Mesh (const int numVertices, const int numFaces, const int numCells);
-    ~Mesh();
+    //~Mesh();
     void setVertices(const vector<array<float, 3>> & _vertices);
     void addTetrahedron(const int id, const array<int, 4> vertexIds, const vector<int> neighborIds, const float weight);
     bool setTarget(const array<float, 3> _target);

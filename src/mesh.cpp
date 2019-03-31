@@ -21,7 +21,7 @@ Mesh::Mesh(const int numVertices, const int numFaces, const int numCells){
     tetrahedrons.reserve(numCells);
 }
 
-Mesh::~Mesh(){
+/*Mesh::~Mesh(){
     for(Vertex3d* v: vertices){
 	delete v;
     }
@@ -36,9 +36,8 @@ Mesh::~Mesh(){
 	delete tet;
     }
     tetrahedrons.clear();
-    cout << "THIS HAPPENS" << endl;
 }
-
+*/
 
 void Mesh::findPaths(const int epsilon, const int numThreads){
     thread t[numThreads];
@@ -69,7 +68,7 @@ void Mesh::findPaths(const int epsilon, const int numThreads){
     }*/
     for(int i=0; i<numThreads; i++){
 	int start=i*subarraySize;
-	int end=i+subarraySize;
+	int end=start+subarraySize;
 	if(end>(epsilon*epsilon)){
 	    end=epsilon*epsilon;
 	}
@@ -89,9 +88,10 @@ void Mesh::findPaths(const int epsilon, const int numThreads){
 }
 
 void Mesh::computeManySlices(vector<array<float, 2>> planeVector){
+    cout << planeVector.size() << endl;
     for(unsigned long int i=0; i<planeVector.size(); i++){
 	vector<vector<array<float, 3>>> ret= slice(planeVector[i]);
-	//cout << ret.size() << endl;
+	cout << ret.size() << endl;
     }
 }
 
