@@ -5,31 +5,33 @@
 #include <Eigen/Dense>
 
 using namespace Eigen;
+using namespace std;
 
 #ifndef MESH_HPP
 #define MESH_HPP
 
 class Mesh {
-    std::vector<Vertex3d *> vertices;
-    std::vector<Face *> faces;
-    std::vector<Tetrahedron *> tetrahedrons;
+    vector<Vertex3d *> vertices;
+    vector<Face *> faces;
+    vector<Tetrahedron *> tetrahedrons;
     Vector3f target;
     Tetrahedron * targetTet;
     //used for testing
-    std::vector<int> sliceIds;
+    vector<int> sliceIds;
   public:
     Mesh (const int numVertices, const int numFaces, const int numCells);
-    void setVertices(const std::vector<std::array<float, 3>> & _vertices);
-    void addTetrahedron(const int id, const std::array<int, 4> vertexIds, const std::vector<int> neighborIds, const float weight);
-    bool setTarget(const std::array<float, 3> _target);
-    void addFace(const std::array<int, 3> vertexIds, const int tetId);
-    std::vector<Tetrahedron *> findIntersectingOuterTets(Plane3d plane);
-    std::vector<std::vector<std::array<float, 3>>> slice(std::array<float, 2> rotations);
+    ~Mesh();
+    void setVertices(const vector<array<float, 3>> & _vertices);
+    void addTetrahedron(const int id, const array<int, 4> vertexIds, const vector<int> neighborIds, const float weight);
+    bool setTarget(const array<float, 3> _target);
+    void addFace(const array<int, 3> vertexIds, const int tetId);
+    vector<Tetrahedron *> findIntersectingOuterTets(Plane3d plane);
+    vector<vector<array<float, 3>>> slice(array<float, 2> rotations);
     void findPaths(const int epsilon, const int numThreads);
-    void computeManySlices(std::vector<std::array<float, 2>> planeVector);
+    void computeManySlices(vector<array<float, 2>> planeVector);
     //these functions are exposed to Python for testing purposes; while it is possible that a python application may require them, they are not required for any other purpose in this application
     int getTargetTetId();
-    std::vector<int> getSliceIds();
+    vector<int> getSliceIds();
 };
 #endif
 

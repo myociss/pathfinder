@@ -4,6 +4,7 @@
 #include "plane3d.hpp"
 
 using namespace Eigen;
+using namespace std;
 
 Plane3d::Plane3d(float alpha, float theta, Vector3f _target){
     Vector3f u0(1, 0, 0);
@@ -54,14 +55,14 @@ bool Plane3d::containsEdge(Vector3f v0, Vector3f v1){
     return (dotProduct0 == 0 && dotProduct1 == 0);
 }
 
-std::array<float, 3> Plane3d::findIntersection(Vector3f v0, Vector3f v1){
+array<float, 3> Plane3d::findIntersection(Vector3f v0, Vector3f v1){
     Vector3f w = v0 - target;
     Vector3f u = v1 - v0;
 
     float N = -(normal.dot(w));
     float D = normal.dot(u);
 
-    std::array<float, 3> coords3d = {v0[0] + (N/D) * u[0], v0[1] + (N/D) * u[1], v0[2] + (N/D) * u[2]};
+    array<float, 3> coords3d = {v0[0] + (N/D) * u[0], v0[1] + (N/D) * u[1], v0[2] + (N/D) * u[2]};
 
     return coords3d;
 
