@@ -16,6 +16,9 @@ class TestGraph(TestCase):
 
         for idx, tet in enumerate(self.test_mesh['tetrahedrons']):
             self.mesh.add_tetrahedron(tetrahedron_id=idx, neighbor_ids=tet['neighbors'], vertex_ids=tet['vertices'], weight=tet['weight'])
+
+        for face in self.test_mesh['faces']:
+            self.mesh.add_face(vertex_ids=face['vertices'], tetrahedron_id=face['tetrahedron'])
   
     
     def test_target_set(self):
@@ -27,6 +30,7 @@ class TestGraph(TestCase):
             self.mesh.set_target(pt)
             self.assertEqual(idx, self.mesh.get_target_idx())
 
+    '''
     def test_slice(self):
         target=[0.2,0.2,0.2]
         self.mesh.set_target(target)
@@ -62,6 +66,7 @@ class TestGraph(TestCase):
                 contains_count+=1
 
         self.assertEqual(contains_count, len(plane_intersection))
+    '''
     
 
 if __name__ == '__main__':

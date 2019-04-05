@@ -1,6 +1,7 @@
 #include <Eigen/Dense>
 #include <vector>
 #include <array>
+#include <functional>
 #include "plane3d.hpp"
 
 using namespace Eigen;
@@ -20,30 +21,29 @@ class Vertex3d {
 
 class Tetrahedron {
     int id;
-    vector<Vertex3d *> vertices;
-    vector<Tetrahedron *> neighbors;
+    vector<reference_wrapper<Vertex3d>> vertices;
+    vector<reference_wrapper<Tetrahedron>> neighbors;
     array<float, 3> sphereCenter;
     float sphereRadius;
     float weight;
   public:
-    Tetrahedron (const int id, const array<Vertex3d *, 4> _vertices, const float _weight);
-    void addNeighbor(Tetrahedron * neighbor);
-    vector<Vertex3d *> Vertices();
-    vector<Tetrahedron *> getNeighbors();
-    vector<array<float, 3>> intersectsPlane(Plane3d plane);
+    Tetrahedron (const int id, const vector<reference_wrapper<Vertex3d>> _vertices, const float _weight);
+    void addNeighbor(reference_wrapper<Tetrahedron> neighbor);
     bool contains(const array<float, 3>);
+    reference_wrapper<Vertex3d> Vertices();
+    //vector<reference_wrapper<Tetrahedron>> getNeighbors();
+    //vector<array<float, 3>> intersectsPlane(Plane3d plane);
     int getId();
 };
 
-
 class Face {
-    vector<Vertex3d *> vertices;
-    Tetrahedron * tetrahedron;
+    vector<reference_wrapper<Vertex3d>> vertices;
+    unsigned long int tetId;
   public:
-    Face (array<Vertex3d *, 3> _vertices, Tetrahedron * tetrahdron);
+    Face (vector<reference_wrapper<Vertex3d>> _vertices, unsigned long int _tetId);
     //bool intersects(Plane3d plane, Vector3f target);
-    vector<Vertex3d *> Vertices();
-    Tetrahedron* getTetrahedron();
+    //vector<Vertex3d *> Vertices();
+    //Tetrahedron* getTetrahedron();
 };
 
 #endif

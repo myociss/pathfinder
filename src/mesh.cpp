@@ -1,11 +1,12 @@
 #define _USE_MATH_DEFINES
 
 #include "mesh.hpp"
-#include "plane3d.hpp"
+//#include "plane3d.hpp"
 #include <iostream>
 #include <map>
 #include <string>
 #include <vector>
+#include <functional>
 #include <cmath>
 #include <thread>
 
@@ -17,28 +18,67 @@ using namespace std;
 
 Mesh::Mesh(const int numVertices, const int numFaces, const int numCells){
     vertices.reserve(numVertices);
-    faces.reserve(numFaces);
+    //faces.reserve(numFaces);
     tetrahedrons.reserve(numCells);
 }
 
-/*Mesh::~Mesh(){
-    for(Vertex3d* v: vertices){
-	delete v;
-    }
-    vertices.clear();
+void Mesh::setVertices(const vector<array<float, 3>> & _vertices){
 
-    for(Face* f: faces){
-	delete f;
+    for(unsigned long int i=0; i < _vertices.size(); i++){
+	//Vertex3d* pt = new Vertex3d(_vertices[i]);
+	Vertex3d pt(_vertices[i]);
+	
+	vertices.push_back(pt);
+	cout << pt.Vec() << endl;
     }
-    faces.clear();
 
-    for(Tetrahedron* tet: tetrahedrons){
-	delete tet;
-    }
-    tetrahedrons.clear();
 }
-*/
 
+
+void Mesh::addTetrahedron(const int id, const array<int, 4> vertexIds, 
+	const vector<int> neighborIds, const float weight){
+
+    vector<reference_wrapper<Vertex3d>> refs = {vertices[vertexIds[0]], vertices[vertexIds[1]], vertices[vertexIds[2]], vertices[vertexIds[3]]};
+
+    Tetrahedron tet(id, refs, weight);
+    tetrahedrons.push_back(tet);
+
+    unsigned long int current_size = tetrahedrons.size();
+
+    for(unsigned long int i=0; i<neighborIds.size(); i++){
+	if(neighborIds[i]<current_size){
+	    Tetrahedron neighbor = tetrahedrons[neighborIds[i]];
+	    reference_wrapper<Tetrahedron> neighborRef = neighbor;
+	    reference_wrapper<Tetrahedron> tetRef = tet;
+	    
+	    neighbor.addNeighbor(tetRef);
+	    tet.addNeighbor(neighborRef);
+	}
+    }
+}
+
+void Mesh::addFace(const array<int, 3> vertexIds, const int tetId){
+    vector<reference_wrapper<Vertex3d>> refs = {vertices[vertexIds[0]], vertices[vertexIds[1]], vertices[vertexIds[2]]};
+
+    Face face(refs, tetId);
+    faces.push_back(face);
+}
+
+bool Mesh::setTarget(array<float, 3> _target){
+
+    for(unsigned long int i=0; i < tetrahedrons.size(); i++){
+	if (tetrahedrons[i].contains(_target)){
+	    Vector3f t(_target[0], _target[1], _target[2]);
+	    target = t;
+	    targetTetId=i;//tetrahedrons[i];
+	    return true;
+	}
+    }
+    return false;
+}
+
+
+/*
 void Mesh::findPaths(const int epsilon, const int numThreads){
     thread t[numThreads];
     vector<array<float, 2>> planes;
@@ -52,20 +92,7 @@ void Mesh::findPaths(const int epsilon, const int numThreads){
     }
 
     int subarraySize = ((epsilon * epsilon) + numThreads - 1) / numThreads;
-    
-    /*for(int i=0; i<(epsilon*epsilon); i+=subarraySize){
-	int end=(epsilon*epsilon);
-	if(end>(epsilon*epsilon)){
-	    end=(epsilon*epsilon);
-	}
 
-	std::vector<std::array<float, 2>> planeVector;
-
-	for(int idx=i; idx<end; idx++){
-	    planeVector.push_back(planes[idx]);
-	}
-	t[i]=std::thread(&Mesh::computeManySlices, this, planeVector);
-    }*/
     for(int i=0; i<numThreads; i++){
 	int start=i*subarraySize;
 	int end=start+subarraySize;
@@ -92,62 +119,6 @@ void Mesh::computeManySlices(vector<array<float, 2>> planeVector){
     for(unsigned long int i=0; i<planeVector.size(); i++){
 	vector<vector<array<float, 3>>> ret= slice(planeVector[i]);
 	cout << ret.size() << endl;
-    }
-}
-
-bool Mesh::setTarget(array<float, 3> _target){
-
-    for(unsigned long int i=0; i < tetrahedrons.size(); i++){
-	if (tetrahedrons[i]->contains(_target)){
-	    Vector3f t(_target[0], _target[1], _target[2]);
-	    target = t;
-	    targetTet=tetrahedrons[i];
-	    return true;
-	}
-    }
-    return false;
-}
-
-void Mesh::setVertices(const vector<array<float, 3>> & _vertices){
-
-    for(unsigned long int i=0; i < _vertices.size(); i++){
-	Vertex3d* pt = new Vertex3d(_vertices[i]);
-	
-	vertices.push_back(pt);
-
-    }
-
-}
-
-void Mesh::addFace(const array<int, 3> vertexIds, const int tetId){
-    array<Vertex3d *, 3> face_vertices;
-    for(int i=0; i<3; i++){
-	face_vertices[i] = vertices[vertexIds[i]];
-    }
-    Face* face = new Face(face_vertices, tetrahedrons[tetId]);
-    faces.push_back(face);
-}
-    
-
-void Mesh::addTetrahedron(const int id, const array<int, 4> vertexIds, 
-	const vector<int> neighborIds, const float weight){
-
-    array<Vertex3d *, 4> tet_vertices;
-    for(int i=0; i<4; i++){
-	tet_vertices[i] = vertices[vertexIds[i]];
-    }
-
-    Tetrahedron* tet = new Tetrahedron(id, tet_vertices, weight);
-    tetrahedrons.push_back(tet);
-
-    int current_size = tetrahedrons.size();
-
-    for(int i=0; i<neighborIds.size(); i++){
-	if(neighborIds[i]<current_size){
-	    Tetrahedron* neighbor = tetrahedrons[neighborIds[i]];
-	    neighbor->addNeighbor(tet);
-	    tet->addNeighbor(neighbor);
-	}
     }
 }
 
@@ -214,8 +185,9 @@ vector<Tetrahedron *> Mesh::findIntersectingOuterTets(Plane3d plane){
     intersectingTets.push_back(targetTet);
     return intersectingTets;
 }
+*/
 
-int Mesh::getTargetTetId(){
-    return targetTet->getId();
+
+unsigned long int Mesh::getTargetTetId(){
+    return targetTetId;
 }
-

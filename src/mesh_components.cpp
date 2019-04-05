@@ -1,46 +1,69 @@
 #include "mesh_components.hpp"
 #include "plane3d.hpp"
 #include <vector>
+#include <functional>
 #include <array>
+#include <iostream>
 #include <Eigen/Dense>
 
 using namespace Eigen;
 using namespace std;
 
-Tetrahedron::Tetrahedron(const int _id, const array<Vertex3d *, 4> _vertices, const float _weight){
-    vertices.reserve(4);
+Tetrahedron::Tetrahedron(const int _id, const vector<reference_wrapper<Vertex3d>> _vertices, const float _weight){
     id = _id;
-    for(int i=0; i<4;i++){
-	vertices[i] = _vertices[i];
-    }
+    vertices = _vertices;
     weight = _weight;
+    //cout << vertices[0].get().Vec() << endl;
 
-    array<float, 3> faceCentroid = {(vertices[0]->Vec()[0] + vertices[1]->Vec()[0] + vertices[2]->Vec()[0]) / 3, (vertices[0]->Vec()[1] + vertices[1]->Vec()[1] + vertices[2]->Vec()[1]) / 3, (vertices[0]->Vec()[2] + vertices[1]->Vec()[2] + vertices[2]->Vec()[2]) / 3};
+    Vector3f v0 = vertices[0].get().Vec();
+    Vector3f v1 = vertices[1].get().Vec();
+    Vector3f v2 = vertices[2].get().Vec();
+    Vector3f v3 = vertices[3].get().Vec();
 
-    Vector3f pt3 = vertices[3]->Vec();
+    array<float, 3> faceCentroid = {(v0[0] + v1[0] + v2[0]) / 3, (v0[1] + v1[1] + v2[1]) / 3, (v0[2] + v1[2] + v2[2]) / 3};
 
-    sphereCenter = { (3 * faceCentroid[0] + pt3[0])/4, (3 * faceCentroid[1] + pt3[1])/4, (3 * faceCentroid[2] + pt3[2])/4};
+    //Vector3f pt3 = vertices[3]->Vec();
 
-    float r = sqrt( pow(sphereCenter[0]-vertices[0]->Vec()[0], 2) + pow(sphereCenter[1]-vertices[0]->Vec()[1], 2) + pow(sphereCenter[2]-vertices[0]->Vec()[2], 2));
+    sphereCenter = { (3 * faceCentroid[0] + v3[0])/4, (3 * faceCentroid[1] + v3[1])/4, (3 * faceCentroid[2] + v3[2])/4};
+
+    float r0 = sqrt( pow(sphereCenter[0]-v0[0], 2) + pow(sphereCenter[1]-v0[1], 2) + pow(sphereCenter[2]-v0[2], 2));
+
+    float r1 = sqrt( pow(sphereCenter[0]-v1[0], 2) + pow(sphereCenter[1]-v1[1], 2) + pow(sphereCenter[2]-v1[2], 2));
+
+    float r2 = sqrt( pow(sphereCenter[0]-v2[0], 2) + pow(sphereCenter[1]-v2[1], 2) + pow(sphereCenter[2]-v2[2], 2));
+
+    float r3 = sqrt( pow(sphereCenter[0]-v3[0], 2) + pow(sphereCenter[1]-v3[1], 2) + pow(sphereCenter[2]-v3[2], 2));
+
+    float radii [4] = {r0, r1, r2, r3};
+
+    float r = r0;
 
     for(int i=1; i<4; i++){
-	float tmp_r = sqrt( pow(sphereCenter[0]-vertices[i]->Vec()[0], 2) + pow(sphereCenter[1]-vertices[i]->Vec()[1], 2) + pow(sphereCenter[2]-vertices[i]->Vec()[2], 2));
-	if (tmp_r < r){
-	    r = tmp_r;
+	//float tmp_r = ;
+	if (radii[i] < r){
+	    r = radii[i];
 	}
     }
 
     sphereRadius = r;
-   
+}
+
+void Tetrahedron::addNeighbor(reference_wrapper<Tetrahedron> neighbor){
+    neighbors.push_back(neighbor);
+}
+
+Face::Face(const vector<reference_wrapper<Vertex3d>> _vertices, unsigned long int _tetId){
+    vertices = _vertices;
+    tetId=_tetId;
 }
 
 bool Tetrahedron::contains(const array<float, 3> pt_target){
     if (sqrt( pow(pt_target[0] - sphereCenter[0], 2) + pow(pt_target[1] - sphereCenter[1], 2) + pow(pt_target[2] - sphereCenter[2], 2)) < sphereRadius){
 
-	Vector3f pt0 = {(vertices[0])->Vec()};
-	Vector3f pt1 = {(vertices[1])->Vec()};
-	Vector3f pt2 = {(vertices[2])->Vec()};
-	Vector3f pt3 = {(vertices[3])->Vec()};
+	Vector3f pt0 = {vertices[0].get().Vec()};
+	Vector3f pt1 = {vertices[1].get().Vec()};
+	Vector3f pt2 = {vertices[2].get().Vec()};
+	Vector3f pt3 = {vertices[3].get().Vec()};
 
 	Matrix4f m0;
 	Matrix4f m1;
@@ -88,6 +111,7 @@ bool Tetrahedron::contains(const array<float, 3> pt_target){
     return false;
 }
 
+/*
 vector<array<float, 3>> Tetrahedron::intersectsPlane(Plane3d plane){
     vector<array<float, 3>> intersectionPoints;
 
@@ -120,30 +144,17 @@ vector<array<float, 3>> Tetrahedron::intersectsPlane(Plane3d plane){
 
 }
 
-void Tetrahedron::addNeighbor(Tetrahedron * neighbor){
-    neighbors.push_back(neighbor);
-}
-
 
 int Tetrahedron::getId(){
     return id;
 }
 
-vector<Tetrahedron *> Tetrahedron::getNeighbors(){
+vector<reference_wrapper<Tetrahedron>> Tetrahedron::getNeighbors(){
     return neighbors;
 }
 
-vector<Vertex3d *> Tetrahedron::Vertices(){
+vector<reference_wrapper<Vertex3d>> Tetrahedron::Vertices(){
     return vertices;
-}
-
-
-Face::Face(const array<Vertex3d *, 3> _vertices, Tetrahedron * _tetrahedron){
-    vertices.reserve(3);
-    for(int i=0; i<3; i++){
-	vertices[i]=_vertices[i];
-    }
-    tetrahedron=_tetrahedron;
 }
 
 Tetrahedron* Face::getTetrahedron(){
@@ -152,7 +163,7 @@ Tetrahedron* Face::getTetrahedron(){
 
 vector<Vertex3d *> Face::Vertices(){
     return vertices;
-}
+}*/
 
 Vertex3d::Vertex3d(const array<float, 3> _vec) {
     //Vertex3f vec;
