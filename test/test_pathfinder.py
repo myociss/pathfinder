@@ -20,7 +20,7 @@ class TestGraph(TestCase):
         for face in self.test_mesh['faces']:
             self.mesh.add_face(vertex_ids=face['vertices'], tetrahedron_id=face['tetrahedron'])
   
-    
+
     def test_target_set(self):
         # should probably also include a test for a point that definitely lies in more than one sphere
         for idx, tet in enumerate(self.test_mesh['tetrahedrons']):
@@ -30,14 +30,14 @@ class TestGraph(TestCase):
             self.mesh.set_target(pt)
             self.assertEqual(idx, self.mesh.get_target_idx())
 
-    '''
+
     def test_slice(self):
         target=[0.2,0.2,0.2]
         self.mesh.set_target(target)
 
         alpha=0.25
         theta=0.25
-        plane_intersection=self.mesh.slice(rotation=[alpha,theta])
+        plane_intersection=self.mesh.slice(rotation=[alpha,theta], test=True)
         tet_ids=self.mesh.get_slice_ids()
 
         rotation_x=np.array([[1,0,0], [0,math.cos(alpha),math.sin(alpha)], [0,-math.sin(alpha),math.cos(alpha)]])
@@ -66,7 +66,7 @@ class TestGraph(TestCase):
                 contains_count+=1
 
         self.assertEqual(contains_count, len(plane_intersection))
-    '''
+
     
 
 if __name__ == '__main__':

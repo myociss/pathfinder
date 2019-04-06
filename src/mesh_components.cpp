@@ -38,7 +38,7 @@ Tetrahedron::Tetrahedron(const int _id, const vector<reference_wrapper<Vertex3d>
 
     float r = r0;
 
-    for(int i=1; i<4; i++){
+    for(int i=1; i<4; ++i){
 	//float tmp_r = ;
 	if (radii[i] < r){
 	    r = radii[i];
@@ -48,8 +48,8 @@ Tetrahedron::Tetrahedron(const int _id, const vector<reference_wrapper<Vertex3d>
     sphereRadius = r;
 }
 
-void Tetrahedron::addNeighbor(reference_wrapper<Tetrahedron> neighbor){
-    neighbors.push_back(neighbor);
+void Tetrahedron::addNeighbor(unsigned long int neighborId){
+    neighbors.push_back(neighborId);
 }
 
 Face::Face(const vector<reference_wrapper<Vertex3d>> _vertices, unsigned long int _tetId){
@@ -111,14 +111,14 @@ bool Tetrahedron::contains(const array<float, 3> pt_target){
     return false;
 }
 
-/*
+
 vector<array<float, 3>> Tetrahedron::intersectsPlane(Plane3d plane){
     vector<array<float, 3>> intersectionPoints;
 
-    for(int i=0; i<4; i++){
-	for(int j=i+1; j<4; j++){
-	    Vector3f v0 = vertices[i]->Vec();
-	    Vector3f v1 = vertices[j]->Vec();
+    for(int i=0; i<4; ++i){
+	for(int j=i+1; j<4; ++j){
+	    Vector3f v0 = vertices[i].get().Vec();
+	    Vector3f v1 = vertices[j].get().Vec();
 	    if(plane.containsEdge(v0, v1)){
 		array<float, 3> v0Pt = {v0[0], v0[1], v0[2]};
 		array<float, 3> v1Pt = {v1[0], v1[1], v1[2]};
@@ -145,11 +145,11 @@ vector<array<float, 3>> Tetrahedron::intersectsPlane(Plane3d plane){
 }
 
 
-int Tetrahedron::getId(){
+unsigned long int Tetrahedron::Id(){
     return id;
 }
 
-vector<reference_wrapper<Tetrahedron>> Tetrahedron::getNeighbors(){
+vector<unsigned long int> Tetrahedron::Neighbors(){
     return neighbors;
 }
 
@@ -157,17 +157,16 @@ vector<reference_wrapper<Vertex3d>> Tetrahedron::Vertices(){
     return vertices;
 }
 
-Tetrahedron* Face::getTetrahedron(){
-    return tetrahedron;
+
+unsigned long int Face::TetId(){
+    return tetId;
 }
 
-vector<Vertex3d *> Face::Vertices(){
+vector<reference_wrapper<Vertex3d>> Face::Vertices(){
     return vertices;
-}*/
+}
 
 Vertex3d::Vertex3d(const array<float, 3> _vec) {
-    //Vertex3f vec;
-    //vec = _vec;
     vec << _vec[0], _vec[1], _vec[2];
 }
 

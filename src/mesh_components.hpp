@@ -20,20 +20,20 @@ class Vertex3d {
 };
 
 class Tetrahedron {
-    int id;
+    unsigned long int id;
     vector<reference_wrapper<Vertex3d>> vertices;
-    vector<reference_wrapper<Tetrahedron>> neighbors;
+    vector<unsigned long int> neighbors;
     array<float, 3> sphereCenter;
     float sphereRadius;
     float weight;
   public:
     Tetrahedron (const int id, const vector<reference_wrapper<Vertex3d>> _vertices, const float _weight);
-    void addNeighbor(reference_wrapper<Tetrahedron> neighbor);
+    void addNeighbor(unsigned long int neighborId);
     bool contains(const array<float, 3>);
-    reference_wrapper<Vertex3d> Vertices();
-    //vector<reference_wrapper<Tetrahedron>> getNeighbors();
-    //vector<array<float, 3>> intersectsPlane(Plane3d plane);
-    int getId();
+    vector<reference_wrapper<Vertex3d>> Vertices();
+    vector<unsigned long int> Neighbors();
+    vector<array<float, 3>> intersectsPlane(Plane3d plane);
+    unsigned long int Id();
 };
 
 class Face {
@@ -41,6 +41,8 @@ class Face {
     unsigned long int tetId;
   public:
     Face (vector<reference_wrapper<Vertex3d>> _vertices, unsigned long int _tetId);
+    vector<reference_wrapper<Vertex3d>> Vertices();
+    unsigned long int TetId();
     //bool intersects(Plane3d plane, Vector3f target);
     //vector<Vertex3d *> Vertices();
     //Tetrahedron* getTetrahedron();

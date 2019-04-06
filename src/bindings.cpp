@@ -21,11 +21,12 @@ PYBIND11_MODULE(pathfinder, m){
 	py::arg("tetrahedron_id"))
     .def("set_target", &Mesh::setTarget)
     .def("get_target_idx", &Mesh::getTargetTetId)
-    /*.def("slice", &Mesh::slice,
-	py::arg("rotation"))
-    .def("multiple_slices", &Mesh::findPaths,
+    .def("slice", &Mesh::slice,
+	py::arg("rotation"),
+	py::arg("test"))
+    .def("get_slice_ids", &Mesh::getSliceIds)
+    /*.def("multiple_slices", &Mesh::findPaths,
 	py::arg("epsilon"),
-	py::arg("threads"))
-    .def("get_slice_ids", &Mesh::getSliceIds)*/;
+	py::arg("threads"))*/;
 
 }
