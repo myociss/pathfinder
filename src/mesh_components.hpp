@@ -43,7 +43,7 @@ class Face {
     Face (vector<reference_wrapper<Vertex3d>> _vertices, unsigned long int _tetId);
     vector<reference_wrapper<Vertex3d>> Vertices();
     unsigned long int TetId();
-    //bool intersects(Plane3d plane, Vector3f target);
+    bool intersectsPlane(Plane3d plane);
     //vector<Vertex3d *> Vertices();
     //Tetrahedron* getTetrahedron();
 };

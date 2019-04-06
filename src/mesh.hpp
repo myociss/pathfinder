@@ -26,8 +26,8 @@ class Mesh {
     void addFace(const array<int, 3> vertexIds, const int tetId);
     bool setTarget(const array<float, 3> _target);
     vector<vector<array<float, 3>>> slice(array<float, 2> rotations, bool test=false);
-    vector<vector<array<float, 3>>> computeSlice(Plane3d plane, vector<bool> &tetsChecked, bool test=false);
-    vector<unsigned long int> findIntersectingOuterTets(Plane3d plane);
+    vector<vector<array<float, 3>>> computeSlice(Plane3d plane, vector<bool> &tetsChecked, unsigned long int initTet, bool test=false);
+    //vector<unsigned long int> findIntersectingOuterTets(Plane3d plane);
     /*
     void findPaths(const int epsilon, const int numThreads);
     void computeManySlices(vector<array<float, 2>> planeVector);*/

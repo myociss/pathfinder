@@ -144,6 +144,17 @@ vector<array<float, 3>> Tetrahedron::intersectsPlane(Plane3d plane){
 
 }
 
+bool Face::intersectsPlane(Plane3d plane){
+    Vector3f v0 = vertices[0].get().Vec();
+    Vector3f v1 = vertices[1].get().Vec();
+    Vector3f v2 = vertices[2].get().Vec();
+
+    if(plane.intersects(v0, v1) || plane.intersects(v1,v2) || plane.intersects(v0,v2)){
+	return true;
+    }
+    return false;
+}
+
 
 unsigned long int Tetrahedron::Id(){
     return id;

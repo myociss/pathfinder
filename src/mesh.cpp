@@ -88,18 +88,25 @@ vector<vector<array<float, 3>>> Mesh::slice(array<float, 2> rotations, bool test
     }
 
     Plane3d plane(rotations[0], rotations[1], target);
+    vector<vector<array<float, 3>>> slice = computeSlice(plane, tetsChecked, targetTetId, test);
 
-    return computeSlice(plane, tetsChecked, test);
+    for(unsigned long int i=0; i<faces.size(); i++){
+	if(faces[i].intersectsPlane(plane) && !tetsChecked[faces[i].TetId()]){
+	    vector<vector<array<float, 3>>> sliceComponent = computeSlice(plane, tetsChecked, faces[i].TetId(), test);
+	    slice.insert(slice.end(), sliceComponent.begin(), sliceComponent.end());
+	}
+    }
+    return slice;
 }
 
-
-//vector<vector<array<float, 3>>> Mesh::slice(array<float, 2> rotations, vector<bool> &tetsChecked, bool test=false){
-
-vector<vector<array<float, 3>>> Mesh::computeSlice(Plane3d plane, vector<bool> &tetsChecked, bool test){
+vector<vector<array<float, 3>>> Mesh::computeSlice(Plane3d plane, vector<bool> &tetsChecked, unsigned long int initTet, bool test){
 
     //Plane3d plane(rotations[0], rotations[1], target);
     //this should maybe be an argument to this function
-    vector<unsigned long int> tetStack = findIntersectingOuterTets(plane);
+    
+    //vector<unsigned long int> tetStack = findIntersectingOuterTets(plane);
+    vector<unsigned long int> tetStack;
+    tetStack.push_back(initTet);
 
     vector<vector<array<float, 3>>> allPoints;
     
@@ -125,12 +132,9 @@ vector<vector<array<float, 3>>> Mesh::computeSlice(Plane3d plane, vector<bool> &
 		    sliceIds.push_back(tet.Id());
 		}
 		allPoints.push_back(intersectionPoints);
-		//cout << "THIS HAPPENS0" << endl;
 		vector<unsigned long int> neighbors = tet.Neighbors();
-		cout << neighbors.size() << endl;
 
 		for(int i=0; i<neighbors.size();++i){
-		    //cout << "THIS HAPPENS" << endl;
 		    tetStack.push_back(neighbors[i]);
 		}
 	    }
@@ -191,7 +195,7 @@ vector<int> Mesh::getSliceIds(){
     return sliceIds;
 }
 
-vector<unsigned long int> Mesh::findIntersectingOuterTets(Plane3d plane){
+/*vector<unsigned long int> Mesh::findIntersectingOuterTets(Plane3d plane){
     vector<unsigned long int> intersectingTets;
 
     for(unsigned long int i=0; i<faces.size(); ++i){
@@ -200,21 +204,13 @@ vector<unsigned long int> Mesh::findIntersectingOuterTets(Plane3d plane){
 	Vector3f v1 = vertices[1].get().Vec();
 	Vector3f v2 = vertices[2].get().Vec();
 
-	//std::cout << v0 << std::endl;
-	//std::cout << v1 << std::endl;
-	//std::cout << v2 << std::endl;
-
 	if(plane.intersects(v0, v1) || plane.intersects(v1,v2) || plane.intersects(v0,v2)){
-	    //intersectingTets.push_back(faces[i]->getTetrahedron());
-	    
-	    //reference_wrapper<Tetrahedron> tet = tetrahedrons[faces[i].TetId()];
 	    intersectingTets.push_back(faces[i].TetId());
 	}
     }
-    //reference_wrapper<Tetrahedron> target = tetrahedrons[targetTetId];
     intersectingTets.push_back(targetTetId);
     return intersectingTets;
-}
+}*/
 
 unsigned long int Mesh::getTargetTetId(){
     return targetTetId;
