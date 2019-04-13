@@ -1,5 +1,6 @@
 from unittest import TestCase
 import json
+import random
 import pathfinder
 import numpy as np
 import multiprocessing
@@ -32,40 +33,42 @@ class TestGraph(TestCase):
 
 
     def test_slice(self):
-        target=[0.2,0.2,0.2]
-        self.mesh.set_target(target)
+        for test_iter in range(20):
+            target=[2*random.random(), 2*random.random(), 2*random.random()]
 
-        alpha=0.25
-        theta=0.25
-        plane_intersection=self.mesh.slice(rotation=[alpha,theta], test=True)
-        tet_ids=self.mesh.get_slice_ids()
+            self.mesh.set_target(target)
+            alpha=math.pi*random.random()
+            theta=math.pi*random.random()
 
-        rotation_x=np.array([[1,0,0], [0,math.cos(alpha),math.sin(alpha)], [0,-math.sin(alpha),math.cos(alpha)]])
-        rotation_y=np.array([[math.cos(theta),0,math.sin(theta)], [0,1,0], [-math.sin(theta),0,math.cos(theta)]])
+            plane_intersection=self.mesh.slice(rotation=[alpha,theta], test=True)
+            tet_ids=self.mesh.get_slice_ids()
 
-        normal=(np.matmul(rotation_x, rotation_y))[2]
-        contains_count=0
+            rotation_x=np.array([[1,0,0], [0,math.cos(alpha),math.sin(alpha)], [0,-math.sin(alpha),math.cos(alpha)]])
+            rotation_y=np.array([[math.cos(theta),0,math.sin(theta)], [0,1,0], [-math.sin(theta),0,math.cos(theta)]])
 
-        for idx, tet in enumerate(self.test_mesh['tetrahedrons']):
-            intersection_count=0
-            vertices=[self.test_mesh['vertices'][v_id] for v_id in tet['vertices']]
-            for i in range(4):
-                for j in range(i+1, 4):
-                    v0=np.array(vertices[i])
-                    v1=np.array(vertices[j])
+            normal=(np.matmul(rotation_x, rotation_y))[2]
+            contains_count=0
 
-                    dot_product_i=np.dot(normal, v0-target)
-                    dot_product_j=np.dot(normal, v1-target)
-                    if dot_product_i==0 and dot_product_j==0:
-                        intersection_count+=2
-                    elif dot_product_i * dot_product_j < 0:
-                        intersection_count+=1
+            for idx, tet in enumerate(self.test_mesh['tetrahedrons']):
+                intersection_count=0
+                vertices=[self.test_mesh['vertices'][v_id] for v_id in tet['vertices']]
+                for i in range(4):
+                    for j in range(i+1, 4):
+                        v0=np.array(vertices[i])
+                        v1=np.array(vertices[j])
 
-            if intersection_count>2:
-                self.assertIn(idx, tet_ids)
-                contains_count+=1
+                        dot_product_i=np.dot(normal, v0-target)
+                        dot_product_j=np.dot(normal, v1-target)
+                        if dot_product_i==0 and dot_product_j==0:
+                            intersection_count+=2
+                        elif dot_product_i * dot_product_j < 0:
+                            intersection_count+=1
 
-        self.assertEqual(contains_count, len(plane_intersection))
+                if intersection_count>2:
+                    self.assertIn(idx, tet_ids)
+                    contains_count+=1
+
+            self.assertEqual(contains_count, len(plane_intersection))
 
     
 
