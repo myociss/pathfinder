@@ -6,7 +6,8 @@
 using namespace Eigen;
 using namespace std;
 
-Plane3d::Plane3d(float alpha, float theta, Vector3f _target){
+Plane3d::Plane3d(int _id, float alpha, float theta, Vector3f _target){
+    id = _id;
     Vector3f u0(1, 0, 0);
     Vector3f v0(0, cos(alpha), sin(alpha));
     Vector3f w0(0, -sin(alpha), cos(alpha));
@@ -71,6 +72,10 @@ array<float, 3> Plane3d::findIntersection(Vector3f v0, Vector3f v1){
     //float y2d = dist.dot(axisY);
 
     //return {x2d, y2d, atan2(y2d, x2d)};
+}
+
+int Plane3d::Id(){
+    return id;
 }
 
 //Vector3f Plane3d::getNormal(){

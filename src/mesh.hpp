@@ -25,12 +25,11 @@ class Mesh {
     void addTetrahedron(const int id, const array<int, 4> vertexIds, const vector<unsigned long int> neighborIds, const float weight);
     void addFace(const array<int, 3> vertexIds, const int tetId);
     bool setTarget(const array<float, 3> _target);
-    vector<vector<array<float, 3>>> slice(array<float, 2> rotations, bool test=false);
-    vector<vector<array<float, 3>>> computeSlice(Plane3d plane, vector<bool> &tetsChecked, unsigned long int initTet, bool test=false);
-    //vector<unsigned long int> findIntersectingOuterTets(Plane3d plane);
-    /*
-    void findPaths(const int epsilon, const int numThreads);
-    void computeManySlices(vector<array<float, 2>> planeVector);*/
+    vector<vector<array<float, 3>>> slice(Plane3d plane, vector<int> &tetsChecked, bool test=false);
+    void shortestPaths(const int epsilon, const int numThreads);
+    vector<vector<array<float, 3>>> computeSliceComponent(Plane3d plane, vector<int> &tetsChecked, unsigned long int initTet, bool test=false);
+    vector<vector<array<float, 3>>> sliceIndv(array<float, 2> rotation, bool test);
+    void findPaths(vector<Plane3d> planes);
     //these functions are exposed to Python for testing purposes; while it is possible that a python application may require them, they are not required for any other purpose in this application
     unsigned long int getTargetTetId();
     vector<int> getSliceIds();

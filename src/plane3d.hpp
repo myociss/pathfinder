@@ -12,15 +12,17 @@ class Plane3d {
     Vector3f normal;
     Matrix3f rotationInverse;*/
     //Matrix3f rotation;
+    int id;
     Vector3f axisX;
     Vector3f axisY;
     Vector3f normal;
     Vector3f target;
     //float normalDist;
   public:
-    Plane3d (float alpha, float theta, Vector3f _target);
+    Plane3d (int _id, float alpha, float theta, Vector3f _target);
     bool intersects(Vector3f v0, Vector3f v1);
     bool containsEdge(Vector3f v0, Vector3f v1);
     array<float, 3> findIntersection(Vector3f v0, Vector3f v1);
+    int Id();
 };
 #endif
