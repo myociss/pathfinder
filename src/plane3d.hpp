@@ -20,8 +20,10 @@ class Plane3d {
     //float normalDist;
   public:
     Plane3d (int _id, float alpha, float theta, Vector3f _target);
-    bool intersects(Vector3f v0, Vector3f v1);
-    bool containsEdge(Vector3f v0, Vector3f v1);
+    bool intersectsEdge(Vector3f v0, Vector3f v1);
+    //bool intersectsFace(Vector3f v0, Vector3f v1, Vector3f v2);
+    //bool containsEdge(Vector3f v0, Vector3f v1);
+    bool containsPoint(Vector3f v0);
     array<float, 3> findIntersection(Vector3f v0, Vector3f v1);
     int Id();
 };

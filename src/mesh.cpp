@@ -89,7 +89,7 @@ void Mesh::findPaths(vector<Plane3d> planes){
     }
     for(int i=0; i<planes.size(); i++){
 	vector<vector<array<float, 3>>> myslice = slice(planes[i], tetsChecked, false);
-	cout << myslice.size() << endl;
+	//cout << myslice.size() << endl;
     }
 	
 }

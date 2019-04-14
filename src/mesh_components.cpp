@@ -116,19 +116,15 @@ vector<array<float, 3>> Tetrahedron::intersectsPlane(Plane3d plane){
     vector<array<float, 3>> intersectionPoints;
 
     for(int i=0; i<4; ++i){
-	for(int j=i+1; j<4; ++j){
-	    Vector3f v0 = vertices[i].get().Vec();
-	    Vector3f v1 = vertices[j].get().Vec();
-	    if(plane.containsEdge(v0, v1)){
-		array<float, 3> v0Pt = {v0[0], v0[1], v0[2]};
-		array<float, 3> v1Pt = {v1[0], v1[1], v1[2]};
-		intersectionPoints.push_back(v0Pt);
-		intersectionPoints.push_back(v1Pt);
-	    } else{
-		if(id==2){
-		    plane.intersects(v0,v1);
-		}
-	        if(plane.intersects(v0, v1)){
+	Vector3f v0 = vertices[i].get().Vec();
+	if(plane.containsPoint(v0)){
+	    array<float, 3> v0Pt = {v0[0], v0[1], v0[2]};
+	    intersectionPoints.push_back(v0Pt);
+	} 
+	else {
+	    for(int j=i+1; j<4; ++j){
+		Vector3f v1 = vertices[j].get().Vec();
+		if(plane.intersectsEdge(v0, v1)){
 		    intersectionPoints.push_back(plane.findIntersection(v0,v1));
 		}
 	    }
@@ -149,10 +145,13 @@ bool Face::intersectsPlane(Plane3d plane){
     Vector3f v1 = vertices[1].get().Vec();
     Vector3f v2 = vertices[2].get().Vec();
 
-    if(plane.intersects(v0, v1) || plane.intersects(v1,v2) || plane.intersects(v0,v2)){
+    //return plane.intersectsFace(v0, v1, v2);
+
+    /*if(plane.intersects(v0, v1) || plane.intersects(v1,v2) || plane.intersects(v0,v2)){
 	return true;
     }
-    return false;
+    return false;*/
+    return (plane.intersectsEdge(v0, v1) || plane.intersectsEdge(v0, v2));
 }
 
 

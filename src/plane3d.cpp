@@ -36,7 +36,7 @@ Plane3d::Plane3d(int _id, float alpha, float theta, Vector3f _target){
     target = _target;
 }
 
-bool Plane3d::intersects(Vector3f v0, Vector3f v1){
+bool Plane3d::intersectsEdge(Vector3f v0, Vector3f v1){
     Vector3f diffVec0 = v0 - target;
     float dotProduct0 = diffVec0.dot(normal);
 
@@ -46,7 +46,26 @@ bool Plane3d::intersects(Vector3f v0, Vector3f v1){
     return dotProduct0 * dotProduct1 < 0;
 }
 
-bool Plane3d::containsEdge(Vector3f v0, Vector3f v1){
+/*bool Plane3d::intersectsFace(Vector3f v0, Vector3f v1, Vector3f v2){
+    Vector3f diffVec0 = v0 - target;
+    float dotProduct0 = diffVec0.dot(normal);
+
+    Vector3f diffVec1 = v1 - target;	 
+    float dotProduct1 = diffVec1.dot(normal);
+
+    Vector3f diffVec2 = v2 - target;	 
+    float dotProduct2 = diffVec2.dot(normal);
+
+    return (dotProduct0 * dotProduct1 < 0 || dotProduct0 * dotProduct2 < 0);
+}*/
+
+bool Plane3d::containsPoint(Vector3f v0){
+    Vector3f diffVec0 = v0 - target;
+    float dotProduct0 = diffVec0.dot(normal);
+    return dotProduct0 == 0;
+}
+
+/*bool Plane3d::containsEdge(Vector3f v0, Vector3f v1){
     Vector3f diffVec0 = v0 - target;
     float dotProduct0 = diffVec0.dot(normal);
 
@@ -54,7 +73,7 @@ bool Plane3d::containsEdge(Vector3f v0, Vector3f v1){
     float dotProduct1 = diffVec1.dot(normal);
 
     return (dotProduct0 == 0 && dotProduct1 == 0);
-}
+}*/
 
 array<float, 3> Plane3d::findIntersection(Vector3f v0, Vector3f v1){
     Vector3f w = v0 - target;
