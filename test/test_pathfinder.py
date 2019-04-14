@@ -53,16 +53,16 @@ class TestGraph(TestCase):
                 intersection_count=0
                 vertices=[self.test_mesh['vertices'][v_id] for v_id in tet['vertices']]
                 for i in range(4):
-                    for j in range(i+1, 4):
-                        v0=np.array(vertices[i])
-                        v1=np.array(vertices[j])
-
-                        dot_product_i=np.dot(normal, v0-target)
-                        dot_product_j=np.dot(normal, v1-target)
-                        if dot_product_i==0 and dot_product_j==0:
-                            intersection_count+=2
-                        elif dot_product_i * dot_product_j < 0:
-                            intersection_count+=1
+                    v0=np.array(vertices[i])
+                    dot_product_i=np.dot(normal, v0-target)
+                    if dot_product_i==0:
+                        intersection_count+=1
+                    else:
+                        for j in range(i+1, 4):
+                            v1=np.array(vertices[j])
+                            dot_product_j=np.dot(normal, v1-target)
+                            if dot_product_i * dot_product_j < 0:
+                                intersection_count+=1
 
                 if intersection_count>2:
                     self.assertIn(idx, tet_ids)
