@@ -21,7 +21,7 @@ Mesh::Mesh(const int numVertices, const int numFaces, const int numCells){
     tetrahedrons.reserve(numCells);
 }
 
-void Mesh::setVertices(const vector<array<float, 3>> & _vertices){
+void Mesh::setVertices(const vector<array<double, 3>> & _vertices){
 
     for(unsigned long int i=0; i < _vertices.size(); ++i){
 	Vertex3d pt(_vertices[i]);
@@ -32,7 +32,7 @@ void Mesh::setVertices(const vector<array<float, 3>> & _vertices){
 
 
 void Mesh::addTetrahedron(const int id, const array<int, 4> vertexIds, 
-	const vector<unsigned long int> neighborIds, const float weight){
+	const vector<unsigned long int> neighborIds, const double weight){
 
     vector<reference_wrapper<Vertex3d>> refs = {vertices[vertexIds[0]], vertices[vertexIds[1]], vertices[vertexIds[2]], vertices[vertexIds[3]]};
 
@@ -58,10 +58,10 @@ void Mesh::addFace(const array<int, 3> vertexIds, const int tetId){
     faces.push_back(face);
 }
 
-bool Mesh::setTarget(array<float, 3> _target){
+bool Mesh::setTarget(array<double, 3> _target){
     for(unsigned long int i=0; i < tetrahedrons.size(); ++i){
 	if (tetrahedrons[i].contains(_target)){
-	    Vector3f t(_target[0], _target[1], _target[2]);
+	    Vector3d t(_target[0], _target[1], _target[2]);
 	    target = t;
 	    targetTetId=i;
 	    return true;
@@ -70,7 +70,7 @@ bool Mesh::setTarget(array<float, 3> _target){
     return false;
 }
 
-vector<vector<array<float, 3>>> Mesh::sliceIndv(array<float, 2> rotation, bool test){
+vector<Shape3d> Mesh::sliceIndv(array<double, 2> rotation, bool test){
     vector<int> tetsChecked;
     tetsChecked.reserve(tetrahedrons.size());
     for(unsigned long int i=0; i<tetrahedrons.size(); i++){
@@ -88,30 +88,30 @@ void Mesh::findPaths(vector<Plane3d> planes){
 	tetsChecked.push_back(-1);
     }
     for(int i=0; i<planes.size(); i++){
-	vector<vector<array<float, 3>>> myslice = slice(planes[i], tetsChecked, false);
+	vector<Shape3d> myslice = slice(planes[i], tetsChecked, false);
 	//cout << myslice.size() << endl;
     }
 	
 }
 
-vector<vector<array<float, 3>>> Mesh::slice(Plane3d plane, vector<int> &tetsChecked, bool test){
-    vector<vector<array<float, 3>>> slice = computeSliceComponent(plane, tetsChecked, targetTetId, test);
+vector<Shape3d> Mesh::slice(Plane3d plane, vector<int> &tetsChecked, bool test){
+    vector<Shape3d> slice = computeSliceComponent(plane, tetsChecked, targetTetId, test);
 
     for(unsigned long int i=0; i<faces.size(); i++){
 	if(faces[i].intersectsPlane(plane) && tetsChecked[faces[i].TetId()]!=plane.Id()){
-	    vector<vector<array<float, 3>>> sliceComponent = computeSliceComponent(plane, tetsChecked, faces[i].TetId(), test);
+	    vector<Shape3d> sliceComponent = computeSliceComponent(plane, tetsChecked, faces[i].TetId(), test);
 	    slice.insert(slice.end(), sliceComponent.begin(), sliceComponent.end());
 	}
     }
     return slice;
 }
 
-vector<vector<array<float, 3>>> Mesh::computeSliceComponent(Plane3d plane, vector<int> &tetsChecked, unsigned long int initTet, bool test){
+vector<Shape3d> Mesh::computeSliceComponent(Plane3d plane, vector<int> &tetsChecked, unsigned long int initTet, bool test){
     
     vector<unsigned long int> tetStack;
     tetStack.push_back(initTet);
 
-    vector<vector<array<float, 3>>> allPoints;
+    vector<Shape3d> allPoints;
 
     if(test){
 	sliceIds.clear();
@@ -123,13 +123,15 @@ vector<vector<array<float, 3>>> Mesh::computeSliceComponent(Plane3d plane, vecto
 	
 	if(tetsChecked[tet.Id()]!=plane.Id()){
 
-	    vector<array<float, 3>> intersectionPoints = tet.intersectsPlane(plane);
+	    vector<array<double, 3>> intersectionPoints = tet.intersectsPlane(plane);
 
 	    if(intersectionPoints.size()>2){
 		if(test){
 		    sliceIds.push_back(tet.Id());
 		}
-		allPoints.push_back(intersectionPoints);
+		Shape3d shape(tet.Id(), intersectionPoints, tet.Weight());
+		allPoints.push_back(shape);
+		//allPoints.push_back(intersectionPoints);
 		vector<unsigned long int> neighbors = tet.Neighbors();
 
 		for(int i=0; i<neighbors.size();++i){

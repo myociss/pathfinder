@@ -1,4 +1,6 @@
 #include <Eigen/Dense>
+#include <vector>
+#include <array>
 
 using namespace Eigen;
 using namespace std;
@@ -13,18 +15,31 @@ class Plane3d {
     Matrix3f rotationInverse;*/
     //Matrix3f rotation;
     int id;
-    Vector3f axisX;
-    Vector3f axisY;
-    Vector3f normal;
-    Vector3f target;
+    Vector3d axisX;
+    Vector3d axisY;
+    Vector3d normal;
+    Vector3d target;
     //float normalDist;
   public:
-    Plane3d (int _id, float alpha, float theta, Vector3f _target);
-    bool intersectsEdge(Vector3f v0, Vector3f v1);
+    Plane3d(int _id, double alpha, double theta, Vector3d _target);
+    bool intersectsEdge(Vector3d v0, Vector3d v1);
     //bool intersectsFace(Vector3f v0, Vector3f v1, Vector3f v2);
     //bool containsEdge(Vector3f v0, Vector3f v1);
-    bool containsPoint(Vector3f v0);
-    array<float, 3> findIntersection(Vector3f v0, Vector3f v1);
+    bool containsPoint(Vector3d v0);
+    array<double, 3> findIntersection(Vector3d v0, Vector3d v1);
     int Id();
 };
+
+class Shape3d {
+    unsigned long int tetId;
+    vector<array<double, 3>> vertices;
+    //tissueId
+    //these should probably all be doubles?
+    double weight;
+  public:
+    Shape3d(unsigned long int _tetId, vector<array<double, 3>> _vertices, double _weight);
+    unsigned long int TetId();
+};
+
 #endif
+

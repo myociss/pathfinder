@@ -1,14 +1,12 @@
 from unittest import TestCase
-import json
-import random
+import json, random, numpy as np, multiprocessing, math
+from decimal import *
 import pathfinder
-import numpy as np
-import multiprocessing
-import math
 
 class TestGraph(TestCase):
 
     def setUp(self):
+        getcontext().prec = 15
         with open('fixtures/test_mesh.json', 'r') as mesh_file:
             self.test_mesh=json.load(mesh_file)
         self.mesh=pathfinder.Mesh(num_vertices=len(self.test_mesh['vertices']), num_faces=len(self.test_mesh['faces']), num_tetrahedrons=len(self.test_mesh['tetrahedrons']))
@@ -41,7 +39,7 @@ class TestGraph(TestCase):
             theta=math.pi*random.random()
 
             plane_intersection=self.mesh.slice(rotation=[alpha,theta], test=True)
-            tet_ids=self.mesh.get_slice_ids()
+            tet_ids=[shape.tet_id() for shape in plane_intersection]
 
             rotation_x=np.array([[1,0,0], [0,math.cos(alpha),math.sin(alpha)], [0,-math.sin(alpha),math.cos(alpha)]])
             rotation_y=np.array([[math.cos(theta),0,math.sin(theta)], [0,1,0], [-math.sin(theta),0,math.cos(theta)]])

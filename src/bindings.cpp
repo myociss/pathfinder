@@ -1,5 +1,6 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include "plane3d.hpp"
 #include "mesh.hpp"
 
 namespace py = pybind11;
@@ -29,4 +30,10 @@ PYBIND11_MODULE(pathfinder, m){
 	py::arg("epsilon"),
 	py::arg("threads"));
 
+  py::class_<Shape3d>(m, "Shape3d")
+    .def(py::init<unsigned long int, vector<array<double, 3>>, double>(),
+	py::arg("tet_id"),
+	py::arg("points"),
+	py::arg("weight"))
+    .def("tet_id", &Shape3d::TetId);
 }

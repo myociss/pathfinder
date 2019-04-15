@@ -12,28 +12,29 @@ using namespace std;
 
 
 class Vertex3d {
-    Vector3f vec;
+    Vector3d vec;
     //std::vector<Tetrahedron *> tetrahedrons;
   public:
-    Vertex3d (array<float, 3>);
-    Vector3f Vec();
+    Vertex3d (array<double, 3>);
+    Vector3d Vec();
 };
 
 class Tetrahedron {
     unsigned long int id;
     vector<reference_wrapper<Vertex3d>> vertices;
     vector<unsigned long int> neighbors;
-    array<float, 3> sphereCenter;
-    float sphereRadius;
-    float weight;
+    array<double, 3> sphereCenter;
+    double sphereRadius;
+    double weight;
   public:
-    Tetrahedron (const int id, const vector<reference_wrapper<Vertex3d>> _vertices, const float _weight);
+    Tetrahedron (const int id, const vector<reference_wrapper<Vertex3d>> _vertices, const double _weight);
     void addNeighbor(unsigned long int neighborId);
-    bool contains(const array<float, 3>);
+    bool contains(const array<double, 3>);
     vector<reference_wrapper<Vertex3d>> Vertices();
     vector<unsigned long int> Neighbors();
-    vector<array<float, 3>> intersectsPlane(Plane3d plane);
+    vector<array<double, 3>> intersectsPlane(Plane3d plane);
     unsigned long int Id();
+    double Weight();
 };
 
 class Face {
