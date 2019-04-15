@@ -23,9 +23,7 @@ PYBIND11_MODULE(pathfinder, m){
     .def("set_target", &Mesh::setTarget)
     .def("get_target_idx", &Mesh::getTargetTetId)
     .def("slice", &Mesh::sliceIndv,
-	py::arg("rotation"),
-	py::arg("test"))
-    .def("get_slice_ids", &Mesh::getSliceIds)
+	py::arg("rotation"))
     .def("multiple_slices", &Mesh::shortestPaths,
 	py::arg("epsilon"),
 	py::arg("threads"));

@@ -38,7 +38,7 @@ class TestGraph(TestCase):
             alpha=math.pi*random.random()
             theta=math.pi*random.random()
 
-            plane_intersection=self.mesh.slice(rotation=[alpha,theta], test=True)
+            plane_intersection=self.mesh.slice(rotation=[alpha,theta])
             tet_ids=[shape.tet_id() for shape in plane_intersection]
 
             rotation_x=np.array([[1,0,0], [0,math.cos(alpha),math.sin(alpha)], [0,-math.sin(alpha),math.cos(alpha)]])
