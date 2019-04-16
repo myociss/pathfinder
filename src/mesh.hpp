@@ -24,7 +24,7 @@ class Mesh {
     void setVertices(const vector<array<double, 3>> & _vertices);
     void addTetrahedron(const int id, const array<int, 4> vertexIds, const vector<unsigned long int> neighborIds, const double weight);
     void addFace(const array<int, 3> vertexIds, const int tetId);
-    bool setTarget(const array<double, 3> _target);
+    void setTarget(const array<double, 3> _target);
     vector<Shape3d> slice(Plane3d plane, vector<int> &tetsChecked);
     void shortestPaths(const int epsilon, const int numThreads);
     vector<Shape3d> computeSliceComponent(Plane3d plane, vector<int> &tetsChecked, unsigned long int initTet);

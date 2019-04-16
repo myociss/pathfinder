@@ -58,16 +58,18 @@ void Mesh::addFace(const array<int, 3> vertexIds, const int tetId){
     faces.push_back(face);
 }
 
-bool Mesh::setTarget(array<double, 3> _target){
+void Mesh::setTarget(array<double, 3> _target){
     for(unsigned long int i=0; i < tetrahedrons.size(); ++i){
 	if (tetrahedrons[i].contains(_target)){
 	    Vector3d t(_target[0], _target[1], _target[2]);
 	    target = t;
 	    targetTetId=i;
-	    return true;
+	    return;
+	    //return true;
 	}
     }
-    return false;
+    //return false;
+    throw runtime_error("Target not within mesh bounds");
 }
 
 vector<Shape3d> Mesh::sliceIndv(array<double, 2> rotation){
@@ -97,12 +99,12 @@ void Mesh::findPaths(vector<Plane3d> planes){
 vector<Shape3d> Mesh::slice(Plane3d plane, vector<int> &tetsChecked){
     vector<Shape3d> slice = computeSliceComponent(plane, tetsChecked, targetTetId);
 
-    for(unsigned long int i=0; i<faces.size(); i++){
+    /*for(unsigned long int i=0; i<faces.size(); i++){
 	if(faces[i].intersectsPlane(plane) && tetsChecked[faces[i].TetId()]!=plane.Id()){
 	    vector<Shape3d> sliceComponent = computeSliceComponent(plane, tetsChecked, faces[i].TetId());
 	    slice.insert(slice.end(), sliceComponent.begin(), sliceComponent.end());
 	}
-    }
+    }*/
     return slice;
 }
 

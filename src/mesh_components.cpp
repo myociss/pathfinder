@@ -20,11 +20,11 @@ Tetrahedron::Tetrahedron(const int _id, const vector<reference_wrapper<Vertex3d>
     Vector3d v2 = vertices[2].get().Vec();
     Vector3d v3 = vertices[3].get().Vec();
 
-    array<double, 3> faceCentroid = {(v0[0] + v1[0] + v2[0]) / 3, (v0[1] + v1[1] + v2[1]) / 3, (v0[2] + v1[2] + v2[2]) / 3};
+    //array<double, 3> faceCentroid = {(v0[0] + v1[0] + v2[0]) / 3, (v0[1] + v1[1] + v2[1]) / 3, (v0[2] + v1[2] + v2[2]) / 3};
 
     //Vector3f pt3 = vertices[3]->Vec();
 
-    sphereCenter = { (3 * faceCentroid[0] + v3[0])/4, (3 * faceCentroid[1] + v3[1])/4, (3 * faceCentroid[2] + v3[2])/4};
+    sphereCenter = { (v0[0] + v1[0] + v2[0] + v3[0])/4, (v0[1] + v1[1] + v2[1] + v3[1])/4, (v0[2] + v1[2] + v2[2] + v3[2])/4};
 
     double r0 = sqrt( pow(sphereCenter[0]-v0[0], 2) + pow(sphereCenter[1]-v0[1], 2) + pow(sphereCenter[2]-v0[2], 2));
 
@@ -40,7 +40,7 @@ Tetrahedron::Tetrahedron(const int _id, const vector<reference_wrapper<Vertex3d>
 
     for(int i=1; i<4; ++i){
 	//float tmp_r = ;
-	if (radii[i] < r){
+	if (radii[i] > r){
 	    r = radii[i];
 	}
     }
@@ -59,11 +59,24 @@ Face::Face(const vector<reference_wrapper<Vertex3d>> _vertices, unsigned long in
 
 bool Tetrahedron::contains(const array<double, 3> pt_target){
     if (sqrt( pow(pt_target[0] - sphereCenter[0], 2) + pow(pt_target[1] - sphereCenter[1], 2) + pow(pt_target[2] - sphereCenter[2], 2)) < sphereRadius){
+        /*cout << pt_target[0] << endl;
+        cout << pt_target[1] << endl;
+        cout << pt_target[2] << endl;
+        cout << "HERE" << endl;*/
 
 	Vector3d pt0 = {vertices[0].get().Vec()};
 	Vector3d pt1 = {vertices[1].get().Vec()};
 	Vector3d pt2 = {vertices[2].get().Vec()};
 	Vector3d pt3 = {vertices[3].get().Vec()};
+
+	/*cout << "pt0" << endl;
+	cout << pt0 << endl;
+	cout << "pt1" << endl;
+	cout << pt1 << endl;
+	cout << "pt2" << endl;
+	cout << pt2 << endl;
+	cout << "pt3" << endl;
+	cout << pt3 << endl;*/
 
 	Matrix4d m0;
 	Matrix4d m1;
@@ -106,6 +119,12 @@ bool Tetrahedron::contains(const array<double, 3> pt_target){
 
 	double d4 = m4.determinant();
 
+	/*cout << d0 << endl;
+	cout << d1 << endl;
+	cout << d2 << endl;
+	cout << d3 << endl;
+	cout << d4 << endl;*/
+
 	return (d0<0 && d1<0 && d2<0 && d3<0 && d4<0) || (d0>0 && d1>0 && d2>0 && d3>0 && d4>0);
     }
     return false;
@@ -145,13 +164,7 @@ bool Face::intersectsPlane(Plane3d plane){
     Vector3d v1 = vertices[1].get().Vec();
     Vector3d v2 = vertices[2].get().Vec();
 
-    //return plane.intersectsFace(v0, v1, v2);
-
-    /*if(plane.intersects(v0, v1) || plane.intersects(v1,v2) || plane.intersects(v0,v2)){
-	return true;
-    }
-    return false;*/
-    return (plane.intersectsEdge(v0, v1) || plane.intersectsEdge(v0, v2));
+    return (plane.intersectsEdge(v0, v1) || plane.intersectsEdge(v1, v2) || plane.intersectsEdge(v0, v2));
 }
 
 
@@ -179,7 +192,8 @@ vector<reference_wrapper<Vertex3d>> Face::Vertices(){
     return vertices;
 }
 
-Vertex3d::Vertex3d(const array<double, 3> _vec) {
+Vertex3d::Vertex3d(array<double, 3> _vec) {
+    //vec = _vec;
     vec << _vec[0], _vec[1], _vec[2];
 }
 

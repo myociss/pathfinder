@@ -15,7 +15,7 @@ class Vertex3d {
     Vector3d vec;
     //std::vector<Tetrahedron *> tetrahedrons;
   public:
-    Vertex3d (array<double, 3>);
+    Vertex3d (array<double, 3> _vec);
     Vector3d Vec();
 };
 
