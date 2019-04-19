@@ -36,17 +36,9 @@ class TestGraph(TestCase):
     def test_slice(self):
         for test_iter in range(20):
             target=[2*random.random(), 2*random.random(), 2*random.random()]
-            #if test_iter==1:
-            #    target=[1.5543893519310834, 1.4323891076365038, 1.7942337456518473]
-
-            #print(self.mesh.set_target(target))
             self.mesh.set_target(target)
             alpha=math.pi*random.random()
             theta=math.pi*random.random()
-            #if test_iter==1:
-            #    alpha=0.8053766554455807
-            #    theta=0.5977717128533357
-            #print(theta)
 
             plane_intersection=self.mesh.slice(rotation=[alpha,theta])
             tet_ids=[shape.tet_id() for shape in plane_intersection]
@@ -60,36 +52,22 @@ class TestGraph(TestCase):
             for idx, tet in enumerate(self.test_mesh['tetrahedrons']):
                 intersection_count=0
                 vertices=[self.test_mesh['vertices'][v_id] for v_id in tet['vertices']]
-                dot_products=[]
                 for i in range(4):
                     v0=np.array(vertices[i])
                     dot_product_i=np.dot(normal, v0-target)
-                    dot_products.append(dot_product_i)
-                    #print(dot_product_i)
                     if dot_product_i==0:
                         intersection_count+=1
                     else:
                         for j in range(i+1, 4):
                             v1=np.array(vertices[j])
                             dot_product_j=np.dot(normal, v1-target)
-                            #print(dot_product_j)
                             if dot_product_i * dot_product_j < 0:
                                 intersection_count+=1
 
                 if intersection_count>2:
-                    #print(vertices)
-                    #print(target)
-                    #print(normal)
-                    #print(dot_products)
                     self.assertIn(idx, tet_ids)
                     contains_count+=1
 
-            #print(target)
-            #print(alpha)
-            #print(theta)
-            #print(normal)
-            #print(contains_count)
-            #print(len(plane_intersection))
             self.assertEqual(contains_count, len(plane_intersection))
 
     

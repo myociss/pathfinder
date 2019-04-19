@@ -28,6 +28,8 @@ class Plane3d {
     bool containsPoint(Vector3d v0);
     array<double, 3> findIntersection(Vector3d v0, Vector3d v1);
     int Id();
+    //Vector3d Target();
+    Vector2d Rotate(array<double, 3> _vec);
 };
 
 class Shape3d {
@@ -39,6 +41,7 @@ class Shape3d {
   public:
     Shape3d(unsigned long int _tetId, vector<array<double, 3>> _vertices, double _weight);
     unsigned long int TetId();
+    vector<array<double, 3>> Vertices();
 };
 
 #endif

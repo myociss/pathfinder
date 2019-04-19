@@ -97,6 +97,18 @@ int Plane3d::Id(){
     return id;
 }
 
+Vector2d Plane3d::Rotate(array<double, 3> _vec){
+    Vector3d vec(_vec[0], _vec[1], _vec[2]);
+    double xCoord = axisX.dot(vec - target);
+    double yCoord = axisY.dot(vec - target);
+
+    return Vector2d(xCoord, yCoord);
+}
+
+/*Vector3d Plane3d::Target(){
+    return target;
+}*/
+
 //Vector3f Plane3d::getNormal(){
 //    return Vector3f(rotation.row(2)[0], rotation.row(2)[2], rotation.row(2)[2]);
 //}
@@ -110,5 +122,13 @@ Shape3d::Shape3d(unsigned long int _tetId, vector<array<double, 3>> _vertices, d
 
 unsigned long int Shape3d::TetId(){
     return tetId;
+}
+
+vector<array<double, 3>> Shape3d::Vertices(){
+    //return Vector3d(vertices[0], vertices[1], vertices[2]);
+    //vector<Vector3d> verticesAsVecs;
+
+    //for(int i=0; i<
+    return vertices;
 }
 

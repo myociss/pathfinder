@@ -1,6 +1,7 @@
 #define _USE_MATH_DEFINES
 
 #include "mesh.hpp"
+#include "plane2d.hpp"
 //#include "plane3d.hpp"
 #include <iostream>
 #include <map>
@@ -65,10 +66,8 @@ void Mesh::setTarget(array<double, 3> _target){
 	    target = t;
 	    targetTetId=i;
 	    return;
-	    //return true;
 	}
     }
-    //return false;
     throw runtime_error("Target not within mesh bounds");
 }
 
@@ -91,7 +90,7 @@ void Mesh::findPaths(vector<Plane3d> planes){
     }
     for(int i=0; i<planes.size(); i++){
 	vector<Shape3d> myslice = slice(planes[i], tetsChecked);
-	//cout << myslice.size() << endl;
+	Plane2d plane2d(myslice, planes[i]);
     }
 	
 }
@@ -99,12 +98,12 @@ void Mesh::findPaths(vector<Plane3d> planes){
 vector<Shape3d> Mesh::slice(Plane3d plane, vector<int> &tetsChecked){
     vector<Shape3d> slice = computeSliceComponent(plane, tetsChecked, targetTetId);
 
-    /*for(unsigned long int i=0; i<faces.size(); i++){
+    for(unsigned long int i=0; i<faces.size(); i++){
 	if(faces[i].intersectsPlane(plane) && tetsChecked[faces[i].TetId()]!=plane.Id()){
 	    vector<Shape3d> sliceComponent = computeSliceComponent(plane, tetsChecked, faces[i].TetId());
 	    slice.insert(slice.end(), sliceComponent.begin(), sliceComponent.end());
 	}
-    }*/
+    }
     return slice;
 }
 

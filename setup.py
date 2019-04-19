@@ -25,6 +25,7 @@ ext_modules = [
         'pathfinder',
         ['src/mesh.cpp',
 	 'src/plane3d.cpp',
+         'src/plane2d.cpp',
 	 'src/mesh_components.cpp',
 	 'src/bindings.cpp'],
         include_dirs=[
