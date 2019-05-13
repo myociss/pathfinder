@@ -9,11 +9,6 @@ class TestGraph(TestCase):
             self.test_mesh=json.load(mesh_file)
         self.mesh=pathfinder.Mesh(num_vertices=len(self.test_mesh['vertices']), num_faces=len(self.test_mesh['faces']), num_tetrahedrons=len(self.test_mesh['tetrahedrons']))
 
-        #vertices=[[np.double(comp) for comp in v] for v in self.test_mesh['vertices']]
-
-        #print(type(vertices[800][0]))
-        #print(vertices[800][0])
-
         self.mesh.set_vertices(self.test_mesh['vertices'])
 
         for idx, tet in enumerate(self.test_mesh['tetrahedrons']):
@@ -70,6 +65,17 @@ class TestGraph(TestCase):
 
             self.assertEqual(contains_count, len(plane_intersection))
 
+    def test_flatten_plane(self):
+        for test_iter in range(5):
+            target=[2*random.random(), 2*random.random(), 2*random.random()]
+            self.mesh.set_target(target)
+            alpha=math.pi*random.random()
+            theta=math.pi*random.random()
+
+            plane_intersection=self.mesh.slice(rotation=[alpha,theta])
+            plane3d = pathfinder.Plane3d(id=0, alpha=alpha, theta=theta, target=np.array(target))
+            plane2d = pathfinder.Plane2d(plane_intersection, plane3d)
+            
     
 
 if __name__ == '__main__':
