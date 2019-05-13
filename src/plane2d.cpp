@@ -20,15 +20,17 @@ Plane2d::Plane2d(vector<Shape3d>& shapes, Plane3d plane3d){
 	for(int j=0; j<vertices.size(); ++j){
 	    Vector2d rotatedPoint = plane3d.Rotate(vertices[j]);
 	    Point2d point(rotatedPoint);
-	    //double x = rotatedPoint[0];
-	    //double y = rotatedPoint[1];
-	    //Vector3d point(x, y, atan2(y, x));
 	    points.push_back(point);
 	}
     }
 
     sort(points.begin(), points.end());
+
+    //assignAngleIds(points)
 }
+
+//void assignAngleIds()
+
 
 Point2d::Point2d(Vector2d _vec){
     vec = _vec;

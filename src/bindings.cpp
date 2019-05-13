@@ -34,5 +34,6 @@ PYBIND11_MODULE(pathfinder, m){
 	py::arg("tet_id"),
 	py::arg("points"),
 	py::arg("weight"))
-    .def("tet_id", &Shape3d::TetId);
+    .def("tet_id", &Shape3d::TetId)
+    .def("vertices", &Shape3d::Vertices);
 }
