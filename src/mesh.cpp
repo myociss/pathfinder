@@ -33,11 +33,11 @@ void Mesh::setVertices(const vector<array<double, 3>> & _vertices){
 
 
 void Mesh::addTetrahedron(const int id, const array<int, 4> vertexIds, 
-	const vector<unsigned long int> neighborIds, const double weight){
+	const vector<unsigned long int> neighborIds, const double weight, const int label){
 
     vector<reference_wrapper<Vertex3d>> refs = {vertices[vertexIds[0]], vertices[vertexIds[1]], vertices[vertexIds[2]], vertices[vertexIds[3]]};
 
-    Tetrahedron tet(id, refs, weight);
+    Tetrahedron tet(id, refs, weight, label);
 
     unsigned long int current_size = tetrahedrons.size();
 
@@ -123,7 +123,7 @@ vector<Shape3d> Mesh::computeSliceComponent(Plane3d plane, vector<int> &tetsChec
 	    vector<array<double, 3>> intersectionPoints = tet.intersectsPlane(plane);
 
 	    if(intersectionPoints.size()>2){
-		Shape3d shape(tet.Id(), intersectionPoints, tet.Weight());
+		Shape3d shape(tet.Id(), intersectionPoints, tet.Weight(), tet.Label());
 		allPoints.push_back(shape);
 		//allPoints.push_back(intersectionPoints);
 		vector<unsigned long int> neighbors = tet.Neighbors();

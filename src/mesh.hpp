@@ -20,9 +20,8 @@ class Mesh {
     vector<int> sliceIds;
   public:
     Mesh (const int numVertices, const int numFaces, const int numCells);
-    //~Mesh();
     void setVertices(const vector<array<double, 3>> & _vertices);
-    void addTetrahedron(const int id, const array<int, 4> vertexIds, const vector<unsigned long int> neighborIds, const double weight);
+    void addTetrahedron(const int id, const array<int, 4> vertexIds, const vector<unsigned long int> neighborIds, const double weight, const int label);
     void addFace(const array<int, 3> vertexIds, const int tetId);
     void setTarget(const array<double, 3> _target);
     vector<Shape3d> slice(Plane3d plane, vector<int> &tetsChecked);

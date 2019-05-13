@@ -114,10 +114,11 @@ Vector2d Plane3d::Rotate(array<double, 3> _vec){
 //}
 
 
-Shape3d::Shape3d(unsigned long int _tetId, vector<array<double, 3>> _vertices, double _weight){
+Shape3d::Shape3d(unsigned long int _tetId, vector<array<double, 3>> _vertices, double _weight, int _label){
     tetId = _tetId;
     vertices = _vertices;
     weight = _weight;
+    label = _label;
 }
 
 unsigned long int Shape3d::TetId(){
@@ -132,3 +133,6 @@ vector<array<double, 3>> Shape3d::Vertices(){
     return vertices;
 }
 
+int Shape3d::Label(){
+    return label;
+}

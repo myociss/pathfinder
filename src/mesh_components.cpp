@@ -9,10 +9,11 @@
 using namespace Eigen;
 using namespace std;
 
-Tetrahedron::Tetrahedron(const int _id, const vector<reference_wrapper<Vertex3d>> _vertices, const double _weight){
+Tetrahedron::Tetrahedron(const int _id, const vector<reference_wrapper<Vertex3d>> _vertices, const double _weight, const int _label){
     id = _id;
     vertices = _vertices;
     weight = _weight;
+    label = _label;
     //cout << vertices[0].get().Vec() << endl;
 
     Vector3d v0 = vertices[0].get().Vec();
@@ -182,6 +183,10 @@ vector<reference_wrapper<Vertex3d>> Tetrahedron::Vertices(){
 
 double Tetrahedron::Weight(){
     return weight;
+}
+
+int Tetrahedron::Label(){
+    return label;
 }
 
 unsigned long int Face::TetId(){

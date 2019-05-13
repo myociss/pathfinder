@@ -17,7 +17,7 @@ class TestGraph(TestCase):
         self.mesh.set_vertices(self.test_mesh['vertices'])
 
         for idx, tet in enumerate(self.test_mesh['tetrahedrons']):
-            self.mesh.add_tetrahedron(tetrahedron_id=idx, neighbor_ids=tet['neighbors'], vertex_ids=tet['vertices'], weight=tet['weight'])
+            self.mesh.add_tetrahedron(tetrahedron_id=idx, neighbor_ids=tet['neighbors'], vertex_ids=tet['vertices'], weight=tet['weight'], label=tet['label'])
 
         for face in self.test_mesh['faces']:
             self.mesh.add_face(vertex_ids=face['vertices'], tetrahedron_id=face['tetrahedron'])

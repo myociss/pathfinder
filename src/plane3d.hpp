@@ -35,13 +35,15 @@ class Plane3d {
 class Shape3d {
     unsigned long int tetId;
     vector<array<double, 3>> vertices;
+    int label;
     //tissueId
     //these should probably all be doubles?
     double weight;
   public:
-    Shape3d(unsigned long int _tetId, vector<array<double, 3>> _vertices, double _weight);
+    Shape3d(unsigned long int _tetId, vector<array<double, 3>> _vertices, double _weight, int _label);
     unsigned long int TetId();
     vector<array<double, 3>> Vertices();
+    int Label();
 };
 
 #endif

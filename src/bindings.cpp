@@ -17,7 +17,8 @@ PYBIND11_MODULE(pathfinder, m){
 	py::arg("tetrahedron_id"),
 	py::arg("vertex_ids"),
 	py::arg("neighbor_ids"),
-	py::arg("weight"))
+	py::arg("weight"),
+	py::arg("label"))
     .def("add_face", &Mesh::addFace,
 	py::arg("vertex_ids"),
 	py::arg("tetrahedron_id"))
@@ -30,10 +31,12 @@ PYBIND11_MODULE(pathfinder, m){
 	py::arg("threads"));
 
   py::class_<Shape3d>(m, "Shape3d")
-    .def(py::init<unsigned long int, vector<array<double, 3>>, double>(),
+    .def(py::init<unsigned long int, vector<array<double, 3>>, double, int>(),
 	py::arg("tet_id"),
 	py::arg("points"),
-	py::arg("weight"))
+	py::arg("weight"),
+	py::arg("label"))
     .def("tet_id", &Shape3d::TetId)
-    .def("vertices", &Shape3d::Vertices);
+    .def("vertices", &Shape3d::Vertices)
+    .def("label", &Shape3d::Label);
 }

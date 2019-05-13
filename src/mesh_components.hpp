@@ -26,8 +26,9 @@ class Tetrahedron {
     array<double, 3> sphereCenter;
     double sphereRadius;
     double weight;
+    int label;
   public:
-    Tetrahedron (const int id, const vector<reference_wrapper<Vertex3d>> _vertices, const double _weight);
+    Tetrahedron (const int id, const vector<reference_wrapper<Vertex3d>> _vertices, const double _weight, const int _label);
     void addNeighbor(unsigned long int neighborId);
     bool contains(const array<double, 3>);
     vector<reference_wrapper<Vertex3d>> Vertices();
@@ -35,6 +36,7 @@ class Tetrahedron {
     vector<array<double, 3>> intersectsPlane(Plane3d plane);
     unsigned long int Id();
     double Weight();
+    int Label();
 };
 
 class Face {
