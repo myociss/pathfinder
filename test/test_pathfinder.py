@@ -75,7 +75,24 @@ class TestGraph(TestCase):
             plane_intersection=self.mesh.slice(rotation=[alpha,theta])
             plane3d = pathfinder.Plane3d(id=0, alpha=alpha, theta=theta, target=np.array(target))
             plane2d = pathfinder.Plane2d(plane_intersection, plane3d)
-            
+
+            for shape_idx, shape in enumerate(plane2d.shapes()):
+                vertices_2d=shape.vertices()
+                vertices_3d=plane_intersection[shape_idx].vertices()
+                
+                for vertex_idx, vertex_2d in enumerate(vertices_2d):
+                    vertex_3d=vertices_3d[vertex_idx]
+                    if vertex_idx==len(vertices_2d)-1:
+                        next_2d=vertices_2d[0]
+                        next_3d=vertices_3d[0]
+                    else:
+                        next_2d=vertices_2d[vertex_idx+1]
+                        next_3d=vertices_3d[vertex_idx+1]
+                   
+                    distance_2d = math.sqrt( ((vertex_2d[0]-next_2d[0])**2)+((vertex_2d[1]-next_2d[1])**2) )
+                    distance_3d = math.sqrt( ((vertex_3d[0]-next_3d[0])**2)+((vertex_3d[1]-next_3d[1])**2) + ((vertex_3d[2]-next_3d[2])**2))
+                    self.assertLess(abs(distance_2d - distance_3d), 10e-8)
+                    
     
 
 if __name__ == '__main__':

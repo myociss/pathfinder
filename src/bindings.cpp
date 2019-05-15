@@ -50,7 +50,8 @@ PYBIND11_MODULE(pathfinder, m){
     .def("label", &Shape3d::Label);
 
   py::class_<Plane2d>(m, "Plane2d")
-    .def(py::init<vector<Shape3d>&, Plane3d>());
+    .def(py::init<vector<Shape3d>&, Plane3d>())
+    .def("shapes", &Plane2d::Shapes);
 
   py::class_<Shape2d>(m, "Shape2d")
     .def("vertices", &Shape2d::Vertices);

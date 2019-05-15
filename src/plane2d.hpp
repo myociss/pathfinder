@@ -10,13 +10,24 @@ using namespace std;
 #ifndef PLANE2D_HPP
 #define PLANE2D_HPP
 
+class SweepLineInterval{
+    Vector2d point;
+    array<double, 3> lineComponents;
+    array<double, 2> polarComponents;
+  public:
+    SweepLineInterval(Vector2d _point);
+};
+
+
 class Plane2d{
     vector<Shape2d> shapes;
+    vector<SweepLineInterval> sweepLineIntervals;
     //vector<Vector2d> uniquePoints;
     //vector<Vector2d> uniquePolar;
     //vector<Vector3d> uniqueAngles;
   public:
     Plane2d(vector<Shape3d>& shapes, Plane3d plane3d);
+    vector<Shape2d> Shapes();
 };
 
 #endif
