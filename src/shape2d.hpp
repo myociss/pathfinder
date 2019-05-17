@@ -27,6 +27,7 @@ class Point2d {
     Vector2d Vec();
     double Angle();
     unsigned long int AngleId();
+    void updateAngle();
     void setAngleId(unsigned long int _angleId);
     int ShapeVectorPos();
     unsigned long int ShapeId();
@@ -47,6 +48,7 @@ class Point2d {
 class Shape2d {
     int numVertices;
     vector<Point2d> vertices;
+    int endVertexId;
     //vector<Edge> edges;
   public:
     Shape2d(int _numVertices);

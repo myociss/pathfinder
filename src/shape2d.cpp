@@ -1,6 +1,8 @@
 #include "shape2d.hpp"
-#include <math.h>
 #include <iostream>
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 //#include <sort.h>
 
 using namespace Eigen;
@@ -35,12 +37,6 @@ void Shape2d::arrange(vector<SweepLineInterval>& sweeplineIntervals){
     unsigned long int startAngleId;
     unsigned long int endAngleId;
 
-    /*cout << "start of arrange: " << endl;
-    for(int i=0; i<numVertices; ++i){
-	cout << vertices[i].Vec() << endl;
-	cout << "----------" << endl;
-    }*/
-
     int startVertex;
     for(int i=0; i<vertices.size(); i++){
 	Vector2d prev;
@@ -70,7 +66,6 @@ void Shape2d::arrange(vector<SweepLineInterval>& sweeplineIntervals){
     Vector2d p = vertices[0].Vec();
     Vector2d q = vertices[1].Vec();
     Vector2d r = vertices[2].Vec();
-    //cout << startVertex << endl;
 
     bool orientedClockwise=(r[0]-p[0])*(q[1]-p[1])-(q[0]-p[0])*(r[1]-p[1]) > 0;
 
@@ -78,7 +73,6 @@ void Shape2d::arrange(vector<SweepLineInterval>& sweeplineIntervals){
     tmpVertices.reserve(vertices.size());
     if(orientedClockwise){
 	int idx=startVertex;
-	//count=0;
 	for(int i=0; i<vertices.size(); ++i){
 	    tmpVertices.push_back(vertices[idx]);
 	    ++idx;
@@ -86,27 +80,8 @@ void Shape2d::arrange(vector<SweepLineInterval>& sweeplineIntervals){
 		idx=0;
 	    }
 	}
-
-	/*while(idx!=startVertex){
-	    int headIdx=idx-1;
-	    //if(headIdx<0){
-		//headIdx=vertices.size()-1;
-	    //}
-	    //Edge edge(vertices[headIdx], vertices[idx]);
-	    tmpVertices.push_back(vertices[headIdx]);
-	    //edges.push_back(edge);
-	    headIdx=idx;
-	    ++idx;
-	    if(idx==vertices.size()){
-		idx=0;
-	    }
-	    if(headIdx==vertices.size()){
-		headIdx=0;
-	    }
-	}*/
     } else {
 	int idx=startVertex;
-	//count=0;
 	for(int i=0; i<vertices.size(); ++i){
 	    tmpVertices.push_back(vertices[idx]);
 	    --idx;
@@ -114,37 +89,18 @@ void Shape2d::arrange(vector<SweepLineInterval>& sweeplineIntervals){
 		idx=vertices.size()-1;
 	    }
 	}
-	/*int idx=startVertex-1;
-	while(idx!=startVertex){
-	    int headIdx=idx+1;
-	    //if(headIdx==vertices.size()){
-		//headIdx=0;
-	    //}
-	    //Edge edge(vertices[headIdx], vertices[idx]);
-	    //edges.push_back(edge);
-	    tmpVertices.push_back(vertices[headIdx]);
-	    headIdx=idx;
-	    --idx;
-	    if(idx<0){
-		idx=vertices.size()-1;
-	    }
-	    //if(headIdx<0){
-		//headIdx=vertices.size()-1;
-	    //}
-	}*/
     }
-    /*for(int i=0; i<edges.size(); ++i){
-	int next=i+1;
-	if(next==edges.size()){
-	    next=0;
-	}
-	edges[i].setNext(edges[next]);
-    }*/
-    //cout << "end of arrange: " << endl;
+
+    endVertexId=tmpVertices[0].AngleId();
+    double angleMax=tmpVertices[0].Angle();
     for(int i=0; i<numVertices; ++i){
 	vertices[i]=tmpVertices[i];
-	//cout << vertices[i].Vec() << endl;
-	//cout << "----------" << endl;
+	if(vertices[i].Angle()<0 && vertices[0].Angle()>0){
+	    vertices[i].updateAngle();
+	}
+	if(vertices[i].Angle()>angleMax){
+	    endVertexId=vertices[i].AngleId();
+	}
     }
 }
 
@@ -205,6 +161,10 @@ double Point2d::Angle(){
 
 unsigned long int Point2d::AngleId(){
     return angleId;
+}
+
+void Point2d::updateAngle(){
+    angle += 2 * M_PI;
 }
 
 unsigned long int Point2d::ShapeId(){
