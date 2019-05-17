@@ -54,5 +54,6 @@ PYBIND11_MODULE(pathfinder, m){
     .def("shapes", &Plane2d::Shapes);
 
   py::class_<Shape2d>(m, "Shape2d")
-    .def("vertices", &Shape2d::Vertices);
+    .def("vertices", &Shape2d::Vertices)
+    .def("arranged_vertices", &Shape2d::VerticesArranged);
 }

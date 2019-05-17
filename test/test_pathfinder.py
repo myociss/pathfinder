@@ -93,6 +93,39 @@ class TestGraph(TestCase):
                     distance_3d = math.sqrt( ((vertex_3d[0]-next_3d[0])**2)+((vertex_3d[1]-next_3d[1])**2) + ((vertex_3d[2]-next_3d[2])**2))
                     self.assertLess(abs(distance_2d - distance_3d), 10e-8)
                     
+    def test_arrange_vertices(self):
+        for test_iter in range(5):
+            target=[2*random.random(), 2*random.random(), 2*random.random()]
+            self.mesh.set_target(target)
+            alpha=math.pi*random.random()
+            theta=math.pi*random.random()
+
+            plane_intersection=self.mesh.slice(rotation=[alpha,theta])
+            plane3d = pathfinder.Plane3d(id=0, alpha=alpha, theta=theta, target=np.array(target))
+            plane2d = pathfinder.Plane2d(plane_intersection, plane3d)
+
+            for shape_idx in range(1, len(plane2d.shapes())):
+                vertices_2d=plane2d.shapes()[shape_idx].arranged_vertices()
+
+                angle_inter=math.acos(np.dot(vertices_2d[0], vertices_2d[1])/(np.linalg.norm(vertices_2d[0]) * np.linalg.norm(vertices_2d[1])))
+                angle_first=math.atan2(vertices_2d[0][1], vertices_2d[0][0])
+                angle_next=math.atan2(vertices_2d[1][1], vertices_2d[1][0])
+                angle_expected=angle_first+angle_inter
+
+                if angle_expected>math.pi:
+                    angle_expected=-math.pi + (angle_expected % math.pi)
+
+                self.assertLess(abs(angle_next-angle_expected), 10e-8)
+
+                angle_inter=math.acos(np.dot(vertices_2d[0], vertices_2d[-1])/(np.linalg.norm(vertices_2d[0]) * np.linalg.norm(vertices_2d[-1])))
+                angle_last=math.atan2(vertices_2d[-1][1], vertices_2d[-1][0])
+                angle_expected=angle_first+angle_inter
+
+                if angle_expected>math.pi:
+                    angle_expected=-math.pi + (angle_expected % math.pi)
+
+                self.assertLess(abs(angle_last-angle_expected), 10e-8)
+
     
 
 if __name__ == '__main__':

@@ -1,3 +1,4 @@
+#pragma once
 #include <Eigen/Dense>
 #include <vector>
 #include <array>
@@ -10,12 +11,15 @@ using namespace std;
 #ifndef PLANE2D_HPP
 #define PLANE2D_HPP
 
+class Shape2d;
+
 class SweepLineInterval{
     Vector2d point;
     array<double, 3> lineComponents;
     array<double, 2> polarComponents;
   public:
     SweepLineInterval(Vector2d _point);
+    Vector2d Point();
 };
 
 
@@ -28,6 +32,7 @@ class Plane2d{
   public:
     Plane2d(vector<Shape3d>& shapes, Plane3d plane3d);
     vector<Shape2d> Shapes();
+    SweepLineInterval getSweepLineAt(unsigned long int angleId);
 };
 
 #endif

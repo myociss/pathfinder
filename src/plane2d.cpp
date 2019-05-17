@@ -48,43 +48,23 @@ Plane2d::Plane2d(vector<Shape3d>& _shapes, Plane3d plane3d){
 	}
 	points[i].setAngleId(angleCount-1);
 	anglePrev=angle;
-	shapes[points[i].ShapeId()].addPoint(points[i]);
+	unsigned long int shapeId=points[i].ShapeId();
+	shapes[shapeId].addPoint(points[i]);
+	if(shapes[shapeId].Complete() && shapeId!=0){
+	    shapes[shapeId].arrange(sweepLineIntervals);
+	}
 	//cout << angle << endl;
 	//cout << points[i].ShapeId() << endl;
 	//cout << points[i].ShapeVectorPos() << endl;
     }
+}
 
-    /*vector<shared_ptr<Point2d>> points;
-    points.reserve(count);
+//void Plane2d::GetPaths(){
+    
+//}
 
-    shapes.reserve(_shapes.size());
-    count = 0;
-
-    for(unsigned long int i=0; i<_shapes.size(); ++i){
-	vector<array<double, 3>> vertices = _shapes[i].Vertices();
-	//vector<reference_wrapper<Point2d>> shape2dPoints;
-	for(int j=0; j<vertices.size(); ++j){
-	    Vector2d rotatedPoint = plane3d.Rotate(vertices[j]);
-	    auto point_sp = make_shared<Point2d>(rotatedPoint)
-	    //shared_ptr<Point2d> point(rotatedPoint);
-	    points.push_back(point_sp);
-	    //shape2dPoints.push_back(point);
-	    //shape2dPoints.push_back(point);
-	}
-	vector<shared_ptr<Point2d>> shape2dPoints(points.begin()+count, points.end());
-	Shape2d shape2d(shape2dPoints);
-	shapes.push_back(shape2d);
-	cout << "new shape points :/" << endl;
-	vector<Vector2d> new_shape_vertices = shapes.back().Vertices();
-	for(int k=0; k < new_shape_vertices.size(); k++){
-	    cout << new_shape_vertices[k] << endl;
-	}
-	count+=vertices.size();
-    }*/
-
-    //sort(points.begin(), points.end());
-
-    //assignAngleIds(points)
+SweepLineInterval Plane2d::getSweepLineAt(unsigned long int angleId){
+    return sweepLineIntervals[angleId];
 }
 
 vector<Shape2d> Plane2d::Shapes(){
@@ -93,6 +73,13 @@ vector<Shape2d> Plane2d::Shapes(){
 
 SweepLineInterval::SweepLineInterval(Vector2d _point){
     point = _point;
+    lineComponents[0] = -point[1];
+    lineComponents[1] = point[0];
+    lineComponents[2] = 0.0;
+}
+
+Vector2d SweepLineInterval::Point(){
+    return point;
 }
 
 //void assignAngleIds()
