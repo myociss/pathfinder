@@ -49,12 +49,14 @@ class Shape2d {
     int numVertices;
     vector<Point2d> vertices;
     int endVertexId;
+    vector<array<double, 3>> edgesStoredValues;
     //vector<Edge> edges;
   public:
     Shape2d(int _numVertices);
     bool Complete();
     void addPoint(Point2d point);
     void arrange(vector<SweepLineInterval>& sweeplineIntervals);
+    void setNewVertices(vector<Point2d> tmpVertices);
     vector<Vector2d> Vertices();
     vector<Vector2d> VerticesArranged();
 };

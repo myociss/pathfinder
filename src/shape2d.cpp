@@ -34,8 +34,6 @@ void Shape2d::addPoint(Point2d point){
 }
 
 void Shape2d::arrange(vector<SweepLineInterval>& sweeplineIntervals){
-    unsigned long int startAngleId;
-    unsigned long int endAngleId;
 
     int startVertex;
     for(int i=0; i<vertices.size(); i++){
@@ -57,10 +55,6 @@ void Shape2d::arrange(vector<SweepLineInterval>& sweeplineIntervals){
 	Vector2d sliPoint=sli.Point();
 	if(-sliPoint[1]*prev[0] + sliPoint[0]*prev[1]>0 && -sliPoint[1]*next[0] + sliPoint[0]*next[1]>0){
 	    startAngleId=vertices[i].AngleId();
-	    startVertex=i;
-	}
-	if(-sliPoint[1]*prev[0] + sliPoint[0]*prev[1]<0 && -sliPoint[1]*next[0] + sliPoint[0]*next[1]<0){
-	    endAngleId=vertices[i].AngleId();
 	}
     }
     Vector2d p = vertices[0].Vec();
@@ -91,6 +85,10 @@ void Shape2d::arrange(vector<SweepLineInterval>& sweeplineIntervals){
 	}
     }
 
+    setNewVertices(tmpVertices);
+}
+
+void Shape2d::setNewVertices(vector<Point2d> tmpVertices){
     endVertexId=tmpVertices[0].AngleId();
     double angleMax=tmpVertices[0].Angle();
     for(int i=0; i<numVertices; ++i){
@@ -123,6 +121,41 @@ vector<Vector2d> Shape2d::VerticesArranged(){
 	vecs.push_back(vertices[i].Vec());
     }
     return vecs;
+}
+
+void Shape2d::calculatePaths(vector<SweepLineInterval> sweepLineIntervals){
+    unsigned long int intervalStartIdx=vertices[0].AngleId();
+    int entryEdgeIdx=0;
+    unsigned long int idx=intervalStartIdx;
+
+    while(idx!=endVertexId){
+	double intervalStartAngle=sweepLineIntervals[idx];
+	double intervalEndAngle=sweepLineIntervals[(idx==sweepLineIntervals.size()-1 ? 0 : idx+1)];
+	
+	int terminalEdgeIdx=entryEdgeIdx;
+
+	while(!(vertices[terminalEdgeIdx])){
+
+	}
+
+	
+	intervalStartAngle=intervalEndAngle;
+	idx=(idx==sweepLineIntervals.size()-1 ? 0 : idx+1);
+    }
+
+    /*for(unsigned long int idx=intervalStartIdx; idx<endVertexId; ++idx){
+	double intervalStartAngle=sweepLineIntervals[idx];
+	double intervalEndAngle=sweepLineIntervals[idx==sweepLineIntervals.size() ? 0 : idx+1];
+
+	int terminalEdgeIdx;
+	while(vertices){
+	    ++terminalEdgeIdx;
+	}
+
+	//if(vertices[startEdgeIdx].AngleId()==idx){
+	    
+	//}
+    }*/
 }
 
 //vector<Vector2d> Shape2d::VerticesEdgeOrder(){
