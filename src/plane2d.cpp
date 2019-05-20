@@ -8,6 +8,15 @@
 using namespace Eigen;
 using namespace std;
 
+array<double, 2> polarEquation(Vector2d v0, Vector2d v1){
+    array<double, 3> line={v0[1]-v1[1], v1[0]-v0[0],-(v0[0]*v1[1]-v1[0]-v0[1])};
+
+    double normalAngle=atan2(line[1], line[0]);
+    double normalDist=line[2] / sqrt(line[0] * line[0] + line[1] * line[1]);
+    array<double, 2> polar={normalDist, normalAngle};
+    return polar;
+}
+
 Plane2d::Plane2d(vector<Shape3d>& _shapes, Plane3d plane3d){
     unsigned long int count = 0;
     shapes.reserve(_shapes.size());

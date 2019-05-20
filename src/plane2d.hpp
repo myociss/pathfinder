@@ -20,6 +20,7 @@ class SweepLineInterval{
   public:
     SweepLineInterval(Vector2d _point);
     Vector2d Point();
+    array<double, 3> FunctionsAt(array<double, 2> edge);
 };
 
 
