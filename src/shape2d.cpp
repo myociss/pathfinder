@@ -164,15 +164,31 @@ void Shape2d::calculatePaths(vector<SweepLineInterval>& lineIntervals){
 	double endDeriv=terminalEdgeEndVals[1]-entryEdgeEndVals[1];
 	double endDeriv2=terminalEdgeEndVals[2]-entryEdgeEndVals[2];
 
+	double maxSide=max(startDist, endDist);
+	double minSide=min(startDist, endDist);
+
 	//if the inflection point has changed
 	if(startDeriv2*endDeriv2 < 0){
 	    li.updateUpperBound(weight * maxDist());
 	} else if(startDeriv*endDeriv < 0){
-
+	    double root=li.ApproxRoot(startDist, endDist, startDeriv, endDeriv);
+	    if(root[1] * (startDist) < 0){
+		root=0.0;
+	    }
+	    if(startDeriv<0){
+		li.updateLowerBound(weight * root);
+		li.updateUpperBound(weight * maxSide);
+	    } else{
+		li.updateUpperBound(weight * root);
+		li.updateLowerBound(weight * minSide);
+	    }
 	} else {
-	    li.updateUpperBound(max(startDist, endDist));
-	    li.updateLowerBound(min(startDist, endDist));
+	    li.updateUpperBound(weight * maxSide);
+	    li.updateLowerBound(weight * minSide);
 	}
+
+	terminalEdgeStartVals=terminalEdgeEndVals;
+	entryEdgeStartVals=entryEdgeEndVals;
 	
 
 	unsigned long int nextInterval = (intervalId+1)%lineIntervals.size();

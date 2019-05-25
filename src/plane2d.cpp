@@ -89,6 +89,30 @@ LineInterval::LineInterval(Vector2d _point){
     distUpperBound = 0.0;
 }
 
+array<double, 3> LineInterval::FunctionsAt(array<double, 2> edge, int side){
+    double angle=(side==ANGLE_START ? angleStart : angleEnd);
+    double dist=polarComponents[0]/cos(angle-polarComponents[1]);
+    double distPrime=tan(angle-polarComponents[1])*dist;
+   
+    double angleSin=sin(angle-polarComponents[1]);
+    double angleCos=cos(angle-polarComponents[1]);
+
+    double distPrime2=(1+angleSin*angleSin)/(angleCos*angleCos*angleCos);
+    return {dist, distPrime, distPrime2};
+}
+
+double LineInterval::ApproxRoot(double distStart, double distEnd, double derivStart, double derivEnd){
+    double bStart=distStart - (angleStart * derivStart);
+    double bEnd=distEnd - (angleEnd * derivEnd);
+
+    Matrix2d A;
+    A << derivStart, -1,   derivEnd, -1;
+    Vector2d b;
+    b << -bStart, -bEnd;
+
+    return A.colPivHouseholderQr().solve(b)[1];
+}
+
 void LineInterval::SetAngleEnd(Vector2d _point){
     angleEnd = atan2(_point[1], _point[0]);
 }
