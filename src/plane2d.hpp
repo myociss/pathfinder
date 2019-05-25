@@ -12,28 +12,35 @@ using namespace std;
 #define PLANE2D_HPP
 
 class Shape2d;
+array<double, 2> polarEquation(Vector2d v0, Vector2d v1);
+int ANGLE_START=0;
+int ANGLE_END=1;
 
-class SweepLineInterval{
+class LineInterval{
     Vector2d point;
-    array<double, 3> lineComponents;
+    //array<double, 3> lineComponents;
     array<double, 2> polarComponents;
+    double angleStart;
+    double angleEnd;
+    double distLowerBound;
+    double distUpperBound;
   public:
-    SweepLineInterval(Vector2d _point);
+    LineInterval(Vector2d _point);
+    void SetAngleEnd(Vector2d _point);
     Vector2d Point();
-    array<double, 3> FunctionsAt(array<double, 2> edge);
+    array<double, 3> FunctionsAt(array<double, 2> edge, int side);
+    void updateLowerBound(double val);
+    void updateUpperBound(double val);
 };
 
 
 class Plane2d{
     vector<Shape2d> shapes;
-    vector<SweepLineInterval> sweepLineIntervals;
-    //vector<Vector2d> uniquePoints;
-    //vector<Vector2d> uniquePolar;
-    //vector<Vector3d> uniqueAngles;
+    vector<LineInterval> lineIntervals;
   public:
     Plane2d(vector<Shape3d>& shapes, Plane3d plane3d);
     vector<Shape2d> Shapes();
-    SweepLineInterval getSweepLineAt(unsigned long int angleId);
+    //SweepLineInterval getSweepLineAt(unsigned long int angleId);
 };
 
 #endif

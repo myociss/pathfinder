@@ -24,7 +24,7 @@ Plane2d::Plane2d(vector<Shape3d>& _shapes, Plane3d plane3d){
     for(unsigned long int i=0; i<_shapes.size(); ++i){
 	int numVertices = _shapes[i].Vertices().size();
 	count += numVertices;
-	Shape2d shape(numVertices);
+	Shape2d shape(numVertices, _shapes[i].Weight());
 	shapes.push_back(shape);
     }
 
@@ -51,9 +51,13 @@ Plane2d::Plane2d(vector<Shape3d>& _shapes, Plane3d plane3d){
     for(unsigned long int i=0; i<points.size(); ++i){
 	double angle = points[i].Angle();
 	if(angle!=anglePrev || i==0){
-	    SweepLineInterval sli(points[i].Vec());
-	    sweepLineIntervals.push_back(sli);
+	    LineInterval li(points[i].Vec());
+	    LineIntervals.push_back(li);
 	    ++angleCount;
+
+	    if(angleCount>1){
+		LineIntervals[angleCount-2].SetAngleEnd(LineIntervals[angleCount-1].Point());
+	    }
 	}
 	points[i].setAngleId(angleCount-1);
 	anglePrev=angle;
@@ -62,32 +66,42 @@ Plane2d::Plane2d(vector<Shape3d>& _shapes, Plane3d plane3d){
 	if(shapes[shapeId].Complete() && shapeId!=0){
 	    shapes[shapeId].arrange(sweepLineIntervals);
 	}
-	//cout << angle << endl;
-	//cout << points[i].ShapeId() << endl;
-	//cout << points[i].ShapeVectorPos() << endl;
     }
+
+    LineIntervals[angleCount-1].SetAngleEnd(LineIntervals[0].Point());
 }
 
-//void Plane2d::GetPaths(){
-    
+
+//SweepLineInterval Plane2d::getSweepLineAt(unsigned long int angleId){
+//    return sweepLineIntervals[angleId];
 //}
-
-SweepLineInterval Plane2d::getSweepLineAt(unsigned long int angleId){
-    return sweepLineIntervals[angleId];
-}
 
 vector<Shape2d> Plane2d::Shapes(){
     return shapes;
 }
 
-SweepLineInterval::SweepLineInterval(Vector2d _point){
+LineInterval::LineInterval(Vector2d _point){
     point = _point;
-    lineComponents[0] = -point[1];
-    lineComponents[1] = point[0];
-    lineComponents[2] = 0.0;
+    Vector2d zero(0.0, 0.0);
+    polarComponents = polarEquation(point, zero);
+    angleStart = atan2(point[1], point[0]);
+    distLowerBound = 0.0;
+    distUpperBound = 0.0;
 }
 
-Vector2d SweepLineInterval::Point(){
+void LineInterval::SetAngleEnd(Vector2d _point){
+    angleEnd = atan2(_point[1], _point[0]);
+}
+
+void LineInterval::updateLowerBound(double val){
+    distLowerBound+=val;
+}
+
+void LineInterval::updateUpperBound(double val){
+    distUpperBound+=val;
+}
+
+Vector2d LineInterval::Point(){
     return point;
 }
 

@@ -33,30 +33,21 @@ class Point2d {
     unsigned long int ShapeId();
 };
 
-/*class Edge{
-    Point2d head;
-    Point2d tail;
-    Edge next;
-    array<double, 3> storedValues;
-  public:
-    Edge(Point2d& _head, Point2d& _tail);
-    void setNext(Edge& _next);
-    void store(double dist, double distPrime, double distPrime2);
-    array<double, 3> retrieve();
-};*/
 
 class Shape2d {
     int numVertices;
+    double weight;
     vector<Point2d> vertices;
     int endVertexId;
     vector<array<double, 3>> edgesStoredValues;
     //vector<Edge> edges;
   public:
-    Shape2d(int _numVertices);
+    Shape2d(int _numVertices, double _weight);
     bool Complete();
     void addPoint(Point2d point);
     void arrange(vector<SweepLineInterval>& sweeplineIntervals);
     void setNewVertices(vector<Point2d> tmpVertices);
+    double maxDist();
     vector<Vector2d> Vertices();
     vector<Vector2d> VerticesArranged();
 };

@@ -133,6 +133,10 @@ vector<array<double, 3>> Shape3d::Vertices(){
     return vertices;
 }
 
+double Shape3d::Weight(){
+    return weight;
+}
+
 int Shape3d::Label(){
     return label;
 }

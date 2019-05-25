@@ -44,6 +44,7 @@ class Shape3d {
     unsigned long int TetId();
     vector<array<double, 3>> Vertices();
     int Label();
+    double Weight();
 };
 
 #endif
