@@ -105,9 +105,11 @@ class TestGraph(TestCase):
             plane2d = pathfinder.Plane2d(plane_intersection, plane3d)
 
             for shape_idx in range(1, len(plane2d.shapes())):
-                vertices_2d=plane2d.shapes()[shape_idx].arranged_vertices()
+                shape=plane2d.shapes()[shape_idx]
+                vertices_2d=shape.arranged_vertices()
 
                 angle_inter=math.acos(np.dot(vertices_2d[0], vertices_2d[1])/(np.linalg.norm(vertices_2d[0]) * np.linalg.norm(vertices_2d[1])))
+
                 angle_first=math.atan2(vertices_2d[0][1], vertices_2d[0][0])
                 angle_next=math.atan2(vertices_2d[1][1], vertices_2d[1][0])
                 angle_expected=angle_first+angle_inter
@@ -125,6 +127,26 @@ class TestGraph(TestCase):
                     angle_expected=-math.pi + (angle_expected % math.pi)
 
                 self.assertLess(abs(angle_last-angle_expected), 10e-8)
+
+                dist_first=math.sqrt((vertices_2d[0][0]**2) + (vertices_2d[0][1]**2))
+                dist_next=math.sqrt((vertices_2d[1][0]**2) + (vertices_2d[1][1]**2))
+                dist_last=math.sqrt((vertices_2d[-1][0]**2) + (vertices_2d[-1][1]**2))
+                convex_hull_vertex=vertices_2d[shape.hull_supporting_idx()]
+                A=convex_hull_vertex[1]-vertices_2d[0][1]
+                B=vertices_2d[0][0]-convex_hull_vertex[0]
+                C=convex_hull_vertex[0]*vertices_2d[0][1]-vertices_2d[0][0]*convex_hull_vertex[1]
+
+     
+                origin_side=C
+                for i in range(1, shape.hull_supporting_idx()):
+                    vertex=vertices_2d[i]
+                    vertex_side=vertex[0]*A+vertex[1]*B+C
+                    self.assertGreater(origin_side*vertex_side, 0.0)
+
+                for i in range(shape.hull_supporting_idx()+1, len(vertices_2d)):
+                    vertex=vertices_2d[i]
+                    vertex_side=vertex[0]*A+vertex[1]*B+C
+                    self.assertLess(origin_side*vertex_side, 0.0)
 
     
 

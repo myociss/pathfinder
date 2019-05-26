@@ -55,5 +55,6 @@ PYBIND11_MODULE(pathfinder, m){
 
   py::class_<Shape2d>(m, "Shape2d")
     .def("vertices", &Shape2d::Vertices)
-    .def("arranged_vertices", &Shape2d::VerticesArranged);
+    .def("arranged_vertices", &Shape2d::VerticesArranged)
+    .def("hull_supporting_idx", &Shape2d::EndVertex);
 }

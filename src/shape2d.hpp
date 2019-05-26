@@ -11,7 +11,7 @@ using namespace std;
 #ifndef SHAPE2D_HPP
 #define SHAPE2D_HPP
 
-class SweepLineInterval;
+class LineInterval;
 
 class Point2d {
     unsigned long int shapeId;
@@ -38,16 +38,18 @@ class Shape2d {
     int numVertices;
     double weight;
     vector<Point2d> vertices;
-    int endVertexId;
+    int endVertex;
     vector<array<double, 3>> edgesStoredValues;
     //vector<Edge> edges;
   public:
     Shape2d(int _numVertices, double _weight);
     bool Complete();
     void addPoint(Point2d point);
-    void arrange(vector<SweepLineInterval>& sweeplineIntervals);
+    void arrange(vector<LineInterval>& lineIntervals);
     void setNewVertices(vector<Point2d> tmpVertices);
+    void calculatePaths(vector<LineInterval>& lineIntervals);
     double maxDist();
+    int EndVertex();
     vector<Vector2d> Vertices();
     vector<Vector2d> VerticesArranged();
 };

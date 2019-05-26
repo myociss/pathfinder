@@ -13,8 +13,6 @@ using namespace std;
 
 class Shape2d;
 array<double, 2> polarEquation(Vector2d v0, Vector2d v1);
-int ANGLE_START=0;
-int ANGLE_END=1;
 
 class LineInterval{
     Vector2d point;

@@ -55,7 +55,7 @@ void Shape2d::arrange(vector<LineInterval>& lineIntervals){
 	LineInterval& li=lineIntervals[vertices[i].AngleId()];
 	Vector2d liPoint=li.Point();
 	if(-liPoint[1]*prev[0] + liPoint[0]*prev[1]>0 && -liPoint[1]*next[0] + liPoint[0]*next[1]>0){
-	    startAngleId=vertices[i].AngleId();
+	    startVertex=i;//vertices[i].AngleId();
 	}
     }
     Vector2d p = vertices[0].Vec();
@@ -90,7 +90,7 @@ void Shape2d::arrange(vector<LineInterval>& lineIntervals){
 }
 
 void Shape2d::setNewVertices(vector<Point2d> tmpVertices){
-    endVertexId=tmpVertices[0].AngleId();
+    endVertex=0;
     double angleMax=tmpVertices[0].Angle();
     for(int i=0; i<numVertices; ++i){
 	vertices[i]=tmpVertices[i];
@@ -98,7 +98,7 @@ void Shape2d::setNewVertices(vector<Point2d> tmpVertices){
 	    vertices[i].updateAngle();
 	}
 	if(vertices[i].Angle()>angleMax){
-	    endVertexId=vertices[i].AngleId();
+	    endVertex=i;
 	}
     }
 }
@@ -124,45 +124,47 @@ vector<Vector2d> Shape2d::VerticesArranged(){
     return vecs;
 }
 
-void Shape2d::calculatePaths(vector<SweepLineInterval>& lineIntervals){
+void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
     unsigned long int startIntervalId=vertices[0].AngleId();
 
-    int entryEdgeIdx=0;
-    int terminalEdgeIdx=vertices.size()-1;
+    int entryEdge=0;
+    int terminalEdge=vertices.size()-1;
 
     unsigned long int intervalId=startIntervalId;
 
-    array<double, 3> entryEdgeStartVals;
-    array<double, 3> terminalStartEdgeVals;
+    array<double, 3> entryFStart;
+    array<double, 3> terminalFStart;
 
-    array<double, 2> entryEdgePolar=polarEquation(vertices[0].Vec(), vertices[1].Vec());
-    array<double, 2> terminalEdgePolar=polarEquation(vertices[0].Vec(), vertices[terminalEdgeIdx].Vec());
+    array<double, 2> entryPolar=polarEquation(vertices[0].Vec(), vertices[1].Vec());
+    array<double, 2> terminalPolar=polarEquation(vertices[0].Vec(), vertices[terminalEdge].Vec());
 
-    while(intervalId!=endVertexId){
+    unsigned long int endVertexIntervalId=vertices[endVertex].AngleId();
+
+    while(intervalId!=endVertexIntervalId){
 	LineInterval& li = lineIntervals[intervalId];
 	//new entry edge
-	if(vertices[startEdgeIdx].AngleId()==intervalId){
-	    entryEdgeStartVals=li.FunctionsAt(entryEdgePolar, ANGLE_START);
+	if(vertices[entryEdge].AngleId()==intervalId){
+	    entryFStart=li.FunctionsAt(entryPolar, 0);
 	}
 
 	//new exit edge
-	if(vertices[(terminalEdgeIdx+1)%vertices.size()].AngleId()==intervalId){
-	    terminalEdgeStartVals=li.FunctionsAt(terminalEdgePolar, ANGLE_START);
+	if(vertices[(terminalEdge+1)%vertices.size()].AngleId()==intervalId){
+	    terminalFStart=li.FunctionsAt(terminalPolar, 0);
 	}
 
 	
 	
-	array<double, 3> entryEdgeEndVals=li.FunctionsAt(entryEdgePolar, ANGLE_END);
-	array<double, 3> terminalEdgeEndVals=li.FunctionsAt(terminalEdgePolar, ANGLE_END);
+	array<double, 3> entryFEnd=li.FunctionsAt(entryPolar, 1);
+	array<double, 3> terminalFEnd=li.FunctionsAt(terminalPolar, 1);
 
-	double startDist=terminalEdgeStartVals[0]-entryEdgeStartVals[0];
-	double startDeriv=terminalEdgeStartVals[1]-entryEdgeStartVals[1];
-	double startDeriv2=terminalEdgeStartVals[2]-entryEdgeStartVals[2];
+	double startDist=terminalFStart[0]-entryFStart[0];
+	double startDeriv=terminalFStart[1]-entryFStart[1];
+	double startDeriv2=terminalFStart[2]-entryFStart[2];
 
 
-	double endDist=terminalEdgeEndVals[0]-entryEdgeEndVals[0];
-	double endDeriv=terminalEdgeEndVals[1]-entryEdgeEndVals[1];
-	double endDeriv2=terminalEdgeEndVals[2]-entryEdgeEndVals[2];
+	double endDist=terminalFEnd[0]-entryFEnd[0];
+	double endDeriv=terminalFEnd[1]-entryFEnd[1];
+	double endDeriv2=terminalFEnd[2]-entryFEnd[2];
 
 	double maxSide=max(startDist, endDist);
 	double minSide=min(startDist, endDist);
@@ -172,7 +174,7 @@ void Shape2d::calculatePaths(vector<SweepLineInterval>& lineIntervals){
 	    li.updateUpperBound(weight * maxDist());
 	} else if(startDeriv*endDeriv < 0){
 	    double root=li.ApproxRoot(startDist, endDist, startDeriv, endDeriv);
-	    if(root[1] * (startDist) < 0){
+	    if(root * startDist < 0){
 		root=0.0;
 	    }
 	    if(startDeriv<0){
@@ -187,18 +189,18 @@ void Shape2d::calculatePaths(vector<SweepLineInterval>& lineIntervals){
 	    li.updateLowerBound(weight * minSide);
 	}
 
-	terminalEdgeStartVals=terminalEdgeEndVals;
-	entryEdgeStartVals=entryEdgeEndVals;
+	terminalFStart=terminalFEnd;
+	entryFStart=entryFEnd;
 	
 
 	unsigned long int nextInterval = (intervalId+1)%lineIntervals.size();
-	if(vertices[terminalEdgeIdx].AngleId()==nextInterval){
-	    --terminalEdgeIdx;
-	    terminalEdgePolar=polarEquation(vertices[terminalEdgeIdx+1].Vec(), vertices[terminalEdgeIdx].Vec());
+	if(vertices[terminalEdge].AngleId()==nextInterval){
+	    --terminalEdge;
+	    terminalPolar=polarEquation(vertices[terminalEdge+1].Vec(), vertices[terminalEdge].Vec());
 	}
-	if(vertices[startEdgeIdx+1].AngleId()==nextInterval){
-	    ++startEdgeIdx;
-	    entryEdgePolar=polarEquation(vertices[startEdgeIdx-1].Vec(), vertices[startEdgeIdx].Vec());
+	if(vertices[entryEdge+1].AngleId()==nextInterval){
+	    ++entryEdge;
+	    entryPolar=polarEquation(vertices[entryEdge-1].Vec(), vertices[entryEdge].Vec());
 	}
 	
 
@@ -210,13 +212,19 @@ double Shape2d::maxDist(){
     double maxDist=0.0;
     for(int i=0; i<vertices.size(); ++i){
 	for(int j=i+1; j<vertices.size();++j){
-	    double dist=sqrt(pow(vertices[i][0]-vertices[j][0], 2.0) + pow(vertices[i][1]-vertices[j][1], 2.0));
+	    Vector2d v0=vertices[i].Vec();
+	    Vector2d v1=vertices[j].Vec();
+	    double dist=sqrt(pow(v0[0]-v1[0], 2.0) + pow(v0[1]-v1[1], 2.0));
 	    if(maxDist<dist){
 		maxDist=dist;
 	    }
 	}
     }
     return maxDist;
+}
+
+int Shape2d::EndVertex(){
+    return endVertex;
 }
 
 Point2d::Point2d(Vector2d _vec, unsigned long int _shapeId, int _shapeVectorPos){

@@ -52,11 +52,11 @@ Plane2d::Plane2d(vector<Shape3d>& _shapes, Plane3d plane3d){
 	double angle = points[i].Angle();
 	if(angle!=anglePrev || i==0){
 	    LineInterval li(points[i].Vec());
-	    LineIntervals.push_back(li);
+	    lineIntervals.push_back(li);
 	    ++angleCount;
 
 	    if(angleCount>1){
-		LineIntervals[angleCount-2].SetAngleEnd(LineIntervals[angleCount-1].Point());
+		lineIntervals[angleCount-2].SetAngleEnd(lineIntervals[angleCount-1].Point());
 	    }
 	}
 	points[i].setAngleId(angleCount-1);
@@ -64,11 +64,11 @@ Plane2d::Plane2d(vector<Shape3d>& _shapes, Plane3d plane3d){
 	unsigned long int shapeId=points[i].ShapeId();
 	shapes[shapeId].addPoint(points[i]);
 	if(shapes[shapeId].Complete() && shapeId!=0){
-	    shapes[shapeId].arrange(sweepLineIntervals);
+	    shapes[shapeId].arrange(lineIntervals);
 	}
     }
 
-    LineIntervals[angleCount-1].SetAngleEnd(LineIntervals[0].Point());
+    lineIntervals[angleCount-1].SetAngleEnd(lineIntervals[0].Point());
 }
 
 
@@ -90,7 +90,7 @@ LineInterval::LineInterval(Vector2d _point){
 }
 
 array<double, 3> LineInterval::FunctionsAt(array<double, 2> edge, int side){
-    double angle=(side==ANGLE_START ? angleStart : angleEnd);
+    double angle=(side==0 ? angleStart : angleEnd);
     double dist=polarComponents[0]/cos(angle-polarComponents[1]);
     double distPrime=tan(angle-polarComponents[1])*dist;
    
