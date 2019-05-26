@@ -129,13 +129,38 @@ vector<Vector2d> Shape2d::VerticesArranged(){
     return vecs;
 }
 
+void Shape2d::calculatePathsTarget(vector<LineInterval>& lineIntervals){
+    for(int i=0; i<vertices.size(); i++){
+	int next=(i+1) % vertices.size();
+	unsigned long int startIntervalId=vertices[i].AngleId();
+	unsigned long int intervalId=startIntervalId;
+
+	array<double, 2> edgePolar=polarEquation(vertices[i].Vec(), vertices[next].Vec());
+	while(intervalId!=vertices[next].AngleId()){
+	    LineInterval& li=lineIntervals[intervalId];
+	    double startSide=li.DistAt(edgePolar, 0);
+	    double endSide=li.DistAt(edgePolar, 1);
+
+	    if(li.containsNormal(edgePolar)){
+		li.updateLowerBound(weight * edgePolar[0]);
+		li.updateUpperBound(weight * max(startSide, endSide));
+	    } else {
+		li.updateLowerBound(weight * min(startSide, endSide));
+		li.updateUpperBound(weight * max(startSide, endSide));
+	    }
+
+	    intervalId=(intervalId+1)%lineIntervals.size();
+	}
+    }
+}
+
 void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
     unsigned long int startIntervalId=vertices[0].AngleId();
+    unsigned long int intervalId=startIntervalId;
 
     int entryEdge=0;
     int terminalEdge=vertices.size()-1;
 
-    unsigned long int intervalId=startIntervalId;
 
     array<double, 3> entryFStart;
     array<double, 3> terminalFStart;
@@ -182,8 +207,9 @@ void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
 	    if(root < 0){
 		root=0.0;
 	    }
+
 	    if(startDeriv<0){
-		li.updateLowerBound(weight * root);
+		li.updateLowerBound(weight * min(root, minSide));
 		li.updateUpperBound(weight * maxSide);
 	    } else{
 		li.updateUpperBound(weight * root);

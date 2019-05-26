@@ -73,9 +73,10 @@ Plane2d::Plane2d(vector<Shape3d>& _shapes, Plane3d plane3d){
 
 
 void Plane2d::FindPaths(){
-    vector<Vector2d> shape0Vertices=shapes[0].Vertices();
-    for(int i=0; i<shape0Vertices.size(); i++){
-	int next=(i+1)%shape0Vertices.size();
+    shapes[0].setVerticesClockwise(0);
+    shapes[0].calculatePathsTarget(lineIntervals);
+    for(unsigned long int i=1; i<shapes.size(); i++){
+	shapes[i].calculatePaths(lineIntervals);
     }
 }
 
@@ -92,21 +93,33 @@ LineInterval::LineInterval(Vector2d _point){
     distUpperBound = 0.0;
 }
 
+double LineInterval::DistAt(array<double, 2> edge, int side){
+    double angle=(side==0 ? angleStart : angleEnd);
+    return edge[0]/cos(angle-edge[1]);
+}
+
+bool LineInterval::containsNormal(array<double, 2> edge){
+    double intervalAngleEnd= (angleStart>angleEnd ? angleEnd + (2 * M_PI) : angleEnd);   
+    return edge[1] >= angleStart && edge[1] <= intervalAngleEnd;
+}
+
 array<double, 3> LineInterval::FunctionsAt(array<double, 2> edge, int side){
     double angle=(side==0 ? angleStart : angleEnd);
-    double dist=polarComponents[0]/cos(angle-polarComponents[1]);
-    double distPrime=tan(angle-polarComponents[1])*dist;
+    double dist=edge[0]/cos(angle-edge[1]);
+    double distPrime=tan(angle-edge[1])*dist;
    
-    double angleSin=sin(angle-polarComponents[1]);
-    double angleCos=cos(angle-polarComponents[1]);
+    double angleSin=sin(angle-edge[1]);
+    double angleCos=cos(angle-edge[1]);
 
     double distPrime2=(1+angleSin*angleSin)/(angleCos*angleCos*angleCos);
     return {dist, distPrime, distPrime2};
 }
 
 double LineInterval::ApproxRoot(double distStart, double distEnd, double derivStart, double derivEnd){
+    double intervalAngleEnd= (angleStart>angleEnd ? angleEnd + (2 * M_PI) : angleEnd);   
+
     double bStart=distStart - (angleStart * derivStart);
-    double bEnd=distEnd - (angleEnd * derivEnd);
+    double bEnd=distEnd - (intervalAngleEnd * derivEnd);
 
     Matrix2d A;
     A << derivStart, -1,   derivEnd, -1;

@@ -27,6 +27,8 @@ class LineInterval{
     void SetAngleEnd(Vector2d _point);
     Vector2d Point();
     array<double, 3> FunctionsAt(array<double, 2> edge, int side);
+    double DistAt(array<double, 2> edge, int side);
+    bool containsNormal(array<double, 2> edge);
     double ApproxRoot(double distStart, double distEnd, double derivStart, double derivEnd);
     void updateLowerBound(double val);
     void updateUpperBound(double val);
