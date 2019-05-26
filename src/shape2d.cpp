@@ -55,9 +55,14 @@ void Shape2d::arrange(vector<LineInterval>& lineIntervals){
 	LineInterval& li=lineIntervals[vertices[i].AngleId()];
 	Vector2d liPoint=li.Point();
 	if(-liPoint[1]*prev[0] + liPoint[0]*prev[1]>0 && -liPoint[1]*next[0] + liPoint[0]*next[1]>0){
-	    startVertex=i;//vertices[i].AngleId();
+	    startVertex=i;
 	}
     }
+
+    setVerticesClockwise(startVertex);
+}
+
+void Shape2d::setVerticesClockwise(int startVertex){
     Vector2d p = vertices[0].Vec();
     Vector2d q = vertices[1].Vec();
     Vector2d r = vertices[2].Vec();
@@ -157,12 +162,12 @@ void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
 	array<double, 3> entryFEnd=li.FunctionsAt(entryPolar, 1);
 	array<double, 3> terminalFEnd=li.FunctionsAt(terminalPolar, 1);
 
-	double startDist=terminalFStart[0]-entryFStart[0];
+	double startDist=max(terminalFStart[0]-entryFStart[0], 0.0);
 	double startDeriv=terminalFStart[1]-entryFStart[1];
 	double startDeriv2=terminalFStart[2]-entryFStart[2];
 
 
-	double endDist=terminalFEnd[0]-entryFEnd[0];
+	double endDist=max(terminalFEnd[0]-entryFEnd[0], 0.0);
 	double endDeriv=terminalFEnd[1]-entryFEnd[1];
 	double endDeriv2=terminalFEnd[2]-entryFEnd[2];
 

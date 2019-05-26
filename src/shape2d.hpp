@@ -40,12 +40,12 @@ class Shape2d {
     vector<Point2d> vertices;
     int endVertex;
     vector<array<double, 3>> edgesStoredValues;
-    //vector<Edge> edges;
   public:
     Shape2d(int _numVertices, double _weight);
     bool Complete();
     void addPoint(Point2d point);
     void arrange(vector<LineInterval>& lineIntervals);
+    void setVerticesClockwise(int startVertex);
     void setNewVertices(vector<Point2d> tmpVertices);
     void calculatePaths(vector<LineInterval>& lineIntervals);
     double maxDist();
