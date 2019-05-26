@@ -160,6 +160,17 @@ class TestGraph(TestCase):
                     vertex_side=vertex[0]*A+vertex[1]*B+C
                     self.assertLess(origin_side*vertex_side, 0.0)
 
+    def test_pathfinder(self):
+        target=[2*random.random(), 2*random.random(), 2*random.random()]
+        self.mesh.set_target(target)
+        alpha=math.pi*random.random()
+        theta=math.pi*random.random()
+
+        plane_intersection=self.mesh.slice(rotation=[alpha,theta])
+        plane3d = pathfinder.Plane3d(id=0, alpha=alpha, theta=theta, target=np.array(target))
+        plane2d = pathfinder.Plane2d(plane_intersection, plane3d)
+        plane2d.find_paths()
+        self.assertTrue(True)
     
 
 if __name__ == '__main__':

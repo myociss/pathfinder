@@ -32,6 +32,8 @@ class LineInterval{
     double ApproxRoot(double distStart, double distEnd, double derivStart, double derivEnd);
     void updateLowerBound(double val);
     void updateUpperBound(double val);
+    double UpperBound();
+    double LowerBound();
 };
 
 

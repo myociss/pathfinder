@@ -202,7 +202,7 @@ void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
 	//if the inflection point has changed
 	if(startDeriv2*endDeriv2 < 0){
 	    li.updateUpperBound(weight * maxDist());
-	} else if(startDeriv*endDeriv < 0){
+	} /*else if(startDeriv*endDeriv < 0){
 	    double root=li.ApproxRoot(startDist, endDist, startDeriv, endDeriv);
 	    if(root < 0){
 		root=0.0;
@@ -215,7 +215,7 @@ void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
 		li.updateUpperBound(weight * root);
 		li.updateLowerBound(weight * minSide);
 	    }
-	} else {
+	}*/ else {
 	    li.updateUpperBound(weight * maxSide);
 	    li.updateLowerBound(weight * minSide);
 	}

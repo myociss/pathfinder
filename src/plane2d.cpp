@@ -78,6 +78,12 @@ void Plane2d::FindPaths(){
     for(unsigned long int i=1; i<shapes.size(); i++){
 	shapes[i].calculatePaths(lineIntervals);
     }
+
+    for(unsigned long int i=0; i<lineIntervals.size(); i++){
+	cout << "-------------" << endl;
+	cout << lineIntervals[i].UpperBound() << endl;
+	cout << lineIntervals[i].LowerBound() << endl;
+    }
 }
 
 vector<Shape2d> Plane2d::Shapes(){
@@ -139,6 +145,14 @@ void LineInterval::updateLowerBound(double val){
 
 void LineInterval::updateUpperBound(double val){
     distUpperBound+=val;
+}
+
+double LineInterval::LowerBound(){
+    return distLowerBound;
+}
+
+double LineInterval::UpperBound(){
+    return distUpperBound;
 }
 
 Vector2d LineInterval::Point(){
