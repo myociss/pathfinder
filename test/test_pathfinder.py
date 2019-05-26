@@ -128,9 +128,21 @@ class TestGraph(TestCase):
 
                 self.assertLess(abs(angle_last-angle_expected), 10e-8)
 
-                dist_first=math.sqrt((vertices_2d[0][0]**2) + (vertices_2d[0][1]**2))
-                dist_next=math.sqrt((vertices_2d[1][0]**2) + (vertices_2d[1][1]**2))
-                dist_last=math.sqrt((vertices_2d[-1][0]**2) + (vertices_2d[-1][1]**2))
+    def test_hulls(self):
+        for test_iter in range(5):
+            target=[2*random.random(), 2*random.random(), 2*random.random()]
+            self.mesh.set_target(target)
+            alpha=math.pi*random.random()
+            theta=math.pi*random.random()
+
+            plane_intersection=self.mesh.slice(rotation=[alpha,theta])
+            plane3d = pathfinder.Plane3d(id=0, alpha=alpha, theta=theta, target=np.array(target))
+            plane2d = pathfinder.Plane2d(plane_intersection, plane3d)
+
+            for shape_idx in range(1, len(plane2d.shapes())):
+                shape=plane2d.shapes()[shape_idx]
+                vertices_2d=shape.arranged_vertices()
+
                 convex_hull_vertex=vertices_2d[shape.hull_supporting_idx()]
                 A=convex_hull_vertex[1]-vertices_2d[0][1]
                 B=vertices_2d[0][0]-convex_hull_vertex[0]

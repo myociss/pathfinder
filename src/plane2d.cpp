@@ -72,9 +72,12 @@ Plane2d::Plane2d(vector<Shape3d>& _shapes, Plane3d plane3d){
 }
 
 
-//SweepLineInterval Plane2d::getSweepLineAt(unsigned long int angleId){
-//    return sweepLineIntervals[angleId];
-//}
+void Plane2d::FindPaths(){
+    vector<Vector2d> shape0Vertices=shapes[0].Vertices();
+    for(int i=0; i<shape0Vertices.size(); i++){
+	int next=(i+1)%shape0Vertices.size();
+    }
+}
 
 vector<Shape2d> Plane2d::Shapes(){
     return shapes;

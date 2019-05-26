@@ -39,6 +39,7 @@ class Plane2d{
   public:
     Plane2d(vector<Shape3d>& shapes, Plane3d plane3d);
     vector<Shape2d> Shapes();
+    void FindPaths();
     //SweepLineInterval getSweepLineAt(unsigned long int angleId);
 };
 

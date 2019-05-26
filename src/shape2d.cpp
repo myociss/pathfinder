@@ -174,7 +174,7 @@ void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
 	    li.updateUpperBound(weight * maxDist());
 	} else if(startDeriv*endDeriv < 0){
 	    double root=li.ApproxRoot(startDist, endDist, startDeriv, endDeriv);
-	    if(root * startDist < 0){
+	    if(root < 0){
 		root=0.0;
 	    }
 	    if(startDeriv<0){
