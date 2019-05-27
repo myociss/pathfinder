@@ -130,16 +130,34 @@ vector<Vector2d> Shape2d::VerticesArranged(){
 }
 
 void Shape2d::calculatePathsTarget(vector<LineInterval>& lineIntervals){
-    for(int i=0; i<vertices.size(); i++){
-	int next=(i+1) % vertices.size();
+    for(int i=vertices.size()-1; i>=0; --i){
+	/*cout << "HERE" << endl;
+	cout << i << endl;
+	cout << vertices[i].AngleId() << endl;*/
+	int next=i-1;
+	if(next<0){
+	    next=vertices.size()-1;
+	}
+	//cout << vertices[next].AngleId() << endl;
+
 	unsigned long int startIntervalId=vertices[i].AngleId();
 	unsigned long int intervalId=startIntervalId;
 
 	array<double, 2> edgePolar=polarEquation(vertices[i].Vec(), vertices[next].Vec());
 	while(intervalId!=vertices[next].AngleId()){
+	    //cout << intervalId << endl;
 	    LineInterval& li=lineIntervals[intervalId];
 	    double startSide=li.DistAt(edgePolar, 0);
 	    double endSide=li.DistAt(edgePolar, 1);
+	    /*if(startSide<0 || endSide<0){
+		cout << intervalId << endl;
+		cout << edgePolar[0] << endl;
+		cout << edgePolar[1] << endl;
+		cout << vertices[i].Vec() << endl;
+		cout << vertices[next].Vec() << endl;
+		cout << startSide << endl;
+		cout << endSide << endl;
+	    }*/
 
 	    if(li.containsNormal(edgePolar)){
 		li.updateLowerBound(weight * edgePolar[0]);
@@ -199,23 +217,33 @@ void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
 	double maxSide=max(startDist, endDist);
 	double minSide=min(startDist, endDist);
 
+	//cout << "here" << endl;
+	//cout << maxSide << endl;
+	//cout << minSide << endl;
+
 	//if the inflection point has changed
 	if(startDeriv2*endDeriv2 < 0){
 	    li.updateUpperBound(weight * maxDist());
-	} /*else if(startDeriv*endDeriv < 0){
+	} else if(startDeriv*endDeriv < 0){
 	    double root=li.ApproxRoot(startDist, endDist, startDeriv, endDeriv);
 	    if(root < 0){
 		root=0.0;
 	    }
+	    /*cout << "----------------------" << endl;
+	    cout << root << endl;
+	    cout << maxSide << endl;
+	    cout << minSide << endl;
+	    cout << startDeriv << endl;
+	    cout << endDeriv << endl;*/
 
-	    if(startDeriv<0){
-		li.updateLowerBound(weight * min(root, minSide));
+	    if(startDeriv<0 || startDeriv==0 && endDeriv>0){
+		li.updateLowerBound(weight * root);
 		li.updateUpperBound(weight * maxSide);
 	    } else{
 		li.updateUpperBound(weight * root);
 		li.updateLowerBound(weight * minSide);
 	    }
-	}*/ else {
+	} else {
 	    li.updateUpperBound(weight * maxSide);
 	    li.updateLowerBound(weight * minSide);
 	}

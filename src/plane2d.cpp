@@ -9,7 +9,7 @@ using namespace Eigen;
 using namespace std;
 
 array<double, 2> polarEquation(Vector2d v0, Vector2d v1){
-    array<double, 3> line={v0[1]-v1[1], v1[0]-v0[0],-(v0[0]*v1[1]-v1[0]-v0[1])};
+    array<double, 3> line={v0[1]-v1[1], v1[0]-v0[0],-(v0[0]*v1[1]-v1[0]*v0[1])};
 
     double normalAngle=atan2(line[1], line[0]);
     double normalDist=line[2] / sqrt(line[0] * line[0] + line[1] * line[1]);
@@ -79,11 +79,11 @@ void Plane2d::FindPaths(){
 	shapes[i].calculatePaths(lineIntervals);
     }
 
-    for(unsigned long int i=0; i<lineIntervals.size(); i++){
+    /*for(unsigned long int i=0; i<lineIntervals.size(); i++){
 	cout << "-------------" << endl;
 	cout << lineIntervals[i].UpperBound() << endl;
 	cout << lineIntervals[i].LowerBound() << endl;
-    }
+    }*/
 }
 
 vector<Shape2d> Plane2d::Shapes(){

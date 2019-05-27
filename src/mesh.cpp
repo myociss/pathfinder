@@ -91,6 +91,7 @@ void Mesh::findPaths(vector<Plane3d> planes){
     for(int i=0; i<planes.size(); i++){
 	vector<Shape3d> myslice = slice(planes[i], tetsChecked);
 	Plane2d plane2d(myslice, planes[i]);
+	plane2d.FindPaths();
     }
 	
 }
