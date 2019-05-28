@@ -52,6 +52,8 @@ PYBIND11_MODULE(pathfinder, m){
   py::class_<Plane2d>(m, "Plane2d")
     .def(py::init<vector<Shape3d>&, Plane3d>())
     .def("shapes", &Plane2d::Shapes)
+    .def("calc_intervals_init", &Plane2d::CalcLineIntervalsInit)
+    .def("interval_bounds", &Plane2d::LineIntervalBounds)
     .def("find_paths", &Plane2d::FindPaths);
 
   py::class_<Shape2d>(m, "Shape2d")

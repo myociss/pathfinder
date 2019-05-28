@@ -43,8 +43,10 @@ class Plane2d{
   public:
     Plane2d(vector<Shape3d>& shapes, Plane3d plane3d);
     vector<Shape2d> Shapes();
+    void CalcLineIntervalsInit();
     void FindPaths();
-    //SweepLineInterval getSweepLineAt(unsigned long int angleId);
+    //this is for python and is not used otherwise in this application
+    vector<array<double, 2>> LineIntervalBounds();
 };
 
 #endif

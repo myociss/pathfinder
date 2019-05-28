@@ -1,5 +1,5 @@
 from unittest import TestCase
-import json, random, numpy as np, multiprocessing, math
+import json, random, numpy as np, multiprocessing, math, itertools
 import pathfinder
 
 class TestGraph(TestCase):
@@ -160,7 +160,7 @@ class TestGraph(TestCase):
                     vertex_side=vertex[0]*A+vertex[1]*B+C
                     self.assertLess(origin_side*vertex_side, 0.0)
 
-    def test_pathfinder(self):
+    def test_all_interval_calculations(self):
         target=[2*random.random(), 2*random.random(), 2*random.random()]
         self.mesh.set_target(target)
         alpha=math.pi*random.random()
@@ -169,8 +169,12 @@ class TestGraph(TestCase):
         plane_intersection=self.mesh.slice(rotation=[alpha,theta])
         plane3d = pathfinder.Plane3d(id=0, alpha=alpha, theta=theta, target=np.array(target))
         plane2d = pathfinder.Plane2d(plane_intersection, plane3d)
-        plane2d.find_paths()
-        self.assertTrue(True)
+        plane2d.calc_intervals_init()
+        interval_bounds = plane2d.interval_bounds()
+
+        all_vertices=set(list(itertools.chain.from_iterable([[tuple(v) for v in shape.vertices()] for shape in plane2d.shapes()])))
+
+        self.assertEqual(len(all_vertices), len(interval_bounds))
     
 
 if __name__ == '__main__':
