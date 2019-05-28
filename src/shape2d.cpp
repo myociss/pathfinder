@@ -12,6 +12,7 @@ Shape2d::Shape2d(int _numVertices, double _weight){
     numVertices=_numVertices;
     weight=_weight;
     vertices.reserve(numVertices);
+    endVertex=0;
 }
 
 bool Shape2d::Complete(){
@@ -57,6 +58,10 @@ void Shape2d::arrange(vector<LineInterval>& lineIntervals){
 	if(-liPoint[1]*prev[0] + liPoint[0]*prev[1]>0 && -liPoint[1]*next[0] + liPoint[0]*next[1]>0){
 	    startVertex=i;
 	}
+	
+	//if(-liPoint[1]*prev[0] + liPoint[0]*prev[1]<0 && -liPoint[1]*next[0] + liPoint[0]*next[1]<0){
+	    //endVertex=i;
+	//}
     }
 
     setVerticesClockwise(startVertex);
@@ -75,6 +80,9 @@ void Shape2d::setVerticesClockwise(int startVertex){
 	int idx=startVertex;
 	for(int i=0; i<vertices.size(); ++i){
 	    tmpVertices.push_back(vertices[idx]);
+	    //if(idx==endVertex){
+		//endVertex=i;
+	    //}
 	    ++idx;
 	    if(idx==vertices.size()){
 		idx=0;
@@ -84,6 +92,9 @@ void Shape2d::setVerticesClockwise(int startVertex){
 	int idx=startVertex;
 	for(int i=0; i<vertices.size(); ++i){
 	    tmpVertices.push_back(vertices[idx]);
+	    //if(idx==endVertex){
+		//endVertex=i;
+	    //}
 	    --idx;
 	    if(idx<0){
 		idx=vertices.size()-1;
@@ -95,7 +106,7 @@ void Shape2d::setVerticesClockwise(int startVertex){
 }
 
 void Shape2d::setNewVertices(vector<Point2d> tmpVertices){
-    endVertex=0;
+    //endVertex=0;
     double angleMax=tmpVertices[0].Angle();
     for(int i=0; i<numVertices; ++i){
 	vertices[i]=tmpVertices[i];
@@ -104,6 +115,7 @@ void Shape2d::setNewVertices(vector<Point2d> tmpVertices){
 	}
 	if(vertices[i].Angle()>angleMax){
 	    endVertex=i;
+	    angleMax=vertices[i].Angle();
 	}
     }
 }
@@ -187,8 +199,10 @@ void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
     array<double, 2> terminalPolar=polarEquation(vertices[0].Vec(), vertices[terminalEdge].Vec());
 
     unsigned long int endVertexIntervalId=vertices[endVertex].AngleId();
+    //cout << endVertexIntervalId << endl;
 
     while(intervalId!=endVertexIntervalId){
+	//cout << intervalId << endl;
 	LineInterval& li = lineIntervals[intervalId];
 	//new entry edge
 	if(vertices[entryEdge].AngleId()==intervalId){
