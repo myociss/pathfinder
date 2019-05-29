@@ -24,7 +24,7 @@ Plane2d::Plane2d(vector<Shape3d>& _shapes, Plane3d plane3d){
     for(unsigned long int i=0; i<_shapes.size(); ++i){
 	int numVertices = _shapes[i].Vertices().size();
 	count += numVertices;
-	Shape2d shape(numVertices, _shapes[i].Weight());
+	Shape2d shape(i, numVertices, _shapes[i].Weight());
 	shapes.push_back(shape);
     }
 
@@ -75,11 +75,11 @@ Plane2d::Plane2d(vector<Shape3d>& _shapes, Plane3d plane3d){
 void Plane2d::FindPaths(){
     CalcLineIntervalsInit();
 
-    for(unsigned long int i=0; i<lineIntervals.size(); i++){
+    /*for(unsigned long int i=0; i<lineIntervals.size(); i++){
 	cout << "-------------" << endl;
 	cout << lineIntervals[i].UpperBound() << endl;
 	cout << lineIntervals[i].LowerBound() << endl;
-    }
+    }*/
 }
 
 void Plane2d::CalcLineIntervalsInit(){
@@ -110,6 +110,7 @@ LineInterval::LineInterval(Vector2d _point){
     angleStart = atan2(point[1], point[0]);
     distLowerBound = 0.0;
     distUpperBound = 0.0;
+    storedShapeId=0;
 }
 
 double LineInterval::DistAt(array<double, 2> edge, int side){
@@ -150,6 +151,21 @@ double LineInterval::ApproxRoot(double distStart, double distEnd, double derivSt
 
 void LineInterval::SetAngleEnd(Vector2d _point){
     angleEnd = atan2(_point[1], _point[0]);
+}
+
+/*void LineInterval::update(double upperBound, double lowerBound, unsigned long int shapeId){
+    distUpperBound+=upperBound;
+    distLowerBound+=lowerBound;
+    shapeIds.push_back(shapeId);
+}*/
+
+unsigned long int LineInterval::update(double upperBound, double lowerBound, unsigned long int shapeId){
+    distUpperBound+=upperBound;
+    distLowerBound+=lowerBound;
+    //shapeIds.push_back(shapeId);
+    unsigned long int tmpShapeId=storedShapeId;
+    storedShapeId=shapeId;
+    return tmpShapeId;
 }
 
 void LineInterval::updateLowerBound(double val){

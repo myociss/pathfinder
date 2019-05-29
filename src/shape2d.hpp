@@ -35,13 +35,14 @@ class Point2d {
 
 
 class Shape2d {
+    unsigned long int id;
     int numVertices;
     double weight;
     vector<Point2d> vertices;
     int endVertex;
-    vector<array<double, 3>> edgesStoredValues;
+    vector<unsigned long int> prevShapeIds;
   public:
-    Shape2d(int _numVertices, double _weight);
+    Shape2d(unsigned long int _id, int _numVertices, double _weight);
     bool Complete();
     void addPoint(Point2d point);
     void arrange(vector<LineInterval>& lineIntervals);

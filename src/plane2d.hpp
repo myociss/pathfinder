@@ -22,6 +22,8 @@ class LineInterval{
     double angleEnd;
     double distLowerBound;
     double distUpperBound;
+    vector<unsigned long int> shapeIds;
+    unsigned long int storedShapeId;
   public:
     LineInterval(Vector2d _point);
     void SetAngleEnd(Vector2d _point);
@@ -30,6 +32,8 @@ class LineInterval{
     double DistAt(array<double, 2> edge, int side);
     bool containsNormal(array<double, 2> edge);
     double ApproxRoot(double distStart, double distEnd, double derivStart, double derivEnd);
+    //void update(double upperBound, double lowerBound, unsigned long int shapeId);
+    unsigned long int update(double upperBound, double lowerBound, unsigned long int shapeId);
     void updateLowerBound(double val);
     void updateUpperBound(double val);
     double UpperBound();

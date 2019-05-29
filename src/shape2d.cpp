@@ -8,7 +8,8 @@
 using namespace Eigen;
 using namespace std;
 
-Shape2d::Shape2d(int _numVertices, double _weight){
+Shape2d::Shape2d(unsigned long int _id, int _numVertices, double _weight){
+    id=_id;
     numVertices=_numVertices;
     weight=_weight;
     vertices.reserve(numVertices);
@@ -55,13 +56,10 @@ void Shape2d::arrange(vector<LineInterval>& lineIntervals){
 
 	LineInterval& li=lineIntervals[vertices[i].AngleId()];
 	Vector2d liPoint=li.Point();
-	if(-liPoint[1]*prev[0] + liPoint[0]*prev[1]>0 && -liPoint[1]*next[0] + liPoint[0]*next[1]>0){
+	if(-liPoint[1]*prev[0] + liPoint[0]*prev[1]>0 && -liPoint[1]*next[0] + liPoint[0]*next[1]>=0){
 	    startVertex=i;
 	}
 	
-	//if(-liPoint[1]*prev[0] + liPoint[0]*prev[1]<0 && -liPoint[1]*next[0] + liPoint[0]*next[1]<0){
-	    //endVertex=i;
-	//}
     }
 
     setVerticesClockwise(startVertex);
@@ -80,9 +78,6 @@ void Shape2d::setVerticesClockwise(int startVertex){
 	int idx=startVertex;
 	for(int i=0; i<vertices.size(); ++i){
 	    tmpVertices.push_back(vertices[idx]);
-	    //if(idx==endVertex){
-		//endVertex=i;
-	    //}
 	    ++idx;
 	    if(idx==vertices.size()){
 		idx=0;
@@ -92,9 +87,6 @@ void Shape2d::setVerticesClockwise(int startVertex){
 	int idx=startVertex;
 	for(int i=0; i<vertices.size(); ++i){
 	    tmpVertices.push_back(vertices[idx]);
-	    //if(idx==endVertex){
-		//endVertex=i;
-	    //}
 	    --idx;
 	    if(idx<0){
 		idx=vertices.size()-1;
@@ -106,7 +98,6 @@ void Shape2d::setVerticesClockwise(int startVertex){
 }
 
 void Shape2d::setNewVertices(vector<Point2d> tmpVertices){
-    //endVertex=0;
     double angleMax=tmpVertices[0].Angle();
     for(int i=0; i<numVertices; ++i){
 	vertices[i]=tmpVertices[i];
@@ -143,33 +134,20 @@ vector<Vector2d> Shape2d::VerticesArranged(){
 
 void Shape2d::calculatePathsTarget(vector<LineInterval>& lineIntervals){
     for(int i=vertices.size()-1; i>=0; --i){
-	/*cout << "HERE" << endl;
-	cout << i << endl;
-	cout << vertices[i].AngleId() << endl;*/
 	int next=i-1;
 	if(next<0){
 	    next=vertices.size()-1;
 	}
-	//cout << vertices[next].AngleId() << endl;
 
 	unsigned long int startIntervalId=vertices[i].AngleId();
 	unsigned long int intervalId=startIntervalId;
 
 	array<double, 2> edgePolar=polarEquation(vertices[i].Vec(), vertices[next].Vec());
 	while(intervalId!=vertices[next].AngleId()){
-	    //cout << intervalId << endl;
+
 	    LineInterval& li=lineIntervals[intervalId];
 	    double startSide=li.DistAt(edgePolar, 0);
 	    double endSide=li.DistAt(edgePolar, 1);
-	    /*if(startSide<0 || endSide<0){
-		cout << intervalId << endl;
-		cout << edgePolar[0] << endl;
-		cout << edgePolar[1] << endl;
-		cout << vertices[i].Vec() << endl;
-		cout << vertices[next].Vec() << endl;
-		cout << startSide << endl;
-		cout << endSide << endl;
-	    }*/
 
 	    if(li.containsNormal(edgePolar)){
 		li.updateLowerBound(weight * edgePolar[0]);
@@ -187,8 +165,17 @@ void Shape2d::calculatePathsTarget(vector<LineInterval>& lineIntervals){
 void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
     unsigned long int startIntervalId=vertices[0].AngleId();
     unsigned long int intervalId=startIntervalId;
+    unsigned long int endVertexIntervalId=vertices[endVertex].AngleId();
 
-    int entryEdge=0;
+    if(vertices[0].AngleId()>vertices[endVertex].AngleId()){
+	//unsigned long int 
+	prevShapeIds.reserve(lineIntervals.size() - startIntervalId + endVertexIntervalId);
+    } else {
+	prevShapeIds.reserve(endVertexIntervalId - startIntervalId);
+    }
+    //prevShapeIds.reserve();
+
+    int entryEdge=(vertices[0].AngleId()!=vertices[1].AngleId() ? 0 : 1);
     int terminalEdge=vertices.size()-1;
 
 
@@ -198,7 +185,6 @@ void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
     array<double, 2> entryPolar=polarEquation(vertices[0].Vec(), vertices[1].Vec());
     array<double, 2> terminalPolar=polarEquation(vertices[0].Vec(), vertices[terminalEdge].Vec());
 
-    unsigned long int endVertexIntervalId=vertices[endVertex].AngleId();
     //cout << endVertexIntervalId << endl;
 
     while(intervalId!=endVertexIntervalId){
@@ -231,36 +217,41 @@ void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
 	double maxSide=max(startDist, endDist);
 	double minSide=min(startDist, endDist);
 
-	//cout << "here" << endl;
-	//cout << maxSide << endl;
-	//cout << minSide << endl;
-
-	//if the inflection point has changed
+	double upperBound = 0.0;
+	double lowerBound = 0.0;
 	if(startDeriv2*endDeriv2 < 0){
-	    li.updateUpperBound(weight * maxDist());
+	    //li.updateUpperBound(weight * maxDist());
+	    //li.update(weight * maxDist(), 0.0, id);
+	    upperBound=weight * maxDist();
 	} else if(startDeriv*endDeriv < 0){
 	    double root=li.ApproxRoot(startDist, endDist, startDeriv, endDeriv);
 	    if(root < 0){
 		root=0.0;
 	    }
-	    /*cout << "----------------------" << endl;
-	    cout << root << endl;
-	    cout << maxSide << endl;
-	    cout << minSide << endl;
-	    cout << startDeriv << endl;
-	    cout << endDeriv << endl;*/
 
 	    if(startDeriv<0 || startDeriv==0 && endDeriv>0){
-		li.updateLowerBound(weight * root);
-		li.updateUpperBound(weight * maxSide);
+		//li.updateLowerBound(weight * root);
+		//li.updateUpperBound(weight * maxSide);
+		//li.update(weight * maxSide, weight * root, id);
+		upperBound=weight*maxSide;
+		lowerBound=weight*root;
 	    } else{
-		li.updateUpperBound(weight * root);
-		li.updateLowerBound(weight * minSide);
+		//li.updateUpperBound(weight * root);
+		//li.updateLowerBound(weight * minSide);
+		//li.update(weight * root, weight * minSide, id);
+		upperBound=weight*root;
+		lowerBound=weight*minSide;
 	    }
 	} else {
-	    li.updateUpperBound(weight * maxSide);
-	    li.updateLowerBound(weight * minSide);
+	    //li.updateUpperBound(weight * maxSide);
+	    //li.updateLowerBound(weight * minSide);
+	    //li.update(weight * maxSide, weight * minSide, id);
+	    upperBound=weight*maxSide;
+	    lowerBound=weight*minSide;
 	}
+
+ 	//li.update(upperBound, lowerBound, id);
+	prevShapeIds.push_back(li.update(upperBound, lowerBound, id));
 
 	terminalFStart=terminalFEnd;
 	entryFStart=entryFEnd;
