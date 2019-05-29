@@ -75,11 +75,11 @@ Plane2d::Plane2d(vector<Shape3d>& _shapes, Plane3d plane3d){
 void Plane2d::FindPaths(){
     CalcLineIntervalsInit();
 
-    /*for(unsigned long int i=0; i<lineIntervals.size(); i++){
+    for(unsigned long int i=0; i<lineIntervals.size(); i++){
 	cout << "-------------" << endl;
 	cout << lineIntervals[i].UpperBound() << endl;
 	cout << lineIntervals[i].LowerBound() << endl;
-    }*/
+    }
 }
 
 void Plane2d::CalcLineIntervalsInit(){

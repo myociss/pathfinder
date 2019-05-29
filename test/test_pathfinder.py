@@ -29,7 +29,7 @@ class TestGraph(TestCase):
 
 
     def test_slice(self):
-        for test_iter in range(20):
+        for test_iter in range(5):
             target=[2*random.random(), 2*random.random(), 2*random.random()]
             self.mesh.set_target(target)
             alpha=math.pi*random.random()
@@ -128,6 +128,33 @@ class TestGraph(TestCase):
 
                 self.assertLess(abs(angle_last-angle_expected), 10e-8)
 
+                hull_idx=shape.hull_supporting_idx()
+                next_idx=(hull_idx+1)%len(vertices_2d)
+
+                angle_inter=math.acos(np.dot(vertices_2d[hull_idx], vertices_2d[next_idx])/(np.linalg.norm(vertices_2d[hull_idx]) * np.linalg.norm(vertices_2d[next_idx])))
+
+                angle_hull=math.atan2(vertices_2d[hull_idx][1], vertices_2d[hull_idx][0])
+                angle_next=math.atan2(vertices_2d[next_idx][1], vertices_2d[next_idx][0])
+                angle_expected=angle_hull-angle_inter
+
+                if angle_expected<-math.pi:
+                    angle_expected=2*math.pi + angle_expected
+
+                self.assertLess(abs(angle_next-angle_expected), 10e-8)
+
+
+                prev_idx=hull_idx-1
+
+                angle_inter=math.acos(np.dot(vertices_2d[hull_idx], vertices_2d[prev_idx])/(np.linalg.norm(vertices_2d[hull_idx]) * np.linalg.norm(vertices_2d[prev_idx])))
+
+                angle_prev=math.atan2(vertices_2d[prev_idx][1], vertices_2d[prev_idx][0])
+                angle_expected=angle_hull-angle_inter
+
+                if angle_expected<-math.pi:
+                    angle_expected=2*math.pi + angle_expected
+
+                self.assertLess(abs(angle_prev-angle_expected), 10e-8)
+
     def test_hulls(self):
         for test_iter in range(5):
             target=[2*random.random(), 2*random.random(), 2*random.random()]
@@ -147,13 +174,8 @@ class TestGraph(TestCase):
                 A=convex_hull_vertex[1]-vertices_2d[0][1]
                 B=vertices_2d[0][0]-convex_hull_vertex[0]
                 C=convex_hull_vertex[0]*vertices_2d[0][1]-vertices_2d[0][0]*convex_hull_vertex[1]
-
      
                 origin_side=C
-                #print('---------')
-                #print(shape.hull_supporting_idx())
-                #for v in vertices_2d:
-                #    print(math.atan2(v[1], v[0]))
 
                 for i in range(1, shape.hull_supporting_idx()):
                     vertex=vertices_2d[i]
@@ -166,12 +188,10 @@ class TestGraph(TestCase):
                     self.assertLess(origin_side*vertex_side, 0.0)
     
     def test_all_interval_calculations(self):
-        target=[2*random.random(), 2*random.random(), 2*random.random()]
+        target=[0.1+1.8*random.random(), 0.1+1.8*random.random(), 0.1+1.8*random.random()]
         self.mesh.set_target(target)
         alpha=math.pi*random.random()
         theta=math.pi*random.random()
-        print(alpha)
-        print(theta)
 
         plane_intersection=self.mesh.slice(rotation=[alpha,theta])
         plane3d = pathfinder.Plane3d(id=0, alpha=alpha, theta=theta, target=np.array(target))
@@ -182,39 +202,10 @@ class TestGraph(TestCase):
         all_vertices=list(itertools.chain.from_iterable([[tuple(v) for v in shape.vertices()] for shape in plane2d.shapes()]))
         intervals=sorted(set([math.atan2(v[1], v[0]) for v in all_vertices]))
         self.assertEqual(len(intervals), len(interval_bounds))
+        for interval_bound in interval_bounds:
+            self.assertLess(interval_bound[0], interval_bound[1])
+            self.assertGreater(interval_bound[0], 0.0)
 
-        #interval_shapes=[0 for i in range(len(intervals))]
-                
-        for idx, angle in enumerate(intervals):
-            if idx==len(intervals)-1:
-                angle_next=intervals[0] + 2 * math.pi
-            else:
-                angle_next=intervals[idx+1]
-
-            interval_shapes=[0]
-            #print(angle)
-            #print(angle_next)
-
-            for i in range(1, len(plane2d.shapes())):
-                shape=plane2d.shapes()[i]
-                vertices=shape.arranged_vertices()
-                #print(i)
-                #print(shape.hull_supporting_idx())
-                for vertex_idx in range(shape.hull_supporting_idx()):
-                    vertex=vertices[vertex_idx]
-                    next=vertex_idx+1
-                    vertex_next=vertices[next]
-                    vertex_angle=math.atan2(vertex[1], vertex[0])
-                    vertex_angle_next=math.atan2(vertex_next[1], vertex_next[0])
-                    if vertex_angle>vertex_angle_next:
-                        if idx==len(intervals)-1:
-                            vertex_angle_next += 2 * math.pi
-                        else:
-                            vertex_angle -= 2 * math.pi
-                    if angle>=vertex_angle and angle_next<=vertex_angle_next:
-                        interval_shapes.append(i)
-                        break
-            print(len(interval_shapes))
     
 
 if __name__ == '__main__':
