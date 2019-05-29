@@ -103,6 +103,14 @@ vector<Shape2d> Plane2d::Shapes(){
     return shapes;
 }
 
+vector<unsigned long int> Plane2d::IntervalShapeIds(){
+    vector<unsigned long int> intervalShapeIds;
+    for(unsigned long int i; i<lineIntervals.size(); ++i){
+	intervalShapeIds.push_back(lineIntervals[i].StoredShapeId());
+    }
+    return intervalShapeIds;
+}
+
 LineInterval::LineInterval(Vector2d _point){
     point = _point;
     Vector2d zero(0.0, 0.0);
@@ -170,6 +178,10 @@ unsigned long int LineInterval::update(double upperBound, double lowerBound, uns
 
 void LineInterval::updateLowerBound(double val){
     distLowerBound+=val;
+}
+
+unsigned long int LineInterval::StoredShapeId(){
+    return storedShapeId;
 }
 
 void LineInterval::updateUpperBound(double val){

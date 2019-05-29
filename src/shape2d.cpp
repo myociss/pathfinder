@@ -287,6 +287,10 @@ double Shape2d::maxDist(){
     return maxDist;
 }
 
+vector<unsigned long int> Shape2d::PrevShapeIds(){
+    return prevShapeIds;
+}
+
 int Shape2d::EndVertex(){
     return endVertex;
 }

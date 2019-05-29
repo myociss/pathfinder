@@ -55,6 +55,7 @@ class Shape2d {
     int EndVertex();
     vector<Vector2d> Vertices();
     vector<Vector2d> VerticesArranged();
+    vector<unsigned long int> PrevShapeIds();
 };
 
 

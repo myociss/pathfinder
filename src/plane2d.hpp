@@ -38,6 +38,7 @@ class LineInterval{
     void updateUpperBound(double val);
     double UpperBound();
     double LowerBound();
+    unsigned long int StoredShapeId();
 };
 
 
@@ -51,6 +52,7 @@ class Plane2d{
     void FindPaths();
     //this is for python and is not used otherwise in this application
     vector<array<double, 2>> LineIntervalBounds();
+    vector<unsigned long int> IntervalShapeIds();
 };
 
 #endif

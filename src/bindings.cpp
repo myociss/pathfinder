@@ -54,10 +54,12 @@ PYBIND11_MODULE(pathfinder, m){
     .def("shapes", &Plane2d::Shapes)
     .def("calc_intervals_init", &Plane2d::CalcLineIntervalsInit)
     .def("interval_bounds", &Plane2d::LineIntervalBounds)
-    .def("find_paths", &Plane2d::FindPaths);
+    .def("find_paths", &Plane2d::FindPaths)
+    .def("interval_shape_ids", &Plane2d::IntervalShapeIds);
 
   py::class_<Shape2d>(m, "Shape2d")
     .def("vertices", &Shape2d::Vertices)
     .def("arranged_vertices", &Shape2d::VerticesArranged)
-    .def("hull_supporting_idx", &Shape2d::EndVertex);
+    .def("hull_supporting_idx", &Shape2d::EndVertex)
+    .def("stored_shape_ids", &Shape2d::PrevShapeIds);
 }
