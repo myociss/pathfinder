@@ -59,16 +59,19 @@ void Mesh::addFace(const array<int, 3> vertexIds, const int tetId){
     faces.push_back(face);
 }
 
-void Mesh::setTarget(array<double, 3> _target){
+bool Mesh::setTarget(array<double, 3> _target){
+    bool targetSet=false;
     for(unsigned long int i=0; i < tetrahedrons.size(); ++i){
 	if (tetrahedrons[i].contains(_target)){
 	    Vector3d t(_target[0], _target[1], _target[2]);
 	    target = t;
 	    targetTetId=i;
-	    return;
+	    targetSet=true;
+	    break;
 	}
     }
-    throw runtime_error("Target not within mesh bounds");
+    return targetSet;
+    //throw runtime_error("Target not within mesh bounds");
 }
 
 vector<Shape3d> Mesh::sliceIndv(array<double, 2> rotation){
@@ -145,6 +148,7 @@ vector<Shape3d> Mesh::computeSliceComponent(Plane3d plane, vector<int> &tetsChec
 void Mesh::shortestPaths(const int epsilon, const int numThreads){
     thread t[numThreads];
     vector<Plane3d> planes;
+    cout << numThreads << endl;
 
     for(int i=0; i<epsilon; i++){
 	for(int j=0; j<epsilon; j++){

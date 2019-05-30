@@ -19,6 +19,7 @@ class TestGraph(TestCase):
   
 
     def test_target_set(self):
+        self.assertFalse(self.mesh.set_target([5.0, 5.0, 5.0]))
         # should probably also include a test for a point that definitely lies in more than one sphere
         for idx, tet in enumerate(self.test_mesh['tetrahedrons']):
             vertices=[self.test_mesh['vertices'][i] for i in tet['vertices']]
