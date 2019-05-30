@@ -207,10 +207,8 @@ class TestGraph(TestCase):
             self.assertGreater(interval_bound[0], 0.0)
 
         interval_shape_ids=plane2d.interval_shape_ids()
-        #print(interval_shape_ids)
 
         for interval_idx, interval in enumerate(intervals):
-            #build list of shapes that intersect this interval
             interval_shapes = [0]
             interval_start=interval
             if interval_idx==len(intervals)-1:
@@ -226,10 +224,10 @@ class TestGraph(TestCase):
                     angle_start=math.atan2(v0[1], v0[0])
                     angle_end=math.atan2(v1[1], v1[0])
                     if angle_start>angle_end:
-                        if interval_idx==len(intervals)-1:
-                            angle_end += 2*math.pi
+                        if interval_start<0:
+                            angle_start -= 2 * math.pi
                         else:
-                            angle_start+=-2*math.pi
+                            angle_end += 2 * math.pi
                     if angle_start<=interval_start and angle_end>=interval_end:
                         interval_shapes.append(shape_idx)
                         break
@@ -251,28 +249,13 @@ class TestGraph(TestCase):
                     shape_list_idx=(interval_idx + len(intervals)) - shape_first_interval
                 else:
                     shape_list_idx=interval_idx - shape_first_interval
-                #print(shape_first_interval)
-                #print(interval_idx)
-                #print(shape_list_idx)
-                #print(shape_list)
+
                 interval_prev_shape_id=shape_list[shape_list_idx]
-            #print(pathfinder_interval_shapes)
+
             print(f'testing interval {interval_idx+1} of {len(intervals)}')
             self.assertListEqual(sorted(pathfinder_interval_shapes), sorted(interval_shapes))
 
-        #for shape_idx in range(1, len(plane2d.shapes())):
-        #    shape=plane2d.shapes()[shape_idx]
-        #    start_vertex=shape.arranged_vertices()[0]
-        #    start_angle=math.atan2(start_vertex[1], start_vertex[0])
-        #    last_interval_vertex=shape.arranged_vertices()[shape.hull_supporting_idx()]
-        #    last_angle=math.atan2(last_interval_vertex[1], last_interval_vertex[0])
-        #    start_interval=intervals.index(start_angle)
-        #    last_interval=intervals.index(last_angle)
-        #    linked_list_shapes=shape.stored_shape_ids()
 
-            
-
-    
 
 if __name__ == '__main__':
     unittest.main()
