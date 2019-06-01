@@ -55,7 +55,8 @@ PYBIND11_MODULE(pathfinder, m){
     .def("calc_intervals_init", &Plane2d::CalcLineIntervalsInit)
     .def("interval_bounds", &Plane2d::LineIntervalBounds)
     .def("find_paths", &Plane2d::FindPaths)
-    .def("interval_shape_ids", &Plane2d::IntervalShapeIds);
+    .def("interval_shape_ids", &Plane2d::IntervalShapeIds,
+	py::arg("interval_id"));
 
   py::class_<Shape2d>(m, "Shape2d")
     .def("vertices", &Shape2d::Vertices)

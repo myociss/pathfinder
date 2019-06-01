@@ -207,7 +207,7 @@ class TestGraph(TestCase):
             self.assertLess(interval_bound[0], interval_bound[1])
             self.assertGreater(interval_bound[0], 0.0)
 
-        interval_shape_ids=plane2d.interval_shape_ids()
+        #interval_shape_ids=plane2d.interval_shape_ids()
 
         for interval_idx, interval in enumerate(intervals):
             interval_shapes = [0]
@@ -234,25 +234,8 @@ class TestGraph(TestCase):
                         break
 
             #build a second list from pathfinder
-            pathfinder_interval_shapes=[0]
-            interval_prev_shape_id=interval_shape_ids[interval_idx]
-            while(interval_prev_shape_id!=0):
-                pathfinder_interval_shapes.append(interval_prev_shape_id)
-                shape=plane2d.shapes()[interval_prev_shape_id]
-                start_vertex=shape.arranged_vertices()[0]
-                start_angle=math.atan2(start_vertex[1], start_vertex[0])
-                last_interval_vertex=shape.arranged_vertices()[shape.hull_supporting_idx()]
-                last_angle=math.atan2(last_interval_vertex[1], last_interval_vertex[0])
-                shape_first_interval=intervals.index(start_angle)
-                shape_interval_bound=intervals.index(last_angle)
-                shape_list=shape.stored_shape_ids()
-                if interval_idx < shape_first_interval:
-                    shape_list_idx=(interval_idx + len(intervals)) - shape_first_interval
-                else:
-                    shape_list_idx=interval_idx - shape_first_interval
-
-                interval_prev_shape_id=shape_list[shape_list_idx]
-
+            pathfinder_interval_shapes=plane2d.interval_shape_ids(interval_idx)
+    
             print(f'testing interval {interval_idx+1} of {len(intervals)}')
             self.assertListEqual(sorted(pathfinder_interval_shapes), sorted(interval_shapes))
 

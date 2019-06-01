@@ -88,7 +88,7 @@ void Plane2d::FindPaths(){
 	    searchAgain.push_back(lineIntervals[i]);
 	}
     }
-    cout << searchAgain.size() << endl;
+    //cout << searchAgain.size() << endl;
 }
 
 void Plane2d::CalcLineIntervalsInit(){
@@ -112,13 +112,17 @@ vector<Shape2d> Plane2d::Shapes(){
     return shapes;
 }
 
-vector<unsigned long int> Plane2d::IntervalShapeIds(){
+/*vector<unsigned long int> Plane2d::IntervalShapeIds(){
     vector<unsigned long int> intervalShapeIds;
     for(unsigned long int i; i<lineIntervals.size(); ++i){
 	intervalShapeIds.push_back(lineIntervals[i].StoredShapeId());
     }
     return intervalShapeIds;
+}*/
+vector<unsigned long int> Plane2d::IntervalShapeIds(unsigned long int intervalId){
+    return lineIntervals[intervalId].ShapeIds();
 }
+
 
 LineInterval::LineInterval(Vector2d _point){
     point = _point;
@@ -127,7 +131,7 @@ LineInterval::LineInterval(Vector2d _point){
     angleStart = atan2(point[1], point[0]);
     distLowerBound = 0.0;
     distUpperBound = 0.0;
-    storedShapeId=0;
+    //storedShapeId=0;
 }
 
 double LineInterval::DistAt(array<double, 2> edge, int side){
@@ -170,27 +174,30 @@ void LineInterval::SetAngleEnd(Vector2d _point){
     angleEnd = atan2(_point[1], _point[0]);
 }
 
-/*void LineInterval::update(double upperBound, double lowerBound, unsigned long int shapeId){
+void LineInterval::update(double upperBound, double lowerBound, unsigned long int shapeId){
     distUpperBound+=upperBound;
     distLowerBound+=lowerBound;
     shapeIds.push_back(shapeId);
-}*/
+}
 
-unsigned long int LineInterval::update(double upperBound, double lowerBound, unsigned long int shapeId){
+/*unsigned long int LineInterval::update(double upperBound, double lowerBound, unsigned long int shapeId){
     distUpperBound+=upperBound;
     distLowerBound+=lowerBound;
-    //shapeIds.push_back(shapeId);
     unsigned long int tmpShapeId=storedShapeId;
     storedShapeId=shapeId;
     return tmpShapeId;
-}
+}*/
 
 void LineInterval::updateLowerBound(double val){
     distLowerBound+=val;
 }
 
-unsigned long int LineInterval::StoredShapeId(){
+/*unsigned long int LineInterval::StoredShapeId(){
     return storedShapeId;
+}*/
+
+vector<unsigned long int> LineInterval::ShapeIds(){
+    return shapeIds;
 }
 
 void LineInterval::updateUpperBound(double val){

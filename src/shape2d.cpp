@@ -142,6 +142,9 @@ void Shape2d::calculatePathsTarget(vector<LineInterval>& lineIntervals){
 	unsigned long int startIntervalId=vertices[i].AngleId();
 	unsigned long int intervalId=startIntervalId;
 
+	double upperBound=0.0;
+	double lowerBound=0.0;
+
 	array<double, 2> edgePolar=polarEquation(vertices[i].Vec(), vertices[next].Vec());
 	while(intervalId!=vertices[next].AngleId()){
 
@@ -150,12 +153,13 @@ void Shape2d::calculatePathsTarget(vector<LineInterval>& lineIntervals){
 	    double endSide=li.DistAt(edgePolar, 1);
 
 	    if(li.containsNormal(edgePolar)){
-		li.updateLowerBound(weight * edgePolar[0]);
-		li.updateUpperBound(weight * max(startSide, endSide));
+		upperBound=weight * max(startSide, endSide);
+		lowerBound=weight * edgePolar[0];
 	    } else {
-		li.updateLowerBound(weight * min(startSide, endSide));
-		li.updateUpperBound(weight * max(startSide, endSide));
+		upperBound=weight * max(startSide, endSide);
+		lowerBound=weight * min(startSide, endSide);
 	    }
+	    li.update(upperBound, lowerBound, id);
 
 	    intervalId=(intervalId+1)%lineIntervals.size();
 	}
@@ -166,14 +170,6 @@ void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
     unsigned long int startIntervalId=vertices[0].AngleId();
     unsigned long int intervalId=startIntervalId;
     unsigned long int endVertexIntervalId=vertices[endVertex].AngleId();
-
-    if(vertices[0].AngleId()>vertices[endVertex].AngleId()){
-	//unsigned long int 
-	prevShapeIds.reserve(lineIntervals.size() - startIntervalId + endVertexIntervalId);
-    } else {
-	prevShapeIds.reserve(endVertexIntervalId - startIntervalId);
-    }
-    //prevShapeIds.reserve();
 
     int entryEdge=(vertices[0].AngleId()!=vertices[1].AngleId() ? 0 : 1);
     int terminalEdge=vertices.size()-1;
@@ -220,8 +216,6 @@ void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
 	double upperBound = 0.0;
 	double lowerBound = 0.0;
 	if(startDeriv2*endDeriv2 < 0){
-	    //li.updateUpperBound(weight * maxDist());
-	    //li.update(weight * maxDist(), 0.0, id);
 	    upperBound=weight * maxDist();
 	} else if(startDeriv*endDeriv < 0){
 	    double root=li.ApproxRoot(startDist, endDist, startDeriv, endDeriv);
@@ -230,28 +224,19 @@ void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
 	    }
 
 	    if(startDeriv<0 || startDeriv==0 && endDeriv>0){
-		//li.updateLowerBound(weight * root);
-		//li.updateUpperBound(weight * maxSide);
-		//li.update(weight * maxSide, weight * root, id);
 		upperBound=weight*maxSide;
 		lowerBound=weight*root;
 	    } else{
-		//li.updateUpperBound(weight * root);
-		//li.updateLowerBound(weight * minSide);
-		//li.update(weight * root, weight * minSide, id);
 		upperBound=weight*root;
 		lowerBound=weight*minSide;
 	    }
 	} else {
-	    //li.updateUpperBound(weight * maxSide);
-	    //li.updateLowerBound(weight * minSide);
-	    //li.update(weight * maxSide, weight * minSide, id);
 	    upperBound=weight*maxSide;
 	    lowerBound=weight*minSide;
 	}
 
- 	//li.update(upperBound, lowerBound, id);
-	prevShapeIds.push_back(li.update(upperBound, lowerBound, id));
+ 	li.update(upperBound, lowerBound, id);
+	//prevShapeIds.push_back(li.update(upperBound, lowerBound, id));
 
 	terminalFStart=terminalFEnd;
 	entryFStart=entryFEnd;
