@@ -159,7 +159,7 @@ void Shape2d::calculatePathsTarget(vector<LineInterval>& lineIntervals){
 		upperBound=weight * max(startSide, endSide);
 		lowerBound=weight * min(startSide, endSide);
 	    }
-	    li.update(upperBound, lowerBound, id);
+	    li.update(upperBound, lowerBound, startSide, endSide, id);
 
 	    intervalId=(intervalId+1)%lineIntervals.size();
 	}
@@ -223,7 +223,7 @@ void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
 		root=0.0;
 	    }
 
-	    if(startDeriv<0 || startDeriv==0 && endDeriv>0){
+	    if(startDeriv<0 || (startDeriv==0 && endDeriv>0)){
 		upperBound=weight*maxSide;
 		lowerBound=weight*root;
 	    } else{
@@ -235,8 +235,7 @@ void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
 	    lowerBound=weight*minSide;
 	}
 
- 	li.update(upperBound, lowerBound, id);
-	//prevShapeIds.push_back(li.update(upperBound, lowerBound, id));
+ 	li.update(upperBound, lowerBound, terminalFStart[0], terminalFEnd[1], id);
 
 	terminalFStart=terminalFEnd;
 	entryFStart=entryFEnd;
@@ -255,6 +254,10 @@ void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
 
 	intervalId=nextInterval;
     }
+}
+
+void Shape2d::calculateInterval(LineInterval& lineInterval){
+    
 }
 
 double Shape2d::maxDist(){

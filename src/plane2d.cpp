@@ -72,7 +72,7 @@ Plane2d::Plane2d(vector<Shape3d>& _shapes, Plane3d plane3d){
 }
 
 
-void Plane2d::FindPaths(){
+void Plane2d::FindPaths(double distBound){
     CalcLineIntervalsInit();
 
     double minUpperBound=lineIntervals[0].UpperBound();
@@ -82,13 +82,70 @@ void Plane2d::FindPaths(){
 	    minUpperBound=upperBound;
 	}
     }
-    vector<LineInterval> searchAgain;
+
     for(unsigned long int i=0; i<lineIntervals.size(); ++i){
 	if(lineIntervals[i].LowerBound()<minUpperBound){
-	    searchAgain.push_back(lineIntervals[i]);
+	    candidateIntervals.push_back(lineIntervals[i]);
 	}
     }
     //cout << searchAgain.size() << endl;
+    bool distBoundSatisfied=DivideCandidateIntervals(distBound);
+
+    while(!distBoundSatisfied){
+
+	double minUpperBound=candidateIntervals[0].UpperBound();
+	for(unsigned long int i=0; i<candidateIntervals.size(); ++i){
+	    double upperBound=candidateIntervals[i].UpperBound();
+	    if(upperBound<minUpperBound){
+		minUpperBound=upperBound;
+	    }
+	}
+	vector<LineInterval> newCandidateIntervals;
+	for(unsigned long int i=0; i<candidateIntervals.size(); ++i){
+	    if(candidateIntervals[i].LowerBound()<minUpperBound){
+		newCandidateIntervals.push_back(lineIntervals[i]);
+	    }
+	}
+	candidateIntervals=newCandidateIntervals;
+	
+	distBoundSatisfied=DivideCandidateIntervals(distBound);
+    }
+}
+
+/*
+-get maximum width of all candidate intervals at outer faces
+-while maximum width is too large:
+  -get new vector of candidate intervals
+  -prune vector
+  -get new maximum width of new candidate vector at outer faces
+
+to get new vector of candidate intervals:
+-call a function on all line intervals that returns that line interval if its width is small enough, or two line intervals if division is required
+*/
+
+bool Plane2d::DivideCandidateIntervals(double distBound){
+    vector<LineInterval> newCandidateIntervals;
+    for(unsigned long int i=0; i<candidateIntervals.size(); ++i){
+	if(candidateIntervals[i].MaxWidth() <= distBound){
+	    newCandidateIntervals.push_back(candidateIntervals[i]);
+	} else{
+	    array<double, 3> newAngles=candidateIntervals[i].Divide();
+	    LineInterval li0 = LineInterval(newAngles[0], newAngles[1]);
+	    LineInterval li1 = LineInterval(newAngles[1], newAngles[2]);
+	    vector<unsigned long int> shapeIds=candidateIntervals[i].ShapeIds();
+	    shapes[0].calculateIntervalTarget(li0);
+	    shapes[0].calculateIntervalTarget(li1);
+	    for(unsigned long int i=1; i<shapeIds.size(); ++i){
+		shapes[i].calculateInterval(li0);
+		shapes[i].calculateInterval(li1);
+	    }
+	    newCandidateIntervals.push_back(li0);
+	    newCandidateIntervals.push_back(li1);
+	}
+    }
+    bool distBoundSatisfied=(candidateIntervals.size()==newCandidateIntervals.size());
+    candidateIntervals=newCandidateIntervals;
+    return distBoundSatisfied;
 }
 
 void Plane2d::CalcLineIntervalsInit(){
@@ -112,13 +169,7 @@ vector<Shape2d> Plane2d::Shapes(){
     return shapes;
 }
 
-/*vector<unsigned long int> Plane2d::IntervalShapeIds(){
-    vector<unsigned long int> intervalShapeIds;
-    for(unsigned long int i; i<lineIntervals.size(); ++i){
-	intervalShapeIds.push_back(lineIntervals[i].StoredShapeId());
-    }
-    return intervalShapeIds;
-}*/
+
 vector<unsigned long int> Plane2d::IntervalShapeIds(unsigned long int intervalId){
     return lineIntervals[intervalId].ShapeIds();
 }
@@ -126,12 +177,18 @@ vector<unsigned long int> Plane2d::IntervalShapeIds(unsigned long int intervalId
 
 LineInterval::LineInterval(Vector2d _point){
     point = _point;
-    Vector2d zero(0.0, 0.0);
-    polarComponents = polarEquation(point, zero);
     angleStart = atan2(point[1], point[0]);
     distLowerBound = 0.0;
     distUpperBound = 0.0;
-    //storedShapeId=0;
+    intervalMaxDists = {0.0, 0.0};
+}
+
+LineInterval::LineInterval(double _angleStart, double _angleEnd){
+    angleStart=_angleStart;
+    angleEnd=_angleEnd;
+    distLowerBound = 0.0;
+    distUpperBound = 0.0;
+    intervalMaxDists = {0.0, 0.0};
 }
 
 double LineInterval::DistAt(array<double, 2> edge, int side){
@@ -139,8 +196,21 @@ double LineInterval::DistAt(array<double, 2> edge, int side){
     return edge[0]/cos(angle-edge[1]);
 }
 
+array<double, 3> LineInterval::Divide(){
+    if(angleStart>angleEnd){
+	double intervalAngleEnd=angleEnd + (2 * M_PI);
+	double mid=(angleStart+intervalAngleEnd)/2;
+	if(mid>=M_PI){
+	    mid -= 2 * M_PI;
+	}
+	return {angleStart, mid, angleEnd};
+    } else{
+	return {angleStart, (angleStart+angleEnd)/2, angleEnd};
+    }
+}
+
 bool LineInterval::containsNormal(array<double, 2> edge){
-    double intervalAngleEnd= (angleStart>angleEnd ? angleEnd + (2 * M_PI) : angleEnd);   
+    double intervalAngleEnd= (angleStart>angleEnd ? angleEnd + (2 * M_PI) : angleEnd);
     return edge[1] >= angleStart && edge[1] <= intervalAngleEnd;
 }
 
@@ -157,7 +227,7 @@ array<double, 3> LineInterval::FunctionsAt(array<double, 2> edge, int side){
 }
 
 double LineInterval::ApproxRoot(double distStart, double distEnd, double derivStart, double derivEnd){
-    double intervalAngleEnd= (angleStart>angleEnd ? angleEnd + (2 * M_PI) : angleEnd);   
+    double intervalAngleEnd= (angleStart>angleEnd ? angleEnd + (2 * M_PI) : angleEnd);
 
     double bStart=distStart - (angleStart * derivStart);
     double bEnd=distEnd - (intervalAngleEnd * derivEnd);
@@ -174,35 +244,38 @@ void LineInterval::SetAngleEnd(Vector2d _point){
     angleEnd = atan2(_point[1], _point[0]);
 }
 
-void LineInterval::update(double upperBound, double lowerBound, unsigned long int shapeId){
+void LineInterval::update(double upperBound, double lowerBound, double distStart, double distEnd, unsigned long int shapeId){
     distUpperBound+=upperBound;
     distLowerBound+=lowerBound;
+
+    if(distStart > max(intervalMaxDists[0], intervalMaxDists[1]) || distEnd > max(intervalMaxDists[0], intervalMaxDists[1])){
+	intervalMaxDists={distStart, distEnd};
+    }
     shapeIds.push_back(shapeId);
 }
 
-/*unsigned long int LineInterval::update(double upperBound, double lowerBound, unsigned long int shapeId){
-    distUpperBound+=upperBound;
-    distLowerBound+=lowerBound;
-    unsigned long int tmpShapeId=storedShapeId;
-    storedShapeId=shapeId;
-    return tmpShapeId;
-}*/
+double LineInterval::MaxWidth(){
+    double intervalAngleEnd= (angleStart>angleEnd ? angleEnd + (2 * M_PI) : angleEnd);
+    double b=intervalMaxDists[0];
+    double c=intervalMaxDists[1];
+    return sqrt( b*b + c*c - 2*b*c*cos(intervalAngleEnd-angleStart) )
+}
 
+/*
 void LineInterval::updateLowerBound(double val){
     distLowerBound+=val;
 }
-
-/*unsigned long int LineInterval::StoredShapeId(){
-    return storedShapeId;
-}*/
+*/
 
 vector<unsigned long int> LineInterval::ShapeIds(){
     return shapeIds;
 }
 
+/*
 void LineInterval::updateUpperBound(double val){
     distUpperBound+=val;
 }
+*/
 
 double LineInterval::LowerBound(){
     return distLowerBound;
