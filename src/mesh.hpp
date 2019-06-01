@@ -25,10 +25,10 @@ class Mesh {
     void addFace(const array<int, 3> vertexIds, const int tetId);
     bool setTarget(const array<double, 3> _target);
     vector<Shape3d> slice(Plane3d plane, vector<int> &tetsChecked);
-    void shortestPaths(const int epsilon, const int numThreads);
+    void shortestPaths(const int epsilon, const int numThreads, double distBound);
     vector<Shape3d> computeSliceComponent(Plane3d plane, vector<int> &tetsChecked, unsigned long int initTet);
     vector<Shape3d> sliceIndv(array<double, 2> rotation);
-    void findPaths(vector<Plane3d> planes);
+    void findPaths(vector<Plane3d> planes, double distBound);
     //these functions are exposed to Python for testing purposes; while it is possible that a python application may require them, they are not required for any other purpose in this application
     unsigned long int getTargetTetId();
 };

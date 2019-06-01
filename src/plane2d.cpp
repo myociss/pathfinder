@@ -83,7 +83,7 @@ void Plane2d::FindPaths(double distBound){
 	}
     }
 
-    for(unsigned long int i=0; i<lineIntervals.size(); ++i){
+    /*for(unsigned long int i=0; i<lineIntervals.size(); ++i){
 	if(lineIntervals[i].LowerBound()<minUpperBound){
 	    candidateIntervals.push_back(lineIntervals[i]);
 	}
@@ -109,7 +109,7 @@ void Plane2d::FindPaths(double distBound){
 	candidateIntervals=newCandidateIntervals;
 	
 	distBoundSatisfied=DivideCandidateIntervals(distBound);
-    }
+    }*/
 }
 
 /*
@@ -123,6 +123,7 @@ to get new vector of candidate intervals:
 -call a function on all line intervals that returns that line interval if its width is small enough, or two line intervals if division is required
 */
 
+/*
 bool Plane2d::DivideCandidateIntervals(double distBound){
     vector<LineInterval> newCandidateIntervals;
     for(unsigned long int i=0; i<candidateIntervals.size(); ++i){
@@ -146,7 +147,7 @@ bool Plane2d::DivideCandidateIntervals(double distBound){
     bool distBoundSatisfied=(candidateIntervals.size()==newCandidateIntervals.size());
     candidateIntervals=newCandidateIntervals;
     return distBoundSatisfied;
-}
+}*/
 
 void Plane2d::CalcLineIntervalsInit(){
     shapes[0].setVerticesClockwise(0);
@@ -258,7 +259,7 @@ double LineInterval::MaxWidth(){
     double intervalAngleEnd= (angleStart>angleEnd ? angleEnd + (2 * M_PI) : angleEnd);
     double b=intervalMaxDists[0];
     double c=intervalMaxDists[1];
-    return sqrt( b*b + c*c - 2*b*c*cos(intervalAngleEnd-angleStart) )
+    return sqrt( b*b + c*c - 2*b*c*cos(intervalAngleEnd-angleStart) );
 }
 
 /*

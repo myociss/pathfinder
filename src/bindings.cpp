@@ -28,9 +28,10 @@ PYBIND11_MODULE(pathfinder, m){
     .def("get_target_idx", &Mesh::getTargetTetId)
     .def("slice", &Mesh::sliceIndv,
 	py::arg("rotation"))
-    .def("multiple_slices", &Mesh::shortestPaths,
+    .def("get_paths", &Mesh::shortestPaths,
 	py::arg("epsilon"),
-	py::arg("threads"));
+	py::arg("threads"),
+	py::arg("distance_bound"));
 
   py::class_<Plane3d>(m, "Plane3d")
     .def(py::init<int, double, double, Eigen::Vector3d>(),
@@ -61,6 +62,5 @@ PYBIND11_MODULE(pathfinder, m){
   py::class_<Shape2d>(m, "Shape2d")
     .def("vertices", &Shape2d::Vertices)
     .def("arranged_vertices", &Shape2d::VerticesArranged)
-    .def("hull_supporting_idx", &Shape2d::EndVertex)
-    .def("stored_shape_ids", &Shape2d::PrevShapeIds);
+    .def("hull_supporting_idx", &Shape2d::EndVertex);
 }

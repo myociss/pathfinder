@@ -40,7 +40,7 @@ class Shape2d {
     double weight;
     vector<Point2d> vertices;
     int endVertex;
-    vector<unsigned long int> prevShapeIds;
+    //vector<unsigned long int> prevShapeIds;
   public:
     Shape2d(unsigned long int _id, int _numVertices, double _weight);
     bool Complete();
@@ -57,7 +57,7 @@ class Shape2d {
     int EndVertex();
     vector<Vector2d> Vertices();
     vector<Vector2d> VerticesArranged();
-    vector<unsigned long int> PrevShapeIds();
+    //vector<unsigned long int> PrevShapeIds();
 };
 
 

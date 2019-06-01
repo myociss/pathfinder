@@ -226,9 +226,19 @@ void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
 	    if(startDeriv<0 || (startDeriv==0 && endDeriv>0)){
 		upperBound=weight*maxSide;
 		lowerBound=weight*root;
+		if(root > minSide){
+		    cout << minSide << endl;
+		    cout << root << endl;
+		    cout << "yikes fam" << endl;
+		}
 	    } else{
 		upperBound=weight*root;
 		lowerBound=weight*minSide;
+		if(root < maxSide){
+		    cout << maxSide << endl;
+		    cout << root << endl;
+		    cout << "yikes fam" << endl;
+		}
 	    }
 	} else {
 	    upperBound=weight*maxSide;
@@ -256,9 +266,9 @@ void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
     }
 }
 
-void Shape2d::calculateInterval(LineInterval& lineInterval){
+/*void Shape2d::calculateInterval(LineInterval& lineInterval){
     
-}
+}*/
 
 double Shape2d::maxDist(){
     double maxDist=0.0;
@@ -275,9 +285,9 @@ double Shape2d::maxDist(){
     return maxDist;
 }
 
-vector<unsigned long int> Shape2d::PrevShapeIds(){
+/*vector<unsigned long int> Shape2d::PrevShapeIds(){
     return prevShapeIds;
-}
+}*/
 
 int Shape2d::EndVertex(){
     return endVertex;

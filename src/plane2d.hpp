@@ -37,6 +37,7 @@ class LineInterval{
     double UpperBound();
     double LowerBound();
     double MaxWidth();
+    array<double, 3> Divide();
     vector<unsigned long int> ShapeIds();
 };
 
@@ -48,8 +49,8 @@ class Plane2d{
     Plane2d(vector<Shape3d>& shapes, Plane3d plane3d);
     vector<Shape2d> Shapes();
     void CalcLineIntervalsInit();
-    void FindPaths();
-    bool DivideCandidateIntervals();
+    void FindPaths(double distBound);
+    bool DivideCandidateIntervals(double distBound);
     vector<array<double, 2>> LineIntervalBounds();
     vector<unsigned long int> IntervalShapeIds(unsigned long int intervalId);
 };

@@ -85,7 +85,7 @@ vector<Shape3d> Mesh::sliceIndv(array<double, 2> rotation){
     return slice(plane, tetsChecked);
 }
 
-void Mesh::findPaths(vector<Plane3d> planes){
+void Mesh::findPaths(vector<Plane3d> planes, double distBound){
     vector<int> tetsChecked;
     tetsChecked.reserve(tetrahedrons.size());
     for(unsigned long int i=0; i<tetrahedrons.size(); i++){
@@ -94,7 +94,7 @@ void Mesh::findPaths(vector<Plane3d> planes){
     for(int i=0; i<planes.size(); i++){
 	vector<Shape3d> myslice = slice(planes[i], tetsChecked);
 	Plane2d plane2d(myslice, planes[i]);
-	plane2d.FindPaths();
+	plane2d.FindPaths(distBound);
     }
 	
 }
@@ -145,7 +145,7 @@ vector<Shape3d> Mesh::computeSliceComponent(Plane3d plane, vector<int> &tetsChec
 }
 
 
-void Mesh::shortestPaths(const int epsilon, const int numThreads){
+void Mesh::shortestPaths(const int epsilon, const int numThreads, double distBound){
     thread t[numThreads];
     vector<Plane3d> planes;
     cout << numThreads << endl;
@@ -171,7 +171,7 @@ void Mesh::shortestPaths(const int epsilon, const int numThreads){
 	for(int idx=start; idx<end; idx++){
 	    planeVector.push_back(planes[idx]);
 	}
-	t[i]=thread(&Mesh::findPaths, this, planeVector);
+	t[i]=thread(&Mesh::findPaths, this, planeVector, distBound);
     }
 
     for(int i=0; i<numThreads; i++){
