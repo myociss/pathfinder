@@ -72,22 +72,10 @@ Plane2d::Plane2d(vector<Shape3d>& _shapes, Plane3d plane3d){
 }
 
 
-void Plane2d::FindPaths(double distBound){
+vector<array<Vector2d, 3>> Plane2d::FindPaths(double distBound){
     CalcLineIntervalsInit();
 
-    double minUpperBound=lineIntervals[0].UpperBound();
-    for(unsigned long int i=0; i<lineIntervals.size(); ++i){
-	double upperBound=lineIntervals[i].UpperBound();
-	if(upperBound<minUpperBound){
-	    minUpperBound=upperBound;
-	}
-    }
-
-    /*for(unsigned long int i=0; i<lineIntervals.size(); ++i){
-	if(lineIntervals[i].LowerBound()<minUpperBound){
-	    candidateIntervals.push_back(lineIntervals[i]);
-	}
-    }
+    /*
     //cout << searchAgain.size() << endl;
     bool distBoundSatisfied=DivideCandidateIntervals(distBound);
 
@@ -110,6 +98,15 @@ void Plane2d::FindPaths(double distBound){
 	
 	distBoundSatisfied=DivideCandidateIntervals(distBound);
     }*/
+    vector<array<Vector2d, 3>> foundPaths;
+    foundPaths.reserve(candidateIntervals.size());
+    for(unsigned long int i=0; i<candidateIntervals.size(); ++i){
+	LineInterval li=candidateIntervals[i];
+	Vector2d bounds(li.LowerBound(), li.UpperBound());
+	array<Vector2d, 2> endPoints=li.EndPoints();
+	foundPaths.push_back({bounds, endPoints[0], endPoints[1]});
+    }
+    return foundPaths;
 }
 
 /*
@@ -154,6 +151,20 @@ void Plane2d::CalcLineIntervalsInit(){
     shapes[0].calculatePathsTarget(lineIntervals);
     for(unsigned long int i=1; i<shapes.size(); ++i){
 	shapes[i].calculatePaths(lineIntervals);
+    }
+
+    double minUpperBound=lineIntervals[0].UpperBound();
+    for(unsigned long int i=0; i<lineIntervals.size(); ++i){
+	double upperBound=lineIntervals[i].UpperBound();
+	if(upperBound<minUpperBound){
+	    minUpperBound=upperBound;
+	}
+    }
+
+    for(unsigned long int i=0; i<lineIntervals.size(); ++i){
+	if(lineIntervals[i].LowerBound()<minUpperBound){
+	    candidateIntervals.push_back(lineIntervals[i]);
+	}
     }
 }
 
@@ -210,6 +221,11 @@ array<double, 3> LineInterval::Divide(){
     }
 }
 
+/*void LineInterval::calculateShape(Shape2d& shape){
+    vector<Vector2d> vertices=shape.VerticesArranged();
+    
+}*/
+
 bool LineInterval::containsNormal(array<double, 2> edge){
     double intervalAngleEnd= (angleStart>angleEnd ? angleEnd + (2 * M_PI) : angleEnd);
     return edge[1] >= angleStart && edge[1] <= intervalAngleEnd;
@@ -260,6 +276,12 @@ double LineInterval::MaxWidth(){
     double b=intervalMaxDists[0];
     double c=intervalMaxDists[1];
     return sqrt( b*b + c*c - 2*b*c*cos(intervalAngleEnd-angleStart) );
+}
+
+array<Vector2d, 2> LineInterval::EndPoints(){
+    Vector2d v0(intervalMaxDists[0]*cos(angleStart), intervalMaxDists[0]*sin(angleStart));
+    Vector2d v1(intervalMaxDists[1]*cos(angleEnd), intervalMaxDists[1]*sin(angleEnd));
+    return {v0, v1};
 }
 
 /*

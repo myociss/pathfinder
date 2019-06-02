@@ -101,12 +101,13 @@ void Shape2d::setNewVertices(vector<Point2d> tmpVertices){
     double angleMax=tmpVertices[0].Angle();
     for(int i=0; i<numVertices; ++i){
 	vertices[i]=tmpVertices[i];
+	double vertexAngle=vertices[i].Angle();
 	if(vertices[i].Angle()<0 && vertices[0].Angle()>0){
-	    vertices[i].updateAngle();
+	    vertexAngle += 2 * M_PI;
 	}
-	if(vertices[i].Angle()>angleMax){
+	if(vertexAngle>angleMax){
 	    endVertex=i;
-	    angleMax=vertices[i].Angle();
+	    angleMax=vertexAngle;
 	}
     }
 }
@@ -226,19 +227,9 @@ void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
 	    if(startDeriv<0 || (startDeriv==0 && endDeriv>0)){
 		upperBound=weight*maxSide;
 		lowerBound=weight*root;
-		if(root > minSide){
-		    cout << minSide << endl;
-		    cout << root << endl;
-		    cout << "yikes fam" << endl;
-		}
 	    } else{
 		upperBound=weight*root;
 		lowerBound=weight*minSide;
-		if(root < maxSide){
-		    cout << maxSide << endl;
-		    cout << root << endl;
-		    cout << "yikes fam" << endl;
-		}
 	    }
 	} else {
 	    upperBound=weight*maxSide;
@@ -266,10 +257,6 @@ void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
     }
 }
 
-/*void Shape2d::calculateInterval(LineInterval& lineInterval){
-    
-}*/
-
 double Shape2d::maxDist(){
     double maxDist=0.0;
     for(int i=0; i<vertices.size(); ++i){
@@ -284,10 +271,6 @@ double Shape2d::maxDist(){
     }
     return maxDist;
 }
-
-/*vector<unsigned long int> Shape2d::PrevShapeIds(){
-    return prevShapeIds;
-}*/
 
 int Shape2d::EndVertex(){
     return endVertex;
@@ -306,10 +289,6 @@ double Point2d::Angle(){
 
 unsigned long int Point2d::AngleId(){
     return angleId;
-}
-
-void Point2d::updateAngle(){
-    angle += 2 * M_PI;
 }
 
 unsigned long int Point2d::ShapeId(){

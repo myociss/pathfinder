@@ -27,7 +27,6 @@ class Point2d {
     Vector2d Vec();
     double Angle();
     unsigned long int AngleId();
-    void updateAngle();
     void setAngleId(unsigned long int _angleId);
     int ShapeVectorPos();
     unsigned long int ShapeId();
@@ -49,10 +48,8 @@ class Shape2d {
     void setVerticesClockwise(int startVertex);
     void setNewVertices(vector<Point2d> tmpVertices);
     void calculatePaths(vector<LineInterval>& lineIntervals);
-    void calculateInterval(LineInterval& lineInterval);
     //there should probably be different subclasses for target shapes and nontarget shapes at some point
     void calculatePathsTarget(vector<LineInterval>& lineIntervals);
-    void calculateIntervalTarget(LineInterval& lineInterval);
     double maxDist();
     int EndVertex();
     vector<Vector2d> Vertices();

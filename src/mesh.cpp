@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <future>
 #include <cmath>
 #include <thread>
 
@@ -71,7 +72,6 @@ bool Mesh::setTarget(array<double, 3> _target){
 	}
     }
     return targetSet;
-    //throw runtime_error("Target not within mesh bounds");
 }
 
 vector<Shape3d> Mesh::sliceIndv(array<double, 2> rotation){
@@ -85,18 +85,19 @@ vector<Shape3d> Mesh::sliceIndv(array<double, 2> rotation){
     return slice(plane, tetsChecked);
 }
 
-void Mesh::findPaths(vector<Plane3d> planes, double distBound){
+vector<vector<array<Vector2d, 3>>> Mesh::findPaths(vector<Plane3d> planes, double distBound){
     vector<int> tetsChecked;
     tetsChecked.reserve(tetrahedrons.size());
     for(unsigned long int i=0; i<tetrahedrons.size(); i++){
 	tetsChecked.push_back(-1);
     }
+    vector<vector<array<Vector2d, 3>>> ret;
     for(int i=0; i<planes.size(); i++){
 	vector<Shape3d> myslice = slice(planes[i], tetsChecked);
 	Plane2d plane2d(myslice, planes[i]);
-	plane2d.FindPaths(distBound);
+	ret.push_back(plane2d.FindPaths(distBound));
     }
-	
+    return ret;
 }
 
 vector<Shape3d> Mesh::slice(Plane3d plane, vector<int> &tetsChecked){
@@ -129,7 +130,6 @@ vector<Shape3d> Mesh::computeSliceComponent(Plane3d plane, vector<int> &tetsChec
 	    if(intersectionPoints.size()>2){
 		Shape3d shape(tet.Id(), intersectionPoints, tet.Weight(), tet.Label());
 		allPoints.push_back(shape);
-		//allPoints.push_back(intersectionPoints);
 		vector<unsigned long int> neighbors = tet.Neighbors();
 
 		for(int i=0; i<neighbors.size();++i){
@@ -146,7 +146,9 @@ vector<Shape3d> Mesh::computeSliceComponent(Plane3d plane, vector<int> &tetsChec
 
 
 void Mesh::shortestPaths(const int epsilon, const int numThreads, double distBound){
-    thread t[numThreads];
+    //thread threads[numThreads];
+    future<vector<vector<array<Vector2d, 3>>>> futures[numThreads];
+
     vector<Plane3d> planes;
     cout << numThreads << endl;
 
@@ -171,12 +173,15 @@ void Mesh::shortestPaths(const int epsilon, const int numThreads, double distBou
 	for(int idx=start; idx<end; idx++){
 	    planeVector.push_back(planes[idx]);
 	}
-	t[i]=thread(&Mesh::findPaths, this, planeVector, distBound);
+	//promise<vector<array<Vector2d, 3>>> p;
+	//future<vector<array<Vector2d, 3>>> future=p.get_future();
+	//threads[i]=thread(&Mesh::findPaths, this, planeVector, distBound, move(p));
+	futures[i]=async(&Mesh::findPaths, this, planeVector, distBound);
     }
 
     for(int i=0; i<numThreads; i++){
 	cout << i << endl;
-	t[i].join();
+	futures[i].get();
     }
 }
 

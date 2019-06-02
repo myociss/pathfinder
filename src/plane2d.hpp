@@ -32,13 +32,12 @@ class LineInterval{
     bool containsNormal(array<double, 2> edge);
     double ApproxRoot(double distStart, double distEnd, double derivStart, double derivEnd);
     void update(double upperBound, double lowerBound, double distStart, double distEnd, unsigned long int shapeId);
-    //void updateLowerBound(double val);
-    //void updateUpperBound(double val);
     double UpperBound();
     double LowerBound();
     double MaxWidth();
     array<double, 3> Divide();
     vector<unsigned long int> ShapeIds();
+    array<Vector2d, 2> EndPoints();
 };
 
 class Plane2d{
@@ -49,7 +48,7 @@ class Plane2d{
     Plane2d(vector<Shape3d>& shapes, Plane3d plane3d);
     vector<Shape2d> Shapes();
     void CalcLineIntervalsInit();
-    void FindPaths(double distBound);
+    vector<array<Vector2d, 3>> FindPaths(double distBound);
     bool DivideCandidateIntervals(double distBound);
     vector<array<double, 2>> LineIntervalBounds();
     vector<unsigned long int> IntervalShapeIds(unsigned long int intervalId);
