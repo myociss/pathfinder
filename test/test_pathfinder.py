@@ -187,7 +187,7 @@ class TestGraph(TestCase):
                     vertex=vertices_2d[i]
                     vertex_side=vertex[0]*A+vertex[1]*B+C
                     self.assertLess(origin_side*vertex_side, 0.0)
-    
+    '''
     def test_interval_calculations(self):
         target=[0.1+1.8*random.random(), 0.1+1.8*random.random(), 0.1+1.8*random.random()]
         self.mesh.set_target(target)
@@ -238,6 +238,37 @@ class TestGraph(TestCase):
     
             print(f'testing interval {interval_idx+1} of {len(intervals)}')
             self.assertListEqual(sorted(pathfinder_interval_shapes), sorted(interval_shapes))
+    '''
+
+    def test_found_paths(self):
+        target=[0.1+1.8*random.random(), 0.1+1.8*random.random(), 0.1+1.8*random.random()]
+        self.mesh.set_target(target)
+        paths=self.mesh.get_paths(epsilon=8, threads=8, distance_bound=0.0)
+        normals=[]
+        for alpha_id in range(8):
+            alpha=alpha_id*math.pi/8
+            normals.append([])
+            for theta_id in range(8):
+                theta=theta_id*math.pi/8
+                rotation_x=np.array([[1,0,0], [0,math.cos(alpha),math.sin(alpha)], [0,-math.sin(alpha),math.cos(alpha)]])
+                rotation_y=np.array([[math.cos(theta),0,math.sin(theta)], [0,1,0], [-math.sin(theta),0,math.cos(theta)]])
+                normal=(np.matmul(rotation_x, rotation_y))[2]
+                normals[alpha_id].append(normal)
+        #print(normals)        
+
+        for path in paths:
+            plane_id=path.plane_id()
+            theta_id=plane_id%8
+            alpha_id=plane_id//8
+            normal=normals[alpha_id][theta_id]
+            pt0=path.points()[0]
+            pt1=path.points()[1]
+            self.assertLess(abs(np.dot(target-pt0, normal)), 10e-7)
+            self.assertLess(abs(np.dot(target-pt1, normal)), 10e-7)
+            #print(np.dot(target-pt0, normal))
+            #print(np.dot(target-pt1, normal))
+            #print(alpha_id)
+            #print(theta_id)
 
 
 

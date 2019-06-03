@@ -92,10 +92,11 @@ vector<FoundPath> Mesh::findPaths(vector<Plane3d> planes, double distBound){
     for(unsigned long int i=0; i<tetrahedrons.size(); i++){
 	tetsChecked.push_back(-1);
     }
-    //vector<vector<array<Vector2d, 3>>> allPlanePaths;
+
     double minUpperBound=numeric_limits<double>::max();
-    //vector<Plane2d> planes2d;
+
     vector<vector<LineInterval>> allCandidateIntervals;
+
     for(int i=0; i<planes.size(); ++i){
 	vector<Shape3d> myslice = slice(planes[i], tetsChecked);
 	Plane2d plane2d(myslice, planes[i]);
@@ -109,21 +110,14 @@ vector<FoundPath> Mesh::findPaths(vector<Plane3d> planes, double distBound){
 
     for(int i=0; i<planes.size(); ++i){
 	vector<LineInterval> candidateIntervals=allCandidateIntervals[i];
-	Matrix3d inverse=planes[i].RotationInverse();
 
 	for(int j=0; j<candidateIntervals.size(); ++j){
 	    LineInterval candidateInterval=candidateIntervals[j];
 	    if(candidateInterval.LowerBound()<minUpperBound){
 		array<Vector2d, 2> endPoints=candidateInterval.EndPoints();
-		double x0=endPoints[0][0]*inverse.row(0)[0]+endPoints[0][1]*inverse.row(0)[1];
-		double y0=endPoints[0][0]*inverse.row(1)[0]+endPoints[0][1]*inverse.row(1)[1];
-		double z0=endPoints[0][0]*inverse.row(2)[0]+endPoints[0][1]*inverse.row(2)[1];
-		Vector3d pt0(x0, y0, z0);
+		Vector3d pt0=planes[i].Get3dPoint(endPoints[0]);
+		Vector3d pt1=planes[i].Get3dPoint(endPoints[1]);
 
-		double x1=endPoints[1][0]*inverse.row(0)[0]+endPoints[1][1]*inverse.row(0)[1];
-		double y1=endPoints[1][0]*inverse.row(1)[0]+endPoints[1][1]*inverse.row(1)[1];
-		double z1=endPoints[1][0]*inverse.row(2)[0]+endPoints[1][1]*inverse.row(2)[1];
-		Vector3d pt1(x1, y1, z1);
 		FoundPath foundPath(planes[i].Id(), pt0, pt1, candidateInterval.LowerBound(), candidateInterval.UpperBound());
 		foundPaths.push_back(foundPath);
 	    }

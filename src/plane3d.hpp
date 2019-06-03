@@ -9,28 +9,20 @@ using namespace std;
 #define PLANE3D_HPP
 
 class Plane3d {
-    /*Vector3f axisX;
-    Vector3f axisY;
-    Vector3f normal;
-    Matrix3f rotationInverse;*/
-    //Matrix3f rotation;
     int id;
     Vector3d axisX;
     Vector3d axisY;
     Vector3d normal;
     Vector3d target;
-    //float normalDist;
+    Matrix3d inverse;
   public:
     Plane3d(int _id, double alpha, double theta, Vector3d _target);
     bool intersectsEdge(Vector3d v0, Vector3d v1);
-    //bool intersectsFace(Vector3f v0, Vector3f v1, Vector3f v2);
-    //bool containsEdge(Vector3f v0, Vector3f v1);
     bool containsPoint(Vector3d v0);
     array<double, 3> findIntersection(Vector3d v0, Vector3d v1);
     int Id();
-    //Vector3d Target();
     Vector2d Rotate(array<double, 3> _vec);
-    Matrix3d RotationInverse();
+    Vector3d Get3dPoint(Vector2d pt2d);
 };
 
 class Shape3d {

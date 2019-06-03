@@ -33,6 +33,14 @@ Plane3d::Plane3d(int _id, double alpha, double theta, Vector3d _target){
     axisX = Vector3d(rotation.row(0)[0], rotation.row(0)[1], rotation.row(0)[2]);
     axisY = Vector3d(rotation.row(1)[0], rotation.row(1)[1], rotation.row(1)[2]);
     normal = Vector3d(rotation.row(2)[0], rotation.row(2)[1], rotation.row(2)[2]);
+
+    Matrix3d A;
+    A << axisX[0], axisX[1], axisX[2],
+	 axisY[0], axisY[1], axisY[2],
+	 normal[0], normal[1], normal[2];
+    inverse = A.inverse();
+
+
     target = _target;
 }
 
@@ -46,18 +54,6 @@ bool Plane3d::intersectsEdge(Vector3d v0, Vector3d v1){
     return dotProduct0 * dotProduct1 < 0;
 }
 
-/*bool Plane3d::intersectsFace(Vector3f v0, Vector3f v1, Vector3f v2){
-    Vector3f diffVec0 = v0 - target;
-    float dotProduct0 = diffVec0.dot(normal);
-
-    Vector3f diffVec1 = v1 - target;	 
-    float dotProduct1 = diffVec1.dot(normal);
-
-    Vector3f diffVec2 = v2 - target;	 
-    float dotProduct2 = diffVec2.dot(normal);
-
-    return (dotProduct0 * dotProduct1 < 0 || dotProduct0 * dotProduct2 < 0);
-}*/
 
 bool Plane3d::containsPoint(Vector3d v0){
     Vector3d diffVec0 = v0 - target;
@@ -65,15 +61,6 @@ bool Plane3d::containsPoint(Vector3d v0){
     return dotProduct0 == 0;
 }
 
-/*bool Plane3d::containsEdge(Vector3f v0, Vector3f v1){
-    Vector3f diffVec0 = v0 - target;
-    float dotProduct0 = diffVec0.dot(normal);
-
-    Vector3f diffVec1 = v1 - target;	 
-    float dotProduct1 = diffVec1.dot(normal);
-
-    return (dotProduct0 == 0 && dotProduct1 == 0);
-}*/
 
 array<double, 3> Plane3d::findIntersection(Vector3d v0, Vector3d v1){
     Vector3d w = v0 - target;
@@ -85,12 +72,6 @@ array<double, 3> Plane3d::findIntersection(Vector3d v0, Vector3d v1){
     array<double, 3> coords3d = {v0[0] + (N/D) * u[0], v0[1] + (N/D) * u[1], v0[2] + (N/D) * u[2]};
 
     return coords3d;
-
-    //Vector3f dist = coords3d-target;
-    //float x2d = dist.dot(axisX);
-    //float y2d = dist.dot(axisY);
-
-    //return {x2d, y2d, atan2(y2d, x2d)};
 }
 
 int Plane3d::Id(){
@@ -105,21 +86,13 @@ Vector2d Plane3d::Rotate(array<double, 3> _vec){
     return Vector2d(xCoord, yCoord);
 }
 
-Matrix3d Plane3d::RotationInverse(){
-    Matrix3d A;
-    A << axisX[0], axisX[1], axisX[2],
-	 axisY[0], axisY[1], axisY[2],
-	 normal[0], normal[1], normal[2];
-    return A.inverse();
+Vector3d Plane3d::Get3dPoint(Vector2d pt2d){
+    double x=pt2d[0]*inverse.row(0)[0] + pt2d[1]*inverse.row(0)[1];
+    double y=pt2d[0]*inverse.row(1)[0] + pt2d[1]*inverse.row(1)[1];
+    double z=pt2d[0]*inverse.row(2)[0] + pt2d[1]*inverse.row(2)[1];
+    Vector3d pt(x + target[0], y + target[1], z + target[2]);
+    return pt;
 }
-
-/*Vector3d Plane3d::Target(){
-    return target;
-}*/
-
-//Vector3f Plane3d::getNormal(){
-//    return Vector3f(rotation.row(2)[0], rotation.row(2)[2], rotation.row(2)[2]);
-//}
 
 
 Shape3d::Shape3d(unsigned long int _tetId, vector<array<double, 3>> _vertices, double _weight, int _label){
