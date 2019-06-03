@@ -243,7 +243,8 @@ class TestGraph(TestCase):
     def test_found_paths(self):
         target=[0.1+1.8*random.random(), 0.1+1.8*random.random(), 0.1+1.8*random.random()]
         self.mesh.set_target(target)
-        paths=self.mesh.get_paths(epsilon=8, threads=8, distance_bound=0.0)
+
+        paths=self.mesh.get_paths(epsilon=8, threads=8, distance_bound=2.0)
         normals=[]
         for alpha_id in range(8):
             alpha=alpha_id*math.pi/8
@@ -255,6 +256,18 @@ class TestGraph(TestCase):
                 normal=(np.matmul(rotation_x, rotation_y))[2]
                 normals[alpha_id].append(normal)
 
+        face_normals=[]
+        face_points=[]
+
+        for face in self.test_mesh['faces']:
+            vertices=face['vertices']
+            v0=np.array(self.test_mesh['vertices'][vertices[0]])
+            v1=np.array(self.test_mesh['vertices'][vertices[1]])
+            v2=np.array(self.test_mesh['vertices'][vertices[2]])
+            u=v1-v0
+            v=v2-v0
+            face_normals.append(np.cross(u, v))
+            face_points.append(v0)
 
         for path in paths:
             plane_id=path.plane_id()
@@ -266,6 +279,11 @@ class TestGraph(TestCase):
             self.assertLess(abs(np.dot(target-pt0, normal)), 10e-7)
             self.assertLess(abs(np.dot(target-pt1, normal)), 10e-7)
 
+            pt0_on_face=[abs(np.dot(face_points[i]-pt0, face_normals[i])) < 10e-2 for i in range(len(face_normals))]
+            pt1_on_face=[abs(np.dot(face_points[i]-pt1, face_normals[i])) < 10e-2 for i in range(len(face_normals))]
+            
+            pts_on_face=[pt0_on_face[i] and pt1_on_face[i] for i in range(6)]
+            self.assertTrue(any(pts_on_face))
 
 
 if __name__ == '__main__':

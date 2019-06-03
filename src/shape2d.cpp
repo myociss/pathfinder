@@ -236,7 +236,7 @@ void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
 	    lowerBound=weight*minSide;
 	}
 
- 	li.update(upperBound, lowerBound, terminalFStart[0], terminalFEnd[1], id);
+ 	li.update(upperBound, lowerBound, terminalFStart[0], terminalFEnd[0], id);
 
 	terminalFStart=terminalFEnd;
 	entryFStart=entryFEnd;
