@@ -254,7 +254,7 @@ class TestGraph(TestCase):
                 rotation_y=np.array([[math.cos(theta),0,math.sin(theta)], [0,1,0], [-math.sin(theta),0,math.cos(theta)]])
                 normal=(np.matmul(rotation_x, rotation_y))[2]
                 normals[alpha_id].append(normal)
-        #print(normals)        
+
 
         for path in paths:
             plane_id=path.plane_id()
@@ -265,10 +265,6 @@ class TestGraph(TestCase):
             pt1=path.points()[1]
             self.assertLess(abs(np.dot(target-pt0, normal)), 10e-7)
             self.assertLess(abs(np.dot(target-pt1, normal)), 10e-7)
-            #print(np.dot(target-pt0, normal))
-            #print(np.dot(target-pt1, normal))
-            #print(alpha_id)
-            #print(theta_id)
 
 
 

@@ -3,6 +3,7 @@
 #include <vector>
 #include <array>
 #include <memory>
+#include "line_interval.hpp"
 #include "plane2d.hpp"
 
 using namespace Eigen;

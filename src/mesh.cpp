@@ -2,6 +2,7 @@
 
 #include "mesh.hpp"
 #include "plane2d.hpp"
+#include "line_interval.hpp"
 //#include "plane3d.hpp"
 #include <iostream>
 #include <map>
