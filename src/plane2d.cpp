@@ -72,7 +72,7 @@ Plane2d::Plane2d(vector<Shape3d>& _shapes, Plane3d plane3d){
 }
 
 
-vector<array<Vector2d, 3>> Plane2d::FindPaths(double distBound){
+void Plane2d::FindPaths(double distBound){
     CalcLineIntervalsInit();
 
     /*
@@ -98,7 +98,8 @@ vector<array<Vector2d, 3>> Plane2d::FindPaths(double distBound){
 	
 	distBoundSatisfied=DivideCandidateIntervals(distBound);
     }*/
-    vector<array<Vector2d, 3>> foundPaths;
+    
+    /*vector<array<Vector2d, 3>> foundPaths;
     foundPaths.reserve(candidateIntervals.size());
     for(unsigned long int i=0; i<candidateIntervals.size(); ++i){
 	LineInterval li=candidateIntervals[i];
@@ -106,7 +107,7 @@ vector<array<Vector2d, 3>> Plane2d::FindPaths(double distBound){
 	array<Vector2d, 2> endPoints=li.EndPoints();
 	foundPaths.push_back({bounds, endPoints[0], endPoints[1]});
     }
-    return foundPaths;
+    return foundPaths;*/
 }
 
 /*
@@ -153,7 +154,7 @@ void Plane2d::CalcLineIntervalsInit(){
 	shapes[i].calculatePaths(lineIntervals);
     }
 
-    double minUpperBound=lineIntervals[0].UpperBound();
+    minUpperBound=lineIntervals[0].UpperBound();
     for(unsigned long int i=0; i<lineIntervals.size(); ++i){
 	double upperBound=lineIntervals[i].UpperBound();
 	if(upperBound<minUpperBound){
@@ -166,6 +167,14 @@ void Plane2d::CalcLineIntervalsInit(){
 	    candidateIntervals.push_back(lineIntervals[i]);
 	}
     }
+}
+
+double Plane2d::MinUpperBound(){
+    return minUpperBound;
+}
+
+vector<LineInterval> Plane2d::CandidateIntervals(){
+    return candidateIntervals;
 }
 
 vector<array<double, 2>> Plane2d::LineIntervalBounds(){

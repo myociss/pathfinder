@@ -30,6 +30,7 @@ class Plane3d {
     int Id();
     //Vector3d Target();
     Vector2d Rotate(array<double, 3> _vec);
+    Matrix3d RotationInverse();
 };
 
 class Shape3d {

@@ -7,6 +7,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <limits>
 #include <functional>
 #include <future>
 #include <cmath>
@@ -85,19 +86,50 @@ vector<Shape3d> Mesh::sliceIndv(array<double, 2> rotation){
     return slice(plane, tetsChecked);
 }
 
-vector<vector<array<Vector2d, 3>>> Mesh::findPaths(vector<Plane3d> planes, double distBound){
+vector<FoundPath> Mesh::findPaths(vector<Plane3d> planes, double distBound){
     vector<int> tetsChecked;
     tetsChecked.reserve(tetrahedrons.size());
     for(unsigned long int i=0; i<tetrahedrons.size(); i++){
 	tetsChecked.push_back(-1);
     }
-    vector<vector<array<Vector2d, 3>>> ret;
-    for(int i=0; i<planes.size(); i++){
+    //vector<vector<array<Vector2d, 3>>> allPlanePaths;
+    double minUpperBound=numeric_limits<double>::max();
+    //vector<Plane2d> planes2d;
+    vector<vector<LineInterval>> allCandidateIntervals;
+    for(int i=0; i<planes.size(); ++i){
 	vector<Shape3d> myslice = slice(planes[i], tetsChecked);
 	Plane2d plane2d(myslice, planes[i]);
-	ret.push_back(plane2d.FindPaths(distBound));
+	plane2d.FindPaths(distBound);
+	allCandidateIntervals.push_back(plane2d.CandidateIntervals());
+	if(plane2d.MinUpperBound()<minUpperBound){
+	    minUpperBound=plane2d.MinUpperBound();
+	}
     }
-    return ret;
+    vector<FoundPath> foundPaths;
+
+    for(int i=0; i<planes.size(); ++i){
+	vector<LineInterval> candidateIntervals=allCandidateIntervals[i];
+	Matrix3d inverse=planes[i].RotationInverse();
+
+	for(int j=0; j<candidateIntervals.size(); ++j){
+	    LineInterval candidateInterval=candidateIntervals[j];
+	    if(candidateInterval.LowerBound()<minUpperBound){
+		array<Vector2d, 2> endPoints=candidateInterval.EndPoints();
+		double x0=endPoints[0][0]*inverse.row(0)[0]+endPoints[0][1]*inverse.row(0)[1];
+		double y0=endPoints[0][0]*inverse.row(1)[0]+endPoints[0][1]*inverse.row(1)[1];
+		double z0=endPoints[0][0]*inverse.row(2)[0]+endPoints[0][1]*inverse.row(2)[1];
+		Vector3d pt0(x0, y0, z0);
+
+		double x1=endPoints[1][0]*inverse.row(0)[0]+endPoints[1][1]*inverse.row(0)[1];
+		double y1=endPoints[1][0]*inverse.row(1)[0]+endPoints[1][1]*inverse.row(1)[1];
+		double z1=endPoints[1][0]*inverse.row(2)[0]+endPoints[1][1]*inverse.row(2)[1];
+		Vector3d pt1(x1, y1, z1);
+		FoundPath foundPath(planes[i].Id(), pt0, pt1, candidateInterval.LowerBound(), candidateInterval.UpperBound());
+		foundPaths.push_back(foundPath);
+	    }
+	}
+    }
+    return foundPaths;
 }
 
 vector<Shape3d> Mesh::slice(Plane3d plane, vector<int> &tetsChecked){
@@ -145,9 +177,9 @@ vector<Shape3d> Mesh::computeSliceComponent(Plane3d plane, vector<int> &tetsChec
 }
 
 
-void Mesh::shortestPaths(const int epsilon, const int numThreads, double distBound){
-    //thread threads[numThreads];
-    future<vector<vector<array<Vector2d, 3>>>> futures[numThreads];
+vector<FoundPath> Mesh::shortestPaths(const int epsilon, const int numThreads, double distBound){
+
+    future<vector<FoundPath>> futures[numThreads];
 
     vector<Plane3d> planes;
     cout << numThreads << endl;
@@ -173,19 +205,59 @@ void Mesh::shortestPaths(const int epsilon, const int numThreads, double distBou
 	for(int idx=start; idx<end; idx++){
 	    planeVector.push_back(planes[idx]);
 	}
-	//promise<vector<array<Vector2d, 3>>> p;
-	//future<vector<array<Vector2d, 3>>> future=p.get_future();
-	//threads[i]=thread(&Mesh::findPaths, this, planeVector, distBound, move(p));
+
 	futures[i]=async(&Mesh::findPaths, this, planeVector, distBound);
     }
 
-    for(int i=0; i<numThreads; i++){
+    vector<FoundPath> allFoundPaths;
+    double minUpperBound=numeric_limits<double>::max();
+    for(unsigned long int i=0; i<numThreads; ++i){
 	cout << i << endl;
-	futures[i].get();
+	vector<FoundPath> foundPaths=futures[i].get();
+	for(unsigned long int j=0; j<foundPaths.size(); ++j){
+	    if(foundPaths[j].UpperBound()<minUpperBound){
+		minUpperBound=foundPaths[j].UpperBound();
+	    }
+	    allFoundPaths.push_back(foundPaths[j]);
+	}
     }
+    
+    vector<FoundPath> ret;
+    for(unsigned long int i=0; i<allFoundPaths.size(); ++i){
+	if(allFoundPaths[i].LowerBound()<minUpperBound){
+	    ret.push_back(allFoundPaths[i]);
+	}
+    }
+    cout << ret.size() << endl;
+    return ret;
 }
 
 
 unsigned long int Mesh::getTargetTetId(){
     return targetTetId;
 }
+
+FoundPath::FoundPath(unsigned long int _planeId, Vector3d _pt0, Vector3d _pt1, double _lowerBound, double _upperBound){
+    planeId=_planeId;
+    pt0=_pt0;
+    pt1=_pt1;
+    lowerBound=_lowerBound;
+    upperBound=_upperBound;
+}
+
+unsigned long int FoundPath::PlaneId(){
+    return planeId;
+}
+
+double FoundPath::UpperBound(){
+    return upperBound;
+}
+
+double FoundPath::LowerBound(){
+    return lowerBound;
+}
+
+array<Vector3d, 2> FoundPath::Points(){
+    return {pt0, pt1};
+}
+

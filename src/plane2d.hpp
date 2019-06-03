@@ -44,14 +44,17 @@ class Plane2d{
     vector<Shape2d> shapes;
     vector<LineInterval> lineIntervals;
     vector<LineInterval> candidateIntervals;
+    double minUpperBound;
   public:
     Plane2d(vector<Shape3d>& shapes, Plane3d plane3d);
     vector<Shape2d> Shapes();
     void CalcLineIntervalsInit();
-    vector<array<Vector2d, 3>> FindPaths(double distBound);
+    void FindPaths(double distBound);
     bool DivideCandidateIntervals(double distBound);
     vector<array<double, 2>> LineIntervalBounds();
     vector<unsigned long int> IntervalShapeIds(unsigned long int intervalId);
+    double MinUpperBound();
+    vector<LineInterval> CandidateIntervals();
 };
 
 #endif

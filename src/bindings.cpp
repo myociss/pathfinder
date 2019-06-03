@@ -33,6 +33,12 @@ PYBIND11_MODULE(pathfinder, m){
 	py::arg("threads"),
 	py::arg("distance_bound"));
 
+  py::class_<FoundPath>(m, "FoundPath")
+    .def("plane_id", &FoundPath::PlaneId)
+    .def("upper_bound", &FoundPath::UpperBound)
+    .def("lower_bound", &FoundPath::LowerBound)
+    .def("points", &FoundPath::Points);
+
   py::class_<Plane3d>(m, "Plane3d")
     .def(py::init<int, double, double, Eigen::Vector3d>(),
 	py::arg("id"),

@@ -105,6 +105,14 @@ Vector2d Plane3d::Rotate(array<double, 3> _vec){
     return Vector2d(xCoord, yCoord);
 }
 
+Matrix3d Plane3d::RotationInverse(){
+    Matrix3d A;
+    A << axisX[0], axisX[1], axisX[2],
+	 axisY[0], axisY[1], axisY[2],
+	 normal[0], normal[1], normal[2];
+    return A.inverse();
+}
+
 /*Vector3d Plane3d::Target(){
     return target;
 }*/
