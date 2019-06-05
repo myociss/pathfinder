@@ -13,7 +13,7 @@ using namespace std;
 #define PLANE2D_HPP
 
 class Shape2d;
-array<double, 2> polarEquation(Vector2d v0, Vector2d v1);
+class LineInterval;
 
 class Plane2d{
     vector<Shape2d> shapes;
@@ -26,6 +26,7 @@ class Plane2d{
     void CalcLineIntervalsInit();
     void FindPaths(double distBound);
     bool DivideCandidateIntervals(double distBound);
+    void PruneCandidateIntervals();
     vector<array<double, 2>> LineIntervalBounds();
     vector<unsigned long int> IntervalShapeIds(unsigned long int intervalId);
     double MinUpperBound();

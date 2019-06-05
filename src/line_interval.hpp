@@ -1,12 +1,18 @@
+#pragma once
 #include <Eigen/Dense>
 #include <vector>
 #include <array>
+#include "shape2d.hpp"
 
 using namespace Eigen;
 using namespace std;
 
 #ifndef LINE_INTERVAL_HPP
 #define LINE_INTERVAL_HPP
+
+class Shape2d;
+
+array<double, 2> polarEquation(Vector2d v0, Vector2d v1);
 
 class LineInterval{
     Vector2d point;
@@ -19,6 +25,9 @@ class LineInterval{
   public:
     LineInterval(Vector2d _point);
     LineInterval(double _angleStart, double _angleEnd);
+    void calculateTargetShape(Shape2d& shape);
+    void calculateShape(Shape2d& shape);
+    void FindShapeBounds(array<double, 3> entryFStart, array<double, 3> terminalFStart, array<double, 3> entryFEnd, array<double, 3> terminalFEnd, Shape2d& shape);
     void SetAngleEnd(Vector2d _point);
     Vector2d Point();
     array<double, 3> FunctionsAt(array<double, 2> edge, int side);

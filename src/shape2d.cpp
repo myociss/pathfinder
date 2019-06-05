@@ -133,6 +133,10 @@ vector<Vector2d> Shape2d::VerticesArranged(){
     return vecs;
 }
 
+double Shape2d::Weight(){
+    return weight;
+}
+
 void Shape2d::calculatePathsTarget(vector<LineInterval>& lineIntervals){
     for(int i=vertices.size()-1; i>=0; --i){
 	int next=i-1;
@@ -196,47 +200,11 @@ void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
 	if(vertices[(terminalEdge+1)%vertices.size()].AngleId()==intervalId){
 	    terminalFStart=li.FunctionsAt(terminalPolar, 0);
 	}
-
-	
 	
 	array<double, 3> entryFEnd=li.FunctionsAt(entryPolar, 1);
 	array<double, 3> terminalFEnd=li.FunctionsAt(terminalPolar, 1);
 
-	double startDist=max(terminalFStart[0]-entryFStart[0], 0.0);
-	double startDeriv=terminalFStart[1]-entryFStart[1];
-	double startDeriv2=terminalFStart[2]-entryFStart[2];
-
-
-	double endDist=max(terminalFEnd[0]-entryFEnd[0], 0.0);
-	double endDeriv=terminalFEnd[1]-entryFEnd[1];
-	double endDeriv2=terminalFEnd[2]-entryFEnd[2];
-
-	double maxSide=max(startDist, endDist);
-	double minSide=min(startDist, endDist);
-
-	double upperBound = 0.0;
-	double lowerBound = 0.0;
-	if(startDeriv2*endDeriv2 < 0){
-	    upperBound=weight * maxDist();
-	} else if(startDeriv*endDeriv < 0){
-	    double root=li.ApproxRoot(startDist, endDist, startDeriv, endDeriv);
-	    if(root < 0){
-		root=0.0;
-	    }
-
-	    if(startDeriv<0 || (startDeriv==0 && endDeriv>0)){
-		upperBound=weight*maxSide;
-		lowerBound=weight*root;
-	    } else{
-		upperBound=weight*root;
-		lowerBound=weight*minSide;
-	    }
-	} else {
-	    upperBound=weight*maxSide;
-	    lowerBound=weight*minSide;
-	}
-
- 	li.update(upperBound, lowerBound, terminalFStart[0], terminalFEnd[0], id);
+	li.FindShapeBounds(entryFStart, terminalFStart, entryFEnd, terminalFEnd, *this);
 
 	terminalFStart=terminalFEnd;
 	entryFStart=entryFEnd;
@@ -274,6 +242,10 @@ double Shape2d::maxDist(){
 
 int Shape2d::EndVertex(){
     return endVertex;
+}
+
+unsigned long int Shape2d::Id(){
+    return id;
 }
 
 Point2d::Point2d(Vector2d _vec, unsigned long int _shapeId, int _shapeVectorPos){

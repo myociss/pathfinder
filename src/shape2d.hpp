@@ -52,6 +52,8 @@ class Shape2d {
     //there should probably be different subclasses for target shapes and nontarget shapes at some point
     void calculatePathsTarget(vector<LineInterval>& lineIntervals);
     double maxDist();
+    double Weight();
+    unsigned long int Id();
     int EndVertex();
     vector<Vector2d> Vertices();
     vector<Vector2d> VerticesArranged();
