@@ -47,14 +47,16 @@ class Shape2d {
     void arrange(vector<LineInterval>& lineIntervals);
     void setVerticesClockwise(int startVertex);
     void setNewVertices(vector<Point2d> tmpVertices);
-    void calculateAllIntervals(vector<LineInterval>& lineIntervals);
     //there should probably be different subclasses for target shapes and nontarget shapes at some point
+    void calculateOneIntervalTarget(LineInterval& li);
     void calculateOneInterval(LineInterval& li);
     void calculateAllIntervalsTarget(vector<LineInterval>& lineIntervals);
+    void calculateAllIntervals(vector<LineInterval>& lineIntervals);
+    void computeBoundsTarget(LineInterval& li, array<double, 2> edgePolar);
     void computeBounds(array<double, 3> entryFStart, array<double, 3> entryFEnd, array<double, 3> terminalFStart, array<double, 3> terminalFEnd, LineInterval& li);
     double maxDist();
-    double Weight();
-    unsigned long int Id();
+    //double Weight();
+    //unsigned long int Id();
     int EndVertex();
     vector<Vector2d> Vertices();
     vector<Vector2d> VerticesArranged();

@@ -40,7 +40,12 @@ double LineInterval::DistAt(array<double, 2> edge, int side){
 }
 
 array<double, 3> LineInterval::Divide(){
-    if(angleStart>angleEnd){
+    double mid=(angleStart+IntervalAngleEnd())/2;
+    if(mid>=M_PI){
+	mid -= 2 * M_PI;
+    }
+    return {angleStart, mid, angleEnd};
+    /*if(angleStart>angleEnd){
 	double intervalAngleEnd=angleEnd + (2 * M_PI);
 	double mid=(angleStart+intervalAngleEnd)/2;
 	if(mid>=M_PI){
@@ -49,7 +54,7 @@ array<double, 3> LineInterval::Divide(){
 	return {angleStart, mid, angleEnd};
     } else{
 	return {angleStart, (angleStart+angleEnd)/2, angleEnd};
-    }
+    }*/
 }
 
 bool LineInterval::IntersectsEdge(double v0Angle, double v1Angle){
@@ -65,104 +70,6 @@ bool LineInterval::IntersectsEdge(double v0Angle, double v1Angle){
     return (edgeAngleStart<=angleStart && edgeAngleEnd>=IntervalAngleEnd());
 }
 
-/*void LineInterval::calculateTargetShape(Shape2d& shape){
-    double intervalAngleEnd= (angleStart>angleEnd ? angleEnd + (2 * M_PI) : angleEnd);
-    double intervalAngleStart=angleStart;
-
-    vector<Vector2d> vertices=shape.VerticesArranged();
-    array<double, 2> edgePolar;
-
-    for(int i=0; i<vertices.size(); ++i){
-	int next=i+1;
-	if(next==vertices.size()){
-	    next=0;
-	}
-	double edgeAngleEnd=atan2(vertices[i][1], vertices[i][0]);
-	double edgeAngleStart=atan2(vertices[next][1], vertices[next][0]);
-	if(edgeAngleStart>edgeAngleEnd){
-	    if(angleStart>angleEnd){
-		edgeAngleStart -= M_PI * 2;
-	    } else {
-		edgeAngleEnd += M_PI * 2;
-	    }
-	}
-	if(edgeAngleStart<=intervalAngleStart && edgeAngleEnd>=intervalAngleEnd){
-	    edgePolar=polarEquation(vertices[next], vertices[i]);
-	    break;
-	}
-    }
-    double startSide=DistAt(edgePolar, 0);
-    double endSide=DistAt(edgePolar, 1);
-    double upperBound=0.0;
-    double lowerBound=0.0;
-    double weight=shape.Weight();
-
-    if(containsNormal(edgePolar)){
-	upperBound=weight * max(startSide, endSide);
-	lowerBound=weight * edgePolar[0];
-    } else {
-	upperBound=weight * max(startSide, endSide);
-	lowerBound=weight * min(startSide, endSide);
-	    }
-    update(upperBound, lowerBound, startSide, endSide, shape.Id());
-}
-
-void LineInterval::calculateShape(Shape2d& shape){
-    double intervalAngleEnd= (angleStart>angleEnd ? angleEnd + (2 * M_PI) : angleEnd);
-    double intervalAngleStart=angleStart;
-
-    vector<Vector2d> vertices=shape.VerticesArranged();
-    array<double, 2> entryEdgePolar;
-    array<double, 2> terminalEdgePolar;
-
-    for(int i=1; i<=shape.EndVertex(); ++i){
-	double edgeAngleStart=atan2(vertices[i-1][1], vertices[i-1][0]);
-	double edgeAngleEnd=atan2(vertices[i][1], vertices[i][0]);
-	if(edgeAngleStart>edgeAngleEnd){
-	    if(angleStart>angleEnd){
-		edgeAngleStart -= M_PI * 2;
-	    } else {
-		edgeAngleEnd += M_PI * 2;
-	    }
-	}
-	if(edgeAngleStart<=intervalAngleStart && edgeAngleEnd>=intervalAngleEnd){
-	    entryEdgePolar=polarEquation(vertices[i-1], vertices[i]);
-	    break;
-	}
-    }
-
-    for(int i=shape.EndVertex(); i<vertices.size(); ++i){
-	int next=i+1;
-	if(next==vertices.size()){
-	    next=0;
-	}
-	double edgeAngleEnd=atan2(vertices[i][1], vertices[i][0]);
-	double edgeAngleStart=atan2(vertices[next][1], vertices[next][0]);
-	if(edgeAngleStart>edgeAngleEnd){
-	    if(angleStart>angleEnd){
-		edgeAngleStart -= M_PI * 2;
-	    } else {
-		edgeAngleEnd += M_PI * 2;
-	    }
-	}
-	if(edgeAngleStart<=intervalAngleStart && edgeAngleEnd>=intervalAngleEnd){
-	    terminalEdgePolar=polarEquation(vertices[next], vertices[i]);
-	    break;
-	}
-    }
-
-    array<double, 3> entryFStart=FunctionsAt(entryEdgePolar, 0);
-    array<double, 3> terminalFStart=FunctionsAt(terminalEdgePolar, 0);
-
-    array<double, 3> entryFEnd=FunctionsAt(entryEdgePolar, 1);
-    array<double, 3> terminalFEnd=FunctionsAt(terminalEdgePolar, 1);
-    
-    FindShapeBounds(entryFStart, terminalFStart, entryFEnd, terminalFEnd, shape);
-}*/
-
-/*double LineInterval::IntervalAngleStart(){
-    return angleStart;
-}*/
 
 double LineInterval::IntervalAngleEnd(){
     double intervalAngleEnd= (angleStart>angleEnd ? angleEnd + (2 * M_PI) : angleEnd);
@@ -170,7 +77,6 @@ double LineInterval::IntervalAngleEnd(){
 }
 
 bool LineInterval::containsNormal(array<double, 2> edge){
-    //double intervalAngleEnd= (angleStart>angleEnd ? angleEnd + (2 * M_PI) : angleEnd);
     return edge[1] >= angleStart && edge[1] <= IntervalAngleEnd();
 }
 

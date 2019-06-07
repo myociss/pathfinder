@@ -67,7 +67,7 @@ Plane2d::Plane2d(vector<Shape3d>& _shapes, Plane3d plane3d){
 
 void Plane2d::FindPaths(double distBound){
     CalcLineIntervalsInit();
-    /*cout << "step 0" << endl;
+    cout << "step 0" << endl;
     cout << candidateIntervals.size() << endl;
     bool distBoundSatisfied=DivideCandidateIntervals(distBound);
     int i=1;
@@ -77,7 +77,7 @@ void Plane2d::FindPaths(double distBound){
 	cout << candidateIntervals.size() << endl;
 	distBoundSatisfied=DivideCandidateIntervals(distBound);
 	++i;
-    }*/
+    }
     
 }
 
@@ -99,7 +99,7 @@ void Plane2d::PruneCandidateIntervals(){
     candidateIntervals = newCandidateIntervals;
 }
 
-/*bool Plane2d::DivideCandidateIntervals(double distBound){
+bool Plane2d::DivideCandidateIntervals(double distBound){
     vector<LineInterval> newCandidateIntervals;
     bool distBoundSatisfied = true;
     for(unsigned long int i=0; i<candidateIntervals.size(); ++i){
@@ -115,11 +115,14 @@ void Plane2d::PruneCandidateIntervals(){
 	    LineInterval li1 = LineInterval(newAngles[1], newAngles[2]);
 	    vector<unsigned long int> shapeIds=candidateIntervals[i].ShapeIds();
 
-	    li0.calculateTargetShape(shapes[0]);
-	    li1.calculateTargetShape(shapes[1]);
+	    //shapes[0].calculateOneIntervalTarget(li0);
+	    //shapes[0].calculateOneIntervalTarget(li1);
+
 	    for(unsigned long int i=1; i<shapeIds.size(); ++i){
-		li0.calculateShape(shapes[i]);
-		li1.calculateShape(shapes[i]);
+		//li0.calculateShape(shapes[i]);
+		//li1.calculateShape(shapes[i]);
+		shapes[shapeIds[i]].calculateOneInterval(li0);
+		shapes[shapeIds[i]].calculateOneInterval(li1);
 	    }
 	    cout << li0.LowerBound() << endl;
 	    cout << li0.UpperBound() << endl;
@@ -132,7 +135,7 @@ void Plane2d::PruneCandidateIntervals(){
 
     candidateIntervals=newCandidateIntervals;
     return distBoundSatisfied;
-}*/
+}
 
 void Plane2d::CalcLineIntervalsInit(){
     shapes[0].setVerticesClockwise(0);
@@ -142,6 +145,7 @@ void Plane2d::CalcLineIntervalsInit(){
     }
 
     minUpperBound=lineIntervals[0].UpperBound();
+    //cout << minUpperBound << endl;
     for(unsigned long int i=0; i<lineIntervals.size(); ++i){
 	double upperBound=lineIntervals[i].UpperBound();
 	if(upperBound<minUpperBound){

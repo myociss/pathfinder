@@ -133,40 +133,15 @@ vector<Vector2d> Shape2d::VerticesArranged(){
     return vecs;
 }
 
-double Shape2d::Weight(){
-    return weight;
-}
-
-void Shape2d::calculateAllIntervalsTarget(vector<LineInterval>& lineIntervals){
+void Shape2d::calculateOneIntervalTarget(LineInterval& li){
     for(int i=vertices.size()-1; i>=0; --i){
 	int next=i-1;
 	if(next<0){
 	    next=vertices.size()-1;
 	}
-
-	unsigned long int startIntervalId=vertices[i].AngleId();
-	unsigned long int intervalId=startIntervalId;
-
-	double upperBound=0.0;
-	double lowerBound=0.0;
-
-	array<double, 2> edgePolar=polarEquation(vertices[i].Vec(), vertices[next].Vec());
-	while(intervalId!=vertices[next].AngleId()){
-
-	    LineInterval& li=lineIntervals[intervalId];
-	    double startSide=li.DistAt(edgePolar, 0);
-	    double endSide=li.DistAt(edgePolar, 1);
-
-	    if(li.containsNormal(edgePolar)){
-		upperBound=weight * max(startSide, endSide);
-		lowerBound=weight * edgePolar[0];
-	    } else {
-		upperBound=weight * max(startSide, endSide);
-		lowerBound=weight * min(startSide, endSide);
-	    }
-	    li.update(upperBound, lowerBound, startSide, endSide, id);
-
-	    intervalId=(intervalId+1)%lineIntervals.size();
+	if(li.IntersectsEdge(vertices[i].Angle(), vertices[next].Angle())){
+	    array<double, 2> edgePolar=polarEquation(vertices[i].Vec(), vertices[next].Vec());
+	    computeBoundsTarget(li, edgePolar);
 	}
     }
 }
@@ -180,36 +155,42 @@ void Shape2d::calculateOneInterval(LineInterval& li){
     array<double, 3> entryFEnd=li.FunctionsAt(entryPolar, 1);
     array<double, 3> terminalFEnd=li.FunctionsAt(terminalPolar, 1);
 
-    computeBounds(entryFStart, terminalFStart, entryFEnd, terminalFEnd, li);
+    computeBounds(entryFStart, entryFEnd, terminalFStart, terminalFEnd, li);
 }
 
-array<double, 2> Shape2d::EntryEdge(LineInterval& li){
-    array<double, 2> entryEdgePolar;
+void Shape2d::calculateAllIntervalsTarget(vector<LineInterval>& lineIntervals){
+    for(int i=vertices.size()-1; i>=0; --i){
+	int next=i-1;
+	if(next<0){
+	    next=vertices.size()-1;
+	}
 
-    for(int i=1; i<=endVertex; ++i){
-	if(li.IntersectsEdge(vertices[i-1].Angle(), vertices[i].Angle())){
-	    entryEdgePolar=polarEquation(vertices[i-1].Vec(), vertices[i].Vec());
-	    break;
+	unsigned long int startIntervalId=vertices[i].AngleId();
+	unsigned long int intervalId=startIntervalId;
+
+	//double upperBound=0.0;
+	//double lowerBound=0.0;
+
+	array<double, 2> edgePolar=polarEquation(vertices[i].Vec(), vertices[next].Vec());
+	while(intervalId!=vertices[next].AngleId()){
+
+	    LineInterval& li=lineIntervals[intervalId];
+	    /*double startSide=li.DistAt(edgePolar, 0);
+	    double endSide=li.DistAt(edgePolar, 1);
+
+	    if(li.containsNormal(edgePolar)){
+		upperBound=weight * max(startSide, endSide);
+		lowerBound=weight * edgePolar[0];
+	    } else {
+		upperBound=weight * max(startSide, endSide);
+		lowerBound=weight * min(startSide, endSide);
+	    }
+	    li.update(upperBound, lowerBound, startSide, endSide, id);*/
+	    computeBoundsTarget(li, edgePolar);
+
+	    intervalId=(intervalId+1)%lineIntervals.size();
 	}
     }
-    return entryEdgePolar;
-}
-
-array<double, 2> Shape2d::TerminalEdge(LineInterval& li){
-    array<double, 2> terminalEdgePolar;
-
-    for(int i=endVertex; i<vertices.size(); ++i){
-	int next=i+1;
-	if(next==vertices.size()){
-	    next=0;
-	}
-	
-	if(li.IntersectsEdge(vertices[i].Angle(), vertices[next].Angle())){
-	    terminalEdgePolar=polarEquation(vertices[i].Vec(), vertices[next].Vec());
-	    break;
-	}
-    }
-    return terminalEdgePolar;
 }
 
 void Shape2d::calculateAllIntervals(vector<LineInterval>& lineIntervals){
@@ -245,7 +226,7 @@ void Shape2d::calculateAllIntervals(vector<LineInterval>& lineIntervals){
 	array<double, 3> entryFEnd=li.FunctionsAt(entryPolar, 1);
 	array<double, 3> terminalFEnd=li.FunctionsAt(terminalPolar, 1);
 
-	computeBounds(entryFStart, terminalFStart, entryFEnd, terminalFEnd, li);
+	computeBounds(entryFStart, entryFEnd, terminalFStart, terminalFEnd, li);
 
 	terminalFStart=terminalFEnd;
 	entryFStart=entryFEnd;
@@ -266,6 +247,22 @@ void Shape2d::calculateAllIntervals(vector<LineInterval>& lineIntervals){
     }
 }
 
+void Shape2d::computeBoundsTarget(LineInterval& li, array<double, 2> edgePolar){
+    double startSide=li.DistAt(edgePolar, 0);
+    double endSide=li.DistAt(edgePolar, 1);
+    double upperBound=0.0;
+    double lowerBound=0.0;
+
+    if(li.containsNormal(edgePolar)){
+	upperBound=weight * max(startSide, endSide);
+	lowerBound=weight * edgePolar[0];
+    } else {
+	upperBound=weight * max(startSide, endSide);
+	lowerBound=weight * min(startSide, endSide);
+    }
+    li.update(upperBound, lowerBound, startSide, endSide, id);
+}
+
 void Shape2d::computeBounds(array<double, 3> entryFStart, array<double, 3> entryFEnd, array<double, 3> terminalFStart, array<double, 3> terminalFEnd, LineInterval& li){
 
     double startDist=max(terminalFStart[0]-entryFStart[0], 0.0);
@@ -282,8 +279,6 @@ void Shape2d::computeBounds(array<double, 3> entryFStart, array<double, 3> entry
 
     double upperBound = 0.0;
     double lowerBound = 0.0;
-
-    double weight = weight;
 
     if(startDeriv2*endDeriv2 < 0){
 	upperBound=weight * maxDist();
@@ -308,6 +303,35 @@ void Shape2d::computeBounds(array<double, 3> entryFStart, array<double, 3> entry
     li.update(upperBound, lowerBound, terminalFStart[0], terminalFEnd[0], id);
 }
 
+array<double, 2> Shape2d::EntryEdge(LineInterval& li){
+    array<double, 2> entryEdgePolar;
+
+    for(int i=1; i<=endVertex; ++i){
+	if(li.IntersectsEdge(vertices[i-1].Angle(), vertices[i].Angle())){
+	    entryEdgePolar=polarEquation(vertices[i-1].Vec(), vertices[i].Vec());
+	    break;
+	}
+    }
+    return entryEdgePolar;
+}
+
+array<double, 2> Shape2d::TerminalEdge(LineInterval& li){
+    array<double, 2> terminalEdgePolar;
+
+    for(int i=endVertex; i<vertices.size(); ++i){
+	int next=i+1;
+	if(next==vertices.size()){
+	    next=0;
+	}
+	
+	if(li.IntersectsEdge(vertices[i].Angle(), vertices[next].Angle())){
+	    terminalEdgePolar=polarEquation(vertices[i].Vec(), vertices[next].Vec());
+	    break;
+	}
+    }
+    return terminalEdgePolar;
+}
+
 double Shape2d::maxDist(){
     double maxDist=0.0;
     for(int i=0; i<vertices.size(); ++i){
@@ -325,10 +349,6 @@ double Shape2d::maxDist(){
 
 int Shape2d::EndVertex(){
     return endVertex;
-}
-
-unsigned long int Shape2d::Id(){
-    return id;
 }
 
 Point2d::Point2d(Vector2d _vec, unsigned long int _shapeId, int _shapeVectorPos){
