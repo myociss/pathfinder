@@ -115,14 +115,14 @@ bool Plane2d::DivideCandidateIntervals(double distBound){
 	    LineInterval li1 = LineInterval(newAngles[1], newAngles[2]);
 	    vector<unsigned long int> shapeIds=candidateIntervals[i].ShapeIds();
 
-	    //shapes[0].calculateOneIntervalTarget(li0);
-	    //shapes[0].calculateOneIntervalTarget(li1);
+	    shapes[0].calculateOneIntervalTarget(li0);
+	    shapes[0].calculateOneIntervalTarget(li1);
 
-	    for(unsigned long int i=1; i<shapeIds.size(); ++i){
+	    for(unsigned long int j=1; j<shapeIds.size(); ++j){
 		//li0.calculateShape(shapes[i]);
 		//li1.calculateShape(shapes[i]);
-		shapes[shapeIds[i]].calculateOneInterval(li0);
-		shapes[shapeIds[i]].calculateOneInterval(li1);
+		shapes[shapeIds[j]].calculateOneInterval(li0);
+		shapes[shapeIds[j]].calculateOneInterval(li1);
 	    }
 	    cout << li0.LowerBound() << endl;
 	    cout << li0.UpperBound() << endl;

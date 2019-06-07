@@ -324,8 +324,8 @@ array<double, 2> Shape2d::TerminalEdge(LineInterval& li){
 	    next=0;
 	}
 	
-	if(li.IntersectsEdge(vertices[i].Angle(), vertices[next].Angle())){
-	    terminalEdgePolar=polarEquation(vertices[i].Vec(), vertices[next].Vec());
+	if(li.IntersectsEdge(vertices[next].Angle(), vertices[i].Angle())){
+	    terminalEdgePolar=polarEquation(vertices[next].Vec(), vertices[i].Vec());
 	    break;
 	}
     }
