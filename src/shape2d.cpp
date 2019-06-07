@@ -137,7 +137,7 @@ double Shape2d::Weight(){
     return weight;
 }
 
-void Shape2d::calculatePathsTarget(vector<LineInterval>& lineIntervals){
+void Shape2d::calculateAllIntervalsTarget(vector<LineInterval>& lineIntervals){
     for(int i=vertices.size()-1; i>=0; --i){
 	int next=i-1;
 	if(next<0){
@@ -171,7 +171,48 @@ void Shape2d::calculatePathsTarget(vector<LineInterval>& lineIntervals){
     }
 }
 
-void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
+void Shape2d::calculateOneInterval(LineInterval& li){
+    array<double, 2> entryPolar=EntryEdge(li);
+    array<double, 2> terminalPolar=TerminalEdge(li);
+
+    array<double, 3> entryFStart=li.FunctionsAt(entryPolar, 0);
+    array<double, 3> terminalFStart=li.FunctionsAt(terminalPolar, 0);
+    array<double, 3> entryFEnd=li.FunctionsAt(entryPolar, 1);
+    array<double, 3> terminalFEnd=li.FunctionsAt(terminalPolar, 1);
+
+    computeBounds(entryFStart, terminalFStart, entryFEnd, terminalFEnd, li);
+}
+
+array<double, 2> Shape2d::EntryEdge(LineInterval& li){
+    array<double, 2> entryEdgePolar;
+
+    for(int i=1; i<=endVertex; ++i){
+	if(li.IntersectsEdge(vertices[i-1].Angle(), vertices[i].Angle())){
+	    entryEdgePolar=polarEquation(vertices[i-1].Vec(), vertices[i].Vec());
+	    break;
+	}
+    }
+    return entryEdgePolar;
+}
+
+array<double, 2> Shape2d::TerminalEdge(LineInterval& li){
+    array<double, 2> terminalEdgePolar;
+
+    for(int i=endVertex; i<vertices.size(); ++i){
+	int next=i+1;
+	if(next==vertices.size()){
+	    next=0;
+	}
+	
+	if(li.IntersectsEdge(vertices[i].Angle(), vertices[next].Angle())){
+	    terminalEdgePolar=polarEquation(vertices[i].Vec(), vertices[next].Vec());
+	    break;
+	}
+    }
+    return terminalEdgePolar;
+}
+
+void Shape2d::calculateAllIntervals(vector<LineInterval>& lineIntervals){
     unsigned long int startIntervalId=vertices[0].AngleId();
     unsigned long int intervalId=startIntervalId;
     unsigned long int endVertexIntervalId=vertices[endVertex].AngleId();
@@ -204,7 +245,7 @@ void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
 	array<double, 3> entryFEnd=li.FunctionsAt(entryPolar, 1);
 	array<double, 3> terminalFEnd=li.FunctionsAt(terminalPolar, 1);
 
-	li.FindShapeBounds(entryFStart, terminalFStart, entryFEnd, terminalFEnd, *this);
+	computeBounds(entryFStart, terminalFStart, entryFEnd, terminalFEnd, li);
 
 	terminalFStart=terminalFEnd;
 	entryFStart=entryFEnd;
@@ -223,6 +264,48 @@ void Shape2d::calculatePaths(vector<LineInterval>& lineIntervals){
 
 	intervalId=nextInterval;
     }
+}
+
+void Shape2d::computeBounds(array<double, 3> entryFStart, array<double, 3> entryFEnd, array<double, 3> terminalFStart, array<double, 3> terminalFEnd, LineInterval& li){
+
+    double startDist=max(terminalFStart[0]-entryFStart[0], 0.0);
+    double startDeriv=terminalFStart[1]-entryFStart[1];
+    double startDeriv2=terminalFStart[2]-entryFStart[2];
+
+
+    double endDist=max(terminalFEnd[0]-entryFEnd[0], 0.0);
+    double endDeriv=terminalFEnd[1]-entryFEnd[1];
+    double endDeriv2=terminalFEnd[2]-entryFEnd[2];
+
+    double maxSide=max(startDist, endDist);
+    double minSide=min(startDist, endDist);
+
+    double upperBound = 0.0;
+    double lowerBound = 0.0;
+
+    double weight = weight;
+
+    if(startDeriv2*endDeriv2 < 0){
+	upperBound=weight * maxDist();
+    } else if(startDeriv*endDeriv < 0){
+	double root=li.ApproxRoot(startDist, endDist, startDeriv, endDeriv);
+	if(root < 0){
+	    root=0.0;
+	}
+
+	if(startDeriv<0 || (startDeriv==0 && endDeriv>0)){
+	    upperBound=weight*maxSide;
+	    lowerBound=weight*root;
+	} else{
+	    upperBound=weight*root;
+	    lowerBound=weight*minSide;
+	}
+    } else {
+	upperBound=weight*maxSide;
+	lowerBound=weight*minSide;
+    }
+
+    li.update(upperBound, lowerBound, terminalFStart[0], terminalFEnd[0], id);
 }
 
 double Shape2d::maxDist(){

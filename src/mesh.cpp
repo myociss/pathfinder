@@ -207,7 +207,7 @@ vector<FoundPath> Mesh::shortestPaths(const int epsilon, const int numThreads, d
     vector<FoundPath> allFoundPaths;
     double minUpperBound=numeric_limits<double>::max();
     for(unsigned long int i=0; i<numThreads; ++i){
-	cout << i << endl;
+	//cout << i << endl;
 	vector<FoundPath> foundPaths=futures[i].get();
 	for(unsigned long int j=0; j<foundPaths.size(); ++j){
 	    if(foundPaths[j].UpperBound()<minUpperBound){

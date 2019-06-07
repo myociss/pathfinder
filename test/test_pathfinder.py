@@ -244,7 +244,7 @@ class TestGraph(TestCase):
         target=[0.1+1.8*random.random(), 0.1+1.8*random.random(), 0.1+1.8*random.random()]
         self.mesh.set_target(target)
 
-        paths=self.mesh.get_paths(epsilon=8, threads=8, distance_bound=2.0)
+        paths=self.mesh.get_paths(epsilon=8, threads=1, distance_bound=0.1)
         normals=[]
         for alpha_id in range(8):
             alpha=alpha_id*math.pi/8

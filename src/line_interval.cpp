@@ -52,7 +52,20 @@ array<double, 3> LineInterval::Divide(){
     }
 }
 
-void LineInterval::calculateTargetShape(Shape2d& shape){
+bool LineInterval::IntersectsEdge(double v0Angle, double v1Angle){
+    double edgeAngleStart=v0Angle;
+    double edgeAngleEnd=v1Angle;
+    if(edgeAngleStart>edgeAngleEnd){
+	if(angleStart>angleEnd){
+	    edgeAngleStart -= M_PI * 2;
+	} else {
+	    edgeAngleEnd += M_PI * 2;
+	}
+    }
+    return (edgeAngleStart<=angleStart && edgeAngleEnd>=IntervalAngleEnd());
+}
+
+/*void LineInterval::calculateTargetShape(Shape2d& shape){
     double intervalAngleEnd= (angleStart>angleEnd ? angleEnd + (2 * M_PI) : angleEnd);
     double intervalAngleStart=angleStart;
 
@@ -145,52 +158,20 @@ void LineInterval::calculateShape(Shape2d& shape){
     array<double, 3> terminalFEnd=FunctionsAt(terminalEdgePolar, 1);
     
     FindShapeBounds(entryFStart, terminalFStart, entryFEnd, terminalFEnd, shape);
-}
+}*/
 
-void LineInterval::FindShapeBounds(array<double, 3> entryFStart, array<double, 3> terminalFStart, array<double, 3> entryFEnd, array<double, 3> terminalFEnd, Shape2d& shape){
-    double startDist=max(terminalFStart[0]-entryFStart[0], 0.0);
-    double startDeriv=terminalFStart[1]-entryFStart[1];
-    double startDeriv2=terminalFStart[2]-entryFStart[2];
+/*double LineInterval::IntervalAngleStart(){
+    return angleStart;
+}*/
 
-
-    double endDist=max(terminalFEnd[0]-entryFEnd[0], 0.0);
-    double endDeriv=terminalFEnd[1]-entryFEnd[1];
-    double endDeriv2=terminalFEnd[2]-entryFEnd[2];
-
-    double maxSide=max(startDist, endDist);
-    double minSide=min(startDist, endDist);
-
-    double upperBound = 0.0;
-    double lowerBound = 0.0;
-
-    double weight = shape.Weight();
-
-    if(startDeriv2*endDeriv2 < 0){
-	upperBound=weight * shape.maxDist();
-    } else if(startDeriv*endDeriv < 0){
-	double root=ApproxRoot(startDist, endDist, startDeriv, endDeriv);
-	if(root < 0){
-	    root=0.0;
-	}
-
-	if(startDeriv<0 || (startDeriv==0 && endDeriv>0)){
-	    upperBound=weight*maxSide;
-	    lowerBound=weight*root;
-	} else{
-	    upperBound=weight*root;
-	    lowerBound=weight*minSide;
-	}
-    } else {
-	upperBound=weight*maxSide;
-	lowerBound=weight*minSide;
-    }
-
-    update(upperBound, lowerBound, terminalFStart[0], terminalFEnd[0], shape.Id());
+double LineInterval::IntervalAngleEnd(){
+    double intervalAngleEnd= (angleStart>angleEnd ? angleEnd + (2 * M_PI) : angleEnd);
+    return intervalAngleEnd;
 }
 
 bool LineInterval::containsNormal(array<double, 2> edge){
-    double intervalAngleEnd= (angleStart>angleEnd ? angleEnd + (2 * M_PI) : angleEnd);
-    return edge[1] >= angleStart && edge[1] <= intervalAngleEnd;
+    //double intervalAngleEnd= (angleStart>angleEnd ? angleEnd + (2 * M_PI) : angleEnd);
+    return edge[1] >= angleStart && edge[1] <= IntervalAngleEnd();
 }
 
 array<double, 3> LineInterval::FunctionsAt(array<double, 2> edge, int side){
@@ -206,10 +187,10 @@ array<double, 3> LineInterval::FunctionsAt(array<double, 2> edge, int side){
 }
 
 double LineInterval::ApproxRoot(double distStart, double distEnd, double derivStart, double derivEnd){
-    double intervalAngleEnd= (angleStart>angleEnd ? angleEnd + (2 * M_PI) : angleEnd);
+    //double intervalAngleEnd= (angleStart>angleEnd ? angleEnd + (2 * M_PI) : angleEnd);
 
     double bStart=distStart - (angleStart * derivStart);
-    double bEnd=distEnd - (intervalAngleEnd * derivEnd);
+    double bEnd=distEnd - (IntervalAngleEnd() * derivEnd);
 
     Matrix2d A;
     A << derivStart, -1,   derivEnd, -1;
@@ -234,10 +215,10 @@ void LineInterval::update(double upperBound, double lowerBound, double distStart
 }
 
 double LineInterval::MaxWidth(){
-    double intervalAngleEnd= (angleStart>angleEnd ? angleEnd + (2 * M_PI) : angleEnd);
+    //double intervalAngleEnd= (angleStart>angleEnd ? angleEnd + (2 * M_PI) : angleEnd);
     double b=intervalMaxDists[0];
     double c=intervalMaxDists[1];
-    return sqrt( b*b + c*c - 2*b*c*cos(intervalAngleEnd-angleStart) );
+    return sqrt( b*b + c*c - 2*b*c*cos(IntervalAngleEnd()-angleStart) );
 }
 
 array<Vector2d, 2> LineInterval::EndPoints(){

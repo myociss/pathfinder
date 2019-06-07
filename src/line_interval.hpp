@@ -25,9 +25,8 @@ class LineInterval{
   public:
     LineInterval(Vector2d _point);
     LineInterval(double _angleStart, double _angleEnd);
-    void calculateTargetShape(Shape2d& shape);
-    void calculateShape(Shape2d& shape);
-    void FindShapeBounds(array<double, 3> entryFStart, array<double, 3> terminalFStart, array<double, 3> entryFEnd, array<double, 3> terminalFEnd, Shape2d& shape);
+    //void calculateTargetShape(Shape2d& shape);
+    //void calculateShape(Shape2d& shape);
     void SetAngleEnd(Vector2d _point);
     Vector2d Point();
     array<double, 3> FunctionsAt(array<double, 2> edge, int side);
@@ -38,6 +37,9 @@ class LineInterval{
     double UpperBound();
     double LowerBound();
     double MaxWidth();
+    bool IntersectsEdge(double v0Angle, double v1Angle);
+    //double IntervalAngleStart();
+    double IntervalAngleEnd();
     array<double, 3> Divide();
     vector<unsigned long int> ShapeIds();
     array<Vector2d, 2> EndPoints();

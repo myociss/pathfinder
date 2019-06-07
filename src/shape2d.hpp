@@ -33,7 +33,6 @@ class Point2d {
     unsigned long int ShapeId();
 };
 
-
 class Shape2d {
     unsigned long int id;
     int numVertices;
@@ -48,15 +47,19 @@ class Shape2d {
     void arrange(vector<LineInterval>& lineIntervals);
     void setVerticesClockwise(int startVertex);
     void setNewVertices(vector<Point2d> tmpVertices);
-    void calculatePaths(vector<LineInterval>& lineIntervals);
+    void calculateAllIntervals(vector<LineInterval>& lineIntervals);
     //there should probably be different subclasses for target shapes and nontarget shapes at some point
-    void calculatePathsTarget(vector<LineInterval>& lineIntervals);
+    void calculateOneInterval(LineInterval& li);
+    void calculateAllIntervalsTarget(vector<LineInterval>& lineIntervals);
+    void computeBounds(array<double, 3> entryFStart, array<double, 3> entryFEnd, array<double, 3> terminalFStart, array<double, 3> terminalFEnd, LineInterval& li);
     double maxDist();
     double Weight();
     unsigned long int Id();
     int EndVertex();
     vector<Vector2d> Vertices();
     vector<Vector2d> VerticesArranged();
+    array<double, 2> EntryEdge(LineInterval& li);
+    array<double, 2> TerminalEdge(LineInterval& li);
     //vector<unsigned long int> PrevShapeIds();
 };
 
