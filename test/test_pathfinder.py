@@ -187,7 +187,7 @@ class TestGraph(TestCase):
                     vertex=vertices_2d[i]
                     vertex_side=vertex[0]*A+vertex[1]*B+C
                     self.assertLess(origin_side*vertex_side, 0.0)
-    '''
+    
     def test_interval_calculations(self):
         target=[0.1+1.8*random.random(), 0.1+1.8*random.random(), 0.1+1.8*random.random()]
         self.mesh.set_target(target)
@@ -244,7 +244,7 @@ class TestGraph(TestCase):
         target=[0.1+1.8*random.random(), 0.1+1.8*random.random(), 0.1+1.8*random.random()]
         self.mesh.set_target(target)
 
-        paths=self.mesh.get_paths(epsilon=8, threads=1, distance_bound=0.1)
+        paths=self.mesh.get_paths(epsilon=8, threads=1, distance_bound=2)
         normals=[]
         for alpha_id in range(8):
             alpha=alpha_id*math.pi/8
@@ -284,7 +284,7 @@ class TestGraph(TestCase):
             
             pts_on_face=[pt0_on_face[i] and pt1_on_face[i] for i in range(6)]
             self.assertTrue(any(pts_on_face))
-
+    '''
 
 if __name__ == '__main__':
     unittest.main()

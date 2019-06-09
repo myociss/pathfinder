@@ -198,14 +198,14 @@ void Shape2d::calculateAllIntervals(vector<LineInterval>& lineIntervals){
     unsigned long int intervalId=startIntervalId;
     unsigned long int endVertexIntervalId=vertices[endVertex].AngleId();
 
-    int entryEdge=(vertices[0].AngleId()!=vertices[1].AngleId() ? 0 : 1);
+    int entryEdge=(vertices[0].AngleId()==vertices[1].AngleId() ? 1 : 0);
     int terminalEdge=vertices.size()-1;
 
 
     array<double, 3> entryFStart;
     array<double, 3> terminalFStart;
 
-    array<double, 2> entryPolar=polarEquation(vertices[0].Vec(), vertices[1].Vec());
+    array<double, 2> entryPolar=polarEquation(vertices[entryEdge].Vec(), vertices[entryEdge+1].Vec());
     array<double, 2> terminalPolar=polarEquation(vertices[0].Vec(), vertices[terminalEdge].Vec());
 
     //cout << endVertexIntervalId << endl;
@@ -239,7 +239,7 @@ void Shape2d::calculateAllIntervals(vector<LineInterval>& lineIntervals){
 	}
 	if(vertices[entryEdge+1].AngleId()==nextInterval){
 	    ++entryEdge;
-	    entryPolar=polarEquation(vertices[entryEdge-1].Vec(), vertices[entryEdge].Vec());
+	    entryPolar=polarEquation(vertices[entryEdge].Vec(), vertices[entryEdge+1].Vec());
 	}
 	
 

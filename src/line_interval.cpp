@@ -61,7 +61,7 @@ bool LineInterval::IntersectsEdge(double v0Angle, double v1Angle){
     double edgeAngleStart=v0Angle;
     double edgeAngleEnd=v1Angle;
     if(edgeAngleStart>edgeAngleEnd){
-	if(angleStart>angleEnd){
+	if(angleStart<0){
 	    edgeAngleStart -= M_PI * 2;
 	} else {
 	    edgeAngleEnd += M_PI * 2;

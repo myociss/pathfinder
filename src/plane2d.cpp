@@ -77,6 +77,7 @@ void Plane2d::FindPaths(double distBound){
 	cout << candidateIntervals.size() << endl;
 	distBoundSatisfied=DivideCandidateIntervals(distBound);
 	++i;
+	//distBoundSatisfied=true;
     }
     
 }
@@ -106,28 +107,28 @@ bool Plane2d::DivideCandidateIntervals(double distBound){
 	if(candidateIntervals[i].MaxWidth() <= distBound){
 	    newCandidateIntervals.push_back(candidateIntervals[i]);
 	} else{
-	    cout << "-------------------" << endl;
+	    /*cout << "-------------------" << endl;
 	    cout << candidateIntervals[i].LowerBound() << endl;
-	    cout << candidateIntervals[i].UpperBound() << endl;
+	    cout << candidateIntervals[i].UpperBound() << endl;*/
 	    distBoundSatisfied = false;
 	    array<double, 3> newAngles=candidateIntervals[i].Divide();
 	    LineInterval li0 = LineInterval(newAngles[0], newAngles[1]);
 	    LineInterval li1 = LineInterval(newAngles[1], newAngles[2]);
+	    //LineInterval li0 = LineInterval(newAngles[0], newAngles[2]);
+	    //LineInterval li1 = LineInterval(newAngles[0], newAngles[2]);
 	    vector<unsigned long int> shapeIds=candidateIntervals[i].ShapeIds();
 
 	    shapes[0].calculateOneIntervalTarget(li0);
 	    shapes[0].calculateOneIntervalTarget(li1);
 
 	    for(unsigned long int j=1; j<shapeIds.size(); ++j){
-		//li0.calculateShape(shapes[i]);
-		//li1.calculateShape(shapes[i]);
 		shapes[shapeIds[j]].calculateOneInterval(li0);
 		shapes[shapeIds[j]].calculateOneInterval(li1);
 	    }
-	    cout << li0.LowerBound() << endl;
+	    /*cout << li0.LowerBound() << endl;
 	    cout << li0.UpperBound() << endl;
 	    cout << li1.LowerBound() << endl;
-	    cout << li1.UpperBound() << endl;
+	    cout << li1.UpperBound() << endl;*/
 	    newCandidateIntervals.push_back(li0);
 	    newCandidateIntervals.push_back(li1);
 	}
