@@ -5,6 +5,7 @@
 #include "plane3d.hpp"
 #include "shape2d.hpp"
 #include "line_interval.hpp"
+#include "found_path.hpp"
 
 using namespace Eigen;
 using namespace std;
@@ -24,7 +25,7 @@ class Plane2d{
     Plane2d(vector<Shape3d>& shapes, Plane3d plane3d);
     vector<Shape2d> Shapes();
     void CalcLineIntervalsInit();
-    void FindPaths(double distBound);
+    vector<FoundPath> FindPaths(double distBound);
     bool DivideCandidateIntervals(double distBound);
     void PruneCandidateIntervals();
     vector<array<double, 2>> LineIntervalBounds();

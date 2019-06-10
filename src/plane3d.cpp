@@ -86,7 +86,7 @@ Vector2d Plane3d::Rotate(array<double, 3> _vec){
     return Vector2d(xCoord, yCoord);
 }
 
-Vector3d Plane3d::Get3dPoint(Vector2d pt2d){
+Vector3d Plane3d::Get3dPoint(Vector3d pt2d){
     double x=pt2d[0]*inverse.row(0)[0] + pt2d[1]*inverse.row(0)[1];
     double y=pt2d[0]*inverse.row(1)[0] + pt2d[1]*inverse.row(1)[1];
     double z=pt2d[0]*inverse.row(2)[0] + pt2d[1]*inverse.row(2)[1];

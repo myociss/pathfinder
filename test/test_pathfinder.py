@@ -238,9 +238,9 @@ class TestGraph(TestCase):
     
             print(f'testing interval {interval_idx+1} of {len(intervals)}')
             self.assertListEqual(sorted(pathfinder_interval_shapes), sorted(interval_shapes))
-    '''
 
-    def test_found_paths(self):
+
+    def test_unflatten_paths(self):
         target=[0.1+1.8*random.random(), 0.1+1.8*random.random(), 0.1+1.8*random.random()]
         self.mesh.set_target(target)
 
@@ -256,19 +256,6 @@ class TestGraph(TestCase):
                 normal=(np.matmul(rotation_x, rotation_y))[2]
                 normals[alpha_id].append(normal)
 
-        face_normals=[]
-        face_points=[]
-
-        for face in self.test_mesh['faces']:
-            vertices=face['vertices']
-            v0=np.array(self.test_mesh['vertices'][vertices[0]])
-            v1=np.array(self.test_mesh['vertices'][vertices[1]])
-            v2=np.array(self.test_mesh['vertices'][vertices[2]])
-            u=v1-v0
-            v=v2-v0
-            face_normals.append(np.cross(u, v))
-            face_points.append(v0)
-
         for path in paths:
             plane_id=path.plane_id()
             theta_id=plane_id%8
@@ -279,12 +266,52 @@ class TestGraph(TestCase):
             self.assertLess(abs(np.dot(target-pt0, normal)), 10e-7)
             self.assertLess(abs(np.dot(target-pt1, normal)), 10e-7)
 
-            pt0_on_face=[abs(np.dot(face_points[i]-pt0, face_normals[i])) < 10e-2 for i in range(len(face_normals))]
-            pt1_on_face=[abs(np.dot(face_points[i]-pt1, face_normals[i])) < 10e-2 for i in range(len(face_normals))]
-            
-            pts_on_face=[pt0_on_face[i] and pt1_on_face[i] for i in range(6)]
-            self.assertTrue(any(pts_on_face))
+    def test_distance_bound(self):
+        target=[0.1+1.8*random.random(), 0.1+1.8*random.random(), 0.1+1.8*random.random()]
+        self.mesh.set_target(target)
+
+        paths=self.mesh.get_paths(epsilon=8, threads=1, distance_bound=0.0001)
+        for path in paths:
+            diff=path.points()[0]-path.points()[1]
+            self.assertLessEqual((diff[0]**2 + diff[1]**2 + diff[2]**2)**0.5, 0.002)
     '''
+    def test_pruned_intervals(self):
+        target=[0.1+1.8*random.random(), 0.1+1.8*random.random(), 0.1+1.8*random.random()]
+        self.mesh.set_target(target)
+        alpha=math.pi*random.random()
+        theta=math.pi*random.random()
+
+        plane_intersection=self.mesh.slice(rotation=[alpha,theta])
+        plane3d = pathfinder.Plane3d(id=0, alpha=alpha, theta=theta, target=np.array(target))
+        plane2d = pathfinder.Plane2d(plane_intersection, plane3d)
+        plane2d.calc_intervals_init()
+        interval_bounds = plane2d.interval_bounds()
+
+        all_vertices=list(itertools.chain.from_iterable([[tuple(v) for v in shape.vertices()] for shape in plane2d.shapes()]))
+        intervals=sorted(set([math.atan2(v[1], v[0]) for v in all_vertices]))
+
+        plane2d.find_paths(distance_bound=0.0001)
+        for path in plane2d.:
+            points=path.points()
+            lower_bound=path.lower_bound()
+            upper_bound=path.upper_bound()
+            path_angle_start=math.atan2(points[0][1], points[0][0])
+            path_angle_end=math.atan2(points[1][1], points[1][0])
+            if path_angle_start>path_angle_end:
+                path_angle_end += 2 * math.pi
+            for interval_idx, interval in enumerate(intervals):
+                interval_start=interval
+                if interval_idx==len(intervals)-1:
+                    interval_end=intervals[0] + 2 * math.pi
+                else:
+                    interval_end=intervals[interval_idx+1]
+                if path_angle_start >= interval_start and path_angle_end <= interval_end:
+                    self.assertGreaterEqual(lower_bound, interval_bounds[0])
+                    self.assertLessEqual(upper_bound, interval_bounds[1])
+                    break
+    '''            
+        
+
 
 if __name__ == '__main__':
     unittest.main()

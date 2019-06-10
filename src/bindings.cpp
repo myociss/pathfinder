@@ -4,6 +4,7 @@
 #include "plane3d.hpp"
 #include "plane2d.hpp"
 #include "shape2d.hpp"
+#include "found_path.hpp"
 #include "mesh.hpp"
 
 namespace py = pybind11;
@@ -61,7 +62,8 @@ PYBIND11_MODULE(pathfinder, m){
     .def("shapes", &Plane2d::Shapes)
     .def("calc_intervals_init", &Plane2d::CalcLineIntervalsInit)
     .def("interval_bounds", &Plane2d::LineIntervalBounds)
-    .def("find_paths", &Plane2d::FindPaths)
+    .def("find_paths", &Plane2d::FindPaths,
+	py::arg("distance_bound"))
     .def("interval_shape_ids", &Plane2d::IntervalShapeIds,
 	py::arg("interval_id"));
 

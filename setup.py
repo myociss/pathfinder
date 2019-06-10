@@ -27,6 +27,7 @@ ext_modules = [
 	 'src/plane3d.cpp',
          'src/plane2d.cpp',
          'src/line_interval.cpp',
+         'src/found_path.cpp',
          'src/shape2d.cpp',
 	 'src/mesh_components.cpp',
 	 'src/bindings.cpp'],

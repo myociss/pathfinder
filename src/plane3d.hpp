@@ -22,7 +22,7 @@ class Plane3d {
     array<double, 3> findIntersection(Vector3d v0, Vector3d v1);
     int Id();
     Vector2d Rotate(array<double, 3> _vec);
-    Vector3d Get3dPoint(Vector2d pt2d);
+    Vector3d Get3dPoint(Vector3d pt2d);
 };
 
 class Shape3d {

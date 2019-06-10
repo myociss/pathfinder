@@ -3,7 +3,7 @@
 #include "mesh.hpp"
 #include "plane2d.hpp"
 #include "line_interval.hpp"
-//#include "plane3d.hpp"
+#include "found_path.hpp"
 #include <iostream>
 #include <map>
 #include <string>
@@ -96,13 +96,14 @@ vector<FoundPath> Mesh::findPaths(vector<Plane3d> planes, double distBound){
 
     double minUpperBound=numeric_limits<double>::max();
 
-    vector<vector<LineInterval>> allCandidateIntervals;
+    //vector<vector<LineInterval>> allCandidateIntervals;
+    vector<vector<FoundPath>> allFoundPaths;
 
     for(int i=0; i<planes.size(); ++i){
 	vector<Shape3d> myslice = slice(planes[i], tetsChecked);
 	Plane2d plane2d(myslice, planes[i]);
-	plane2d.FindPaths(distBound);
-	allCandidateIntervals.push_back(plane2d.CandidateIntervals());
+	vector<FoundPath> planePaths=plane2d.FindPaths(distBound);
+	allFoundPaths.push_back(planePaths);
 	if(plane2d.MinUpperBound()<minUpperBound){
 	    minUpperBound=plane2d.MinUpperBound();
 	}
@@ -110,16 +111,16 @@ vector<FoundPath> Mesh::findPaths(vector<Plane3d> planes, double distBound){
     vector<FoundPath> foundPaths;
 
     for(int i=0; i<planes.size(); ++i){
-	vector<LineInterval> candidateIntervals=allCandidateIntervals[i];
+	vector<FoundPath> planePaths=allFoundPaths[i];
 
-	for(int j=0; j<candidateIntervals.size(); ++j){
-	    LineInterval candidateInterval=candidateIntervals[j];
-	    if(candidateInterval.LowerBound()<minUpperBound){
-		array<Vector2d, 2> endPoints=candidateInterval.EndPoints();
+	for(int j=0; j<planePaths.size(); ++j){
+	    FoundPath foundPath=planePaths[j];
+	    if(foundPath.LowerBound()<minUpperBound){
+		array<Vector3d, 2> endPoints=foundPath.Points();
 		Vector3d pt0=planes[i].Get3dPoint(endPoints[0]);
 		Vector3d pt1=planes[i].Get3dPoint(endPoints[1]);
 
-		FoundPath foundPath(planes[i].Id(), pt0, pt1, candidateInterval.LowerBound(), candidateInterval.UpperBound());
+		FoundPath foundPath(planes[i].Id(), pt0, pt1, foundPath.LowerBound(), foundPath.UpperBound());
 		foundPaths.push_back(foundPath);
 	    }
 	}
@@ -230,29 +231,5 @@ vector<FoundPath> Mesh::shortestPaths(const int epsilon, const int numThreads, d
 
 unsigned long int Mesh::getTargetTetId(){
     return targetTetId;
-}
-
-FoundPath::FoundPath(unsigned long int _planeId, Vector3d _pt0, Vector3d _pt1, double _lowerBound, double _upperBound){
-    planeId=_planeId;
-    pt0=_pt0;
-    pt1=_pt1;
-    lowerBound=_lowerBound;
-    upperBound=_upperBound;
-}
-
-unsigned long int FoundPath::PlaneId(){
-    return planeId;
-}
-
-double FoundPath::UpperBound(){
-    return upperBound;
-}
-
-double FoundPath::LowerBound(){
-    return lowerBound;
-}
-
-array<Vector3d, 2> FoundPath::Points(){
-    return {pt0, pt1};
 }
 

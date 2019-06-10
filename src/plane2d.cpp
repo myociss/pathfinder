@@ -65,21 +65,32 @@ Plane2d::Plane2d(vector<Shape3d>& _shapes, Plane3d plane3d){
 }
 
 
-void Plane2d::FindPaths(double distBound){
+vector<FoundPath> Plane2d::FindPaths(double distBound){
     CalcLineIntervalsInit();
-    cout << "step 0" << endl;
-    cout << candidateIntervals.size() << endl;
+    //cout << "step 0" << endl;
+    //cout << candidateIntervals.size() << endl;
     bool distBoundSatisfied=DivideCandidateIntervals(distBound);
     int i=1;
     while(!distBoundSatisfied){
-	cout << i << endl;
+	//cout << i << endl;
 	PruneCandidateIntervals();
-	cout << candidateIntervals.size() << endl;
+	//cout << candidateIntervals.size() << endl;
 	distBoundSatisfied=DivideCandidateIntervals(distBound);
 	++i;
 	//distBoundSatisfied=true;
     }
-    
+
+    vector<FoundPath> foundPaths;
+
+    for(int i=0; i<candidateIntervals.size(); ++i){
+	LineInterval candidateInterval=candidateIntervals[i];
+	array<Vector2d, 2> endPoints=candidateInterval.EndPoints();
+	Vector3d pt0(endPoints[0][0], endPoints[0][1], 0.0);
+	Vector3d pt1(endPoints[1][0], endPoints[1][1], 0.0);
+	FoundPath foundPath(0, pt0, pt1, candidateInterval.LowerBound(), candidateInterval.UpperBound());
+	foundPaths.push_back(foundPath);
+    }
+    return foundPaths;
 }
 
 void Plane2d::PruneCandidateIntervals(){
@@ -107,13 +118,16 @@ bool Plane2d::DivideCandidateIntervals(double distBound){
 	if(candidateIntervals[i].MaxWidth() <= distBound){
 	    newCandidateIntervals.push_back(candidateIntervals[i]);
 	} else{
-	    /*cout << "-------------------" << endl;
-	    cout << candidateIntervals[i].LowerBound() << endl;
+	    //cout << "-------------------" << endl;
+	    /*cout << candidateIntervals[i].LowerBound() << endl;
 	    cout << candidateIntervals[i].UpperBound() << endl;*/
 	    distBoundSatisfied = false;
 	    array<double, 3> newAngles=candidateIntervals[i].Divide();
 	    LineInterval li0 = LineInterval(newAngles[0], newAngles[1]);
 	    LineInterval li1 = LineInterval(newAngles[1], newAngles[2]);
+	    //cout << newAngles[0] << endl;
+	    //cout << newAngles[1] << endl;
+	    //cout << newAngles[2] << endl;
 	    //LineInterval li0 = LineInterval(newAngles[0], newAngles[2]);
 	    //LineInterval li1 = LineInterval(newAngles[0], newAngles[2]);
 	    vector<unsigned long int> shapeIds=candidateIntervals[i].ShapeIds();
