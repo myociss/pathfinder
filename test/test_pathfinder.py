@@ -187,7 +187,7 @@ class TestGraph(TestCase):
                     vertex=vertices_2d[i]
                     vertex_side=vertex[0]*A+vertex[1]*B+C
                     self.assertLess(origin_side*vertex_side, 0.0)
-    
+    '''
     def test_interval_calculations(self):
         target=[0.1+1.8*random.random(), 0.1+1.8*random.random(), 0.1+1.8*random.random()]
         self.mesh.set_target(target)
@@ -238,7 +238,7 @@ class TestGraph(TestCase):
     
             print(f'testing interval {interval_idx+1} of {len(intervals)}')
             self.assertListEqual(sorted(pathfinder_interval_shapes), sorted(interval_shapes))
-
+    '''
 
     def test_unflatten_paths(self):
         target=[0.1+1.8*random.random(), 0.1+1.8*random.random(), 0.1+1.8*random.random()]
@@ -265,51 +265,91 @@ class TestGraph(TestCase):
             pt1=path.points()[1]
             self.assertLess(abs(np.dot(target-pt0, normal)), 10e-7)
             self.assertLess(abs(np.dot(target-pt1, normal)), 10e-7)
-
+    '''
     def test_distance_bound(self):
         target=[0.1+1.8*random.random(), 0.1+1.8*random.random(), 0.1+1.8*random.random()]
         self.mesh.set_target(target)
 
         paths=self.mesh.get_paths(epsilon=8, threads=1, distance_bound=0.0001)
+        print('len paths' + str(len(paths)))
         for path in paths:
             diff=path.points()[0]-path.points()[1]
-            self.assertLessEqual((diff[0]**2 + diff[1]**2 + diff[2]**2)**0.5, 0.002)
+            self.assertLessEqual((diff[0]**2 + diff[1]**2 + diff[2]**2)**0.5, 0.0001)
     '''
+   
     def test_pruned_intervals(self):
-        target=[0.1+1.8*random.random(), 0.1+1.8*random.random(), 0.1+1.8*random.random()]
-        self.mesh.set_target(target)
-        alpha=math.pi*random.random()
-        theta=math.pi*random.random()
+        for i in range(200):
+            target=[0.1+1.8*random.random(), 0.1+1.8*random.random(), 0.1+1.8*random.random()]
+            #print(target)
+            self.mesh.set_target(target)
+            alpha=math.pi*random.random()
+            theta=math.pi*random.random()
 
-        plane_intersection=self.mesh.slice(rotation=[alpha,theta])
-        plane3d = pathfinder.Plane3d(id=0, alpha=alpha, theta=theta, target=np.array(target))
-        plane2d = pathfinder.Plane2d(plane_intersection, plane3d)
-        plane2d.calc_intervals_init()
-        interval_bounds = plane2d.interval_bounds()
+            plane_intersection=self.mesh.slice(rotation=[alpha,theta])
+            plane3d = pathfinder.Plane3d(id=0, alpha=alpha, theta=theta, target=np.array(target))
+            plane2d = pathfinder.Plane2d(plane_intersection, plane3d)
+            plane2d.calc_intervals_init()
+            interval_bounds = plane2d.interval_bounds()
 
-        all_vertices=list(itertools.chain.from_iterable([[tuple(v) for v in shape.vertices()] for shape in plane2d.shapes()]))
-        intervals=sorted(set([math.atan2(v[1], v[0]) for v in all_vertices]))
+            all_vertices=list(itertools.chain.from_iterable([[tuple(v) for v in shape.vertices()] for shape in plane2d.shapes()]))
+            intervals=sorted(set([math.atan2(v[1], v[0]) for v in all_vertices]))
+            self.assertEqual(len(intervals), len(interval_bounds))
 
-        plane2d.find_paths(distance_bound=0.0001)
-        for path in plane2d.:
-            points=path.points()
-            lower_bound=path.lower_bound()
-            upper_bound=path.upper_bound()
-            path_angle_start=math.atan2(points[0][1], points[0][0])
-            path_angle_end=math.atan2(points[1][1], points[1][0])
-            if path_angle_start>path_angle_end:
-                path_angle_end += 2 * math.pi
-            for interval_idx, interval in enumerate(intervals):
-                interval_start=interval
-                if interval_idx==len(intervals)-1:
-                    interval_end=intervals[0] + 2 * math.pi
+            plane2d = pathfinder.Plane2d(plane_intersection, plane3d)
+            paths = plane2d.find_paths(distance_bound=0.1)
+            self.assertGreater(len(paths), 0)
+
+            #located_intervals_count=0
+            original_intervals_found=[False for i in range(len(paths))]
+
+            for path_idx, path in enumerate(paths):
+                points=path.points()
+                lower_bound=path.lower_bound()
+                upper_bound=path.upper_bound()
+                path_angle_start=math.atan2(points[0][1], points[0][0])
+                path_angle_end=math.atan2(points[1][1], points[1][0])
+
+                if path_angle_start>path_angle_end:
+                    interval_start=intervals[len(intervals)-1]
+                    interval_end=intervals[0]
+                    original_intervals_found[path_idx]=True
                 else:
-                    interval_end=intervals[interval_idx+1]
-                if path_angle_start >= interval_start and path_angle_end <= interval_end:
-                    self.assertGreaterEqual(lower_bound, interval_bounds[0])
-                    self.assertLessEqual(upper_bound, interval_bounds[1])
-                    break
-    '''            
+                    path_angle_mid=(path_angle_start+path_angle_end)/2.0
+                    for interval_idx, interval in enumerate(intervals):
+                        interval_start=interval
+                        if interval_idx==len(intervals)-1:
+                            interval_end=intervals[0]
+                            if path_angle_mid<interval_end or path_angle_mid>interval_start:
+                                original_intervals_found[path_idx]=True
+                                break
+                        else:
+                            interval_end=intervals[interval_idx+1]
+                            if path_angle_mid>interval_start and path_angle_mid<interval_end:
+                                if lower_bound<interval_bounds[interval_idx][0] or upper_bound>interval_bounds[interval_idx][1]:
+                                    print('--------')
+                                    print(path_angle_start)
+                                    print(path_angle_end)
+                                    print(interval_start)
+                                    print(interval_end)
+                                self.assertEqual(lower_bound, interval_bounds[interval_idx][0])
+                                self.assertEqual(upper_bound, interval_bounds[interval_idx][1])
+                                original_intervals_found[path_idx]=True
+                                break
+                        
+            np.set_printoptions(precision=15)
+            if not all(original_intervals_found):
+                print(intervals)
+                for path_idx, path in enumerate(paths):
+                    if not original_intervals_found[path_idx]:
+                        print('-------------------')
+                        points=path.points()
+                        print(path.points()[0])
+                        print(path.points()[1])
+                        path_angle_start=math.atan2(points[0][1], points[0][0])
+                        path_angle_end=math.atan2(points[1][1], points[1][0])
+                        print(path_angle_start)
+                        print(path_angle_end) 
+            self.assertTrue(all(original_intervals_found))
         
 
 

@@ -77,7 +77,7 @@ double LineInterval::IntervalAngleEnd(){
 }
 
 bool LineInterval::containsNormal(array<double, 2> edge){
-    return edge[1] >= angleStart && edge[1] <= IntervalAngleEnd();
+    return (edge[1] >= angleStart && edge[1] <= IntervalAngleEnd());
 }
 
 array<double, 3> LineInterval::FunctionsAt(array<double, 2> edge, int side){

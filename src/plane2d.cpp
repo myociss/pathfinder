@@ -88,6 +88,11 @@ vector<FoundPath> Plane2d::FindPaths(double distBound){
 	Vector3d pt0(endPoints[0][0], endPoints[0][1], 0.0);
 	Vector3d pt1(endPoints[1][0], endPoints[1][1], 0.0);
 	FoundPath foundPath(0, pt0, pt1, candidateInterval.LowerBound(), candidateInterval.UpperBound());
+	if(foundPath.UpperBound() < 0.0 || foundPath.LowerBound() < 0.0){
+	    cout << "warning: incorrect bounds calculation. if you get this message, contact the pathfinder developer" << endl;
+	    cout << foundPath.UpperBound() << endl;
+	    cout << foundPath.LowerBound() << endl;
+	}
 	foundPaths.push_back(foundPath);
     }
     return foundPaths;
@@ -118,16 +123,14 @@ bool Plane2d::DivideCandidateIntervals(double distBound){
 	if(candidateIntervals[i].MaxWidth() <= distBound){
 	    newCandidateIntervals.push_back(candidateIntervals[i]);
 	} else{
-	    //cout << "-------------------" << endl;
+	    //cout << "this happens" << endl;
 	    /*cout << candidateIntervals[i].LowerBound() << endl;
 	    cout << candidateIntervals[i].UpperBound() << endl;*/
 	    distBoundSatisfied = false;
 	    array<double, 3> newAngles=candidateIntervals[i].Divide();
 	    LineInterval li0 = LineInterval(newAngles[0], newAngles[1]);
 	    LineInterval li1 = LineInterval(newAngles[1], newAngles[2]);
-	    //cout << newAngles[0] << endl;
-	    //cout << newAngles[1] << endl;
-	    //cout << newAngles[2] << endl;
+
 	    //LineInterval li0 = LineInterval(newAngles[0], newAngles[2]);
 	    //LineInterval li1 = LineInterval(newAngles[0], newAngles[2]);
 	    vector<unsigned long int> shapeIds=candidateIntervals[i].ShapeIds();
@@ -143,6 +146,18 @@ bool Plane2d::DivideCandidateIntervals(double distBound){
 	    cout << li0.UpperBound() << endl;
 	    cout << li1.LowerBound() << endl;
 	    cout << li1.UpperBound() << endl;*/
+	    LineInterval li=candidateIntervals[i];
+	    if(li0.LowerBound() < li.LowerBound() || li1.LowerBound() < li.LowerBound() || li0.UpperBound() > li.UpperBound() || li1.UpperBound() > li.UpperBound() || li0.UpperBound() < 0.0 || li1.UpperBound() < 0.0 || li0.LowerBound() < 0.0 || li1.LowerBound() < 0.0){
+		cout << "warning: incorrect bounds calculation. if you get this message, contact the pathfinder developer" << endl;
+		cout << li.UpperBound() << endl;
+		cout << li.LowerBound() << endl;
+		cout << li1.UpperBound() << endl;
+		cout << li1.LowerBound() << endl;
+		cout << li0.UpperBound() << endl;
+		cout << li0.LowerBound() << endl;
+		//cout << li.AngleStart() << endl;
+		cout << li.IntervalAngleEnd() << endl;
+	    }
 	    newCandidateIntervals.push_back(li0);
 	    newCandidateIntervals.push_back(li1);
 	}

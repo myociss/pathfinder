@@ -292,7 +292,8 @@ void Shape2d::computeBounds(array<double, 3> entryFStart, array<double, 3> entry
 	    upperBound=weight*maxSide;
 	    lowerBound=weight*root;
 	} else{
-	    upperBound=weight*root;
+	    //upperBound=weight*maxDist();
+	    upperBound=weight*maxDist();
 	    lowerBound=weight*minSide;
 	}
     } else {
