@@ -228,14 +228,6 @@ vector<FoundPath> Mesh::shortestPaths(const int epsilon, const int numThreads, d
 	//allFoundPaths.push_back(foundPaths);
     }
 
-    /*for(unsigned long int i=0; i<allFoundPaths.size(); ++i){
-	vector<FoundPath> foundPaths=allFoundPaths[i];
-	for(unsigned long int j=0; j<foundPaths.size(); ++j){
-	    if(foundPaths[j].UpperBound()<minUpperBound){
-		minUpperBound=foundPaths[j].UpperBound();
-	    }
-	}
-    }*/
     
     vector<FoundPath> ret;
     for(unsigned long int i=0; i<allFoundPaths.size(); ++i){
@@ -243,16 +235,7 @@ vector<FoundPath> Mesh::shortestPaths(const int epsilon, const int numThreads, d
 	    ret.push_back(allFoundPaths[i]);
 	}
     }
-    /*cout << "total minimum upper bound:" << endl;
-    cout << minUpperBound << endl;
-    for(unsigned long int i=0; i<allFoundPaths.size(); ++i){
-	vector<FoundPath> foundPaths=allFoundPaths[i];
-	for(unsigned long int j=0; j<foundPaths.size(); ++j){
-	    if(foundPaths[j].LowerBound()<minUpperBound){
-		ret.push_back(foundPaths[j]);
-	    }
-	}
-    }*/
+
     cout << "ret size:" << endl;
     cout << ret.size() << endl;
     return ret;

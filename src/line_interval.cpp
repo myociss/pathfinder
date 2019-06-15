@@ -3,6 +3,7 @@
 #include <Eigen/Dense>
 #include <vector>
 #include <array>
+#include <iostream>
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -14,6 +15,15 @@ array<double, 2> polarEquation(Vector2d v0, Vector2d v1){
 
     double normalAngle=atan2(line[1], line[0]);
     double normalDist=line[2] / sqrt(line[0] * line[0] + line[1] * line[1]);
+
+    if(normalDist<0){
+	normalDist = -normalDist;
+	normalAngle += M_PI;
+	if(normalAngle>=M_PI){
+	    normalAngle -= 2 * M_PI;
+	}
+    }
+
     array<double, 2> polar={normalDist, normalAngle};
     return polar;
 }
@@ -77,18 +87,24 @@ double LineInterval::IntervalAngleEnd(){
 }
 
 bool LineInterval::containsNormal(array<double, 2> edge){
-    return (edge[1] >= angleStart && edge[1] <= IntervalAngleEnd());
+
+    if(angleStart>angleEnd){
+	return (edge[1]>=angleStart && edge[1]<=M_PI) || (edge[1]<=angleEnd && edge[1] >= -M_PI);
+    } else {
+	return (edge[1] >= angleStart && edge[1] <= angleEnd);
+    }
 }
 
 array<double, 3> LineInterval::FunctionsAt(array<double, 2> edge, int side){
     double angle=(side==0 ? angleStart : angleEnd);
-    double dist=edge[0]/cos(angle-edge[1]);
+    //double dist=edge[0]/cos(angle-edge[1]);
+    double dist=DistAt(edge, side);
     double distPrime=tan(angle-edge[1])*dist;
    
     double angleSin=sin(angle-edge[1]);
     double angleCos=cos(angle-edge[1]);
 
-    double distPrime2=(1+angleSin*angleSin)/(angleCos*angleCos*angleCos);
+    double distPrime2=edge[0]*(1+angleSin*angleSin)/(angleCos*angleCos*angleCos);
     return {dist, distPrime, distPrime2};
 }
 

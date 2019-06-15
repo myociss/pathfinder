@@ -26,7 +26,7 @@ class Plane2d{
     vector<Shape2d> Shapes();
     void CalcLineIntervalsInit();
     vector<FoundPath> FindPaths(double distBound);
-    bool DivideCandidateIntervals(double distBound);
+    bool DivideCandidateIntervals(double distBound, int time);
     void PruneCandidateIntervals();
     vector<array<double, 2>> LineIntervalBounds();
     vector<unsigned long int> IntervalShapeIds(unsigned long int intervalId);

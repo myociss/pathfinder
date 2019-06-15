@@ -289,68 +289,64 @@ class TestGraph(TestCase):
             plane3d = pathfinder.Plane3d(id=0, alpha=alpha, theta=theta, target=np.array(target))
             plane2d = pathfinder.Plane2d(plane_intersection, plane3d)
             plane2d.calc_intervals_init()
-            interval_bounds = plane2d.interval_bounds()
+            init_interval_bounds = plane2d.interval_bounds()
 
             all_vertices=list(itertools.chain.from_iterable([[tuple(v) for v in shape.vertices()] for shape in plane2d.shapes()]))
             intervals=sorted(set([math.atan2(v[1], v[0]) for v in all_vertices]))
-            self.assertEqual(len(intervals), len(interval_bounds))
+            #self.assertEqual(len(intervals), len(interval_bounds))
 
             plane2d = pathfinder.Plane2d(plane_intersection, plane3d)
-            paths = plane2d.find_paths(distance_bound=0.1)
-            self.assertGreater(len(paths), 0)
+            paths = plane2d.find_paths(distance_bound=0.01)
+            #self.assertGreater(len(paths), 0)
+            #print(len(paths))
 
             #located_intervals_count=0
-            original_intervals_found=[False for i in range(len(paths))]
+            intervals_found=[-1 for i in range(len(paths))]
 
             for path_idx, path in enumerate(paths):
                 points=path.points()
-                lower_bound=path.lower_bound()
-                upper_bound=path.upper_bound()
                 path_angle_start=math.atan2(points[0][1], points[0][0])
                 path_angle_end=math.atan2(points[1][1], points[1][0])
-
+                
                 if path_angle_start>path_angle_end:
-                    interval_start=intervals[len(intervals)-1]
-                    interval_end=intervals[0]
-                    original_intervals_found[path_idx]=True
-                else:
-                    path_angle_mid=(path_angle_start+path_angle_end)/2.0
-                    for interval_idx, interval in enumerate(intervals):
-                        interval_start=interval
-                        if interval_idx==len(intervals)-1:
-                            interval_end=intervals[0]
-                            if path_angle_mid<interval_end or path_angle_mid>interval_start:
-                                original_intervals_found[path_idx]=True
-                                break
-                        else:
-                            interval_end=intervals[interval_idx+1]
-                            if path_angle_mid>interval_start and path_angle_mid<interval_end:
-                                if lower_bound<interval_bounds[interval_idx][0] or upper_bound>interval_bounds[interval_idx][1]:
-                                    print('--------')
-                                    print(path_angle_start)
-                                    print(path_angle_end)
-                                    print(interval_start)
-                                    print(interval_end)
-                                self.assertEqual(lower_bound, interval_bounds[interval_idx][0])
-                                self.assertEqual(upper_bound, interval_bounds[interval_idx][1])
-                                original_intervals_found[path_idx]=True
-                                break
-                        
-            np.set_printoptions(precision=15)
-            if not all(original_intervals_found):
-                print(intervals)
-                for path_idx, path in enumerate(paths):
-                    if not original_intervals_found[path_idx]:
-                        print('-------------------')
-                        points=path.points()
-                        print(path.points()[0])
-                        print(path.points()[1])
-                        path_angle_start=math.atan2(points[0][1], points[0][0])
-                        path_angle_end=math.atan2(points[1][1], points[1][0])
-                        print(path_angle_start)
-                        print(path_angle_end) 
-            self.assertTrue(all(original_intervals_found))
-        
+                    intervals_found[path_idx]=len(intervals)-1
+                    continue
+
+                path_angle_mid=(path_angle_start+path_angle_end)/2.0
+                for interval_idx, interval in enumerate(intervals):
+                    interval_start=interval
+                          
+                    #interval_end=intervals[0]
+                    if interval_idx==len(intervals)-1:
+                        interval_end=intervals[0]
+                        if path_angle_mid<interval_end or path_angle_mid>interval_start:
+                            intervals_found[path_idx]=interval_idx
+                            break
+                    else:
+                        interval_end=intervals[interval_idx+1]
+                        if path_angle_mid>interval_start and path_angle_mid<interval_end:
+                            intervals_found[path_idx]=interval_idx
+                            break
+
+            self.assertTrue(all([element>-1 for element in intervals_found]))
+            for path_idx, path in enumerate(paths):
+                interval_idx=intervals_found[path_idx]
+                interval_bounds=init_interval_bounds[interval_idx]
+                if path.lower_bound()<interval_bounds[0] or path.upper_bound()>interval_bounds[1]:
+                    print('--------')
+                    np.set_printoptions(precision=15)
+                    points=path.points()
+                    path_angle_start=math.atan2(points[0][1], points[0][0])
+                    path_angle_end=math.atan2(points[1][1], points[1][0])
+                    #shape_0=plane2d.shapes()[0]
+                    #for v in shape_0.vertices():
+                        #print(math.atan2(v[1], v[0]))
+                    print(path_angle_start)
+                    print(path_angle_end)
+                    #print(interval_start)
+                    #print(interval_end)
+                self.assertGreaterEqual(path.lower_bound(), interval_bounds[0])
+                self.assertLessEqual(path.upper_bound(), interval_bounds[1])
 
 
 if __name__ == '__main__':

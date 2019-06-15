@@ -199,6 +199,9 @@ void Shape2d::calculateAllIntervals(vector<LineInterval>& lineIntervals){
     unsigned long int endVertexIntervalId=vertices[endVertex].AngleId();
 
     int entryEdge=(vertices[0].AngleId()==vertices[1].AngleId() ? 1 : 0);
+    if(entryEdge==1){
+	cout << "guess this happens" << endl;
+    }
     int terminalEdge=vertices.size()-1;
 
 
@@ -280,23 +283,30 @@ void Shape2d::computeBounds(array<double, 3> entryFStart, array<double, 3> entry
     double upperBound = 0.0;
     double lowerBound = 0.0;
 
-    if(startDeriv2*endDeriv2 < 0){
+    if(startDeriv2*endDeriv2 <= 0 || startDeriv*endDeriv <= 0){
+    //if(startDeriv*endDeriv <= 0){
+	//cout << "second deriv changes" << endl;
 	upperBound=weight * maxDist();
-    } else if(startDeriv*endDeriv < 0){
+    } /*else if(startDeriv*endDeriv <= 0){
 	double root=li.ApproxRoot(startDist, endDist, startDeriv, endDeriv);
 	if(root < 0){
 	    root=0.0;
 	}
 
 	if(startDeriv<0 || (startDeriv==0 && endDeriv>0)){
+	    //cout << "root lower bound" << endl;
 	    upperBound=weight*maxSide;
 	    lowerBound=weight*root;
 	} else{
+	    cout << "root upper bound" << endl;
+	    cout << maxDist() << endl;
+	    cout << root << endl;
+	    cout << maxSide << endl;
 	    //upperBound=weight*maxDist();
-	    upperBound=weight*maxDist();
+	    upperBound=weight*min(maxDist(), root);
 	    lowerBound=weight*minSide;
 	}
-    } else {
+    } */else {
 	upperBound=weight*maxSide;
 	lowerBound=weight*minSide;
     }

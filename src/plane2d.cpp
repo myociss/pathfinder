@@ -69,16 +69,19 @@ vector<FoundPath> Plane2d::FindPaths(double distBound){
     CalcLineIntervalsInit();
     //cout << "step 0" << endl;
     //cout << candidateIntervals.size() << endl;
-    bool distBoundSatisfied=DivideCandidateIntervals(distBound);
+    bool distBoundSatisfied=DivideCandidateIntervals(distBound, 0);
     int i=1;
-    while(!distBoundSatisfied){
+    /*while(!distBoundSatisfied){
 	//cout << i << endl;
 	PruneCandidateIntervals();
 	//cout << candidateIntervals.size() << endl;
-	distBoundSatisfied=DivideCandidateIntervals(distBound);
+	distBoundSatisfied=DivideCandidateIntervals(distBound, i);
 	++i;
 	//distBoundSatisfied=true;
     }
+
+    cout << "refined intervals this many times:" << endl;
+    cout << i-1 << endl;*/
 
     vector<FoundPath> foundPaths;
 
@@ -116,15 +119,15 @@ void Plane2d::PruneCandidateIntervals(){
     candidateIntervals = newCandidateIntervals;
 }
 
-bool Plane2d::DivideCandidateIntervals(double distBound){
+bool Plane2d::DivideCandidateIntervals(double distBound, int time){
     vector<LineInterval> newCandidateIntervals;
     bool distBoundSatisfied = true;
     for(unsigned long int i=0; i<candidateIntervals.size(); ++i){
 	if(candidateIntervals[i].MaxWidth() <= distBound){
 	    newCandidateIntervals.push_back(candidateIntervals[i]);
 	} else{
-	    //cout << "this happens" << endl;
-	    /*cout << candidateIntervals[i].LowerBound() << endl;
+	    /*cout << "this happens" << endl;
+	    cout << candidateIntervals[i].LowerBound() << endl;
 	    cout << candidateIntervals[i].UpperBound() << endl;*/
 	    distBoundSatisfied = false;
 	    array<double, 3> newAngles=candidateIntervals[i].Divide();
@@ -142,13 +145,11 @@ bool Plane2d::DivideCandidateIntervals(double distBound){
 		shapes[shapeIds[j]].calculateOneInterval(li0);
 		shapes[shapeIds[j]].calculateOneInterval(li1);
 	    }
-	    /*cout << li0.LowerBound() << endl;
-	    cout << li0.UpperBound() << endl;
-	    cout << li1.LowerBound() << endl;
-	    cout << li1.UpperBound() << endl;*/
+
 	    LineInterval li=candidateIntervals[i];
 	    if(li0.LowerBound() < li.LowerBound() || li1.LowerBound() < li.LowerBound() || li0.UpperBound() > li.UpperBound() || li1.UpperBound() > li.UpperBound() || li0.UpperBound() < 0.0 || li1.UpperBound() < 0.0 || li0.LowerBound() < 0.0 || li1.LowerBound() < 0.0){
 		cout << "warning: incorrect bounds calculation. if you get this message, contact the pathfinder developer" << endl;
+		cout << time << endl;
 		cout << li.UpperBound() << endl;
 		cout << li.LowerBound() << endl;
 		cout << li1.UpperBound() << endl;
