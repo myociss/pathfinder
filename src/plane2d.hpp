@@ -16,6 +16,7 @@ using namespace std;
 class Shape2d;
 class LineInterval;
 
+
 class Plane2d{
     vector<Shape2d> shapes;
     vector<LineInterval> lineIntervals;

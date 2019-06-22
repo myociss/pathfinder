@@ -55,16 +55,6 @@ array<double, 3> LineInterval::Divide(){
 	mid -= 2 * M_PI;
     }
     return {angleStart, mid, angleEnd};
-    /*if(angleStart>angleEnd){
-	double intervalAngleEnd=angleEnd + (2 * M_PI);
-	double mid=(angleStart+intervalAngleEnd)/2;
-	if(mid>=M_PI){
-	    mid -= 2 * M_PI;
-	}
-	return {angleStart, mid, angleEnd};
-    } else{
-	return {angleStart, (angleStart+angleEnd)/2, angleEnd};
-    }*/
 }
 
 bool LineInterval::IntersectsEdge(double v0Angle, double v1Angle){

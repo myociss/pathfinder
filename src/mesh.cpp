@@ -111,8 +111,8 @@ vector<FoundPath> Mesh::findPaths(vector<Plane3d> planes, double distBound){
 	}
     }
     vector<FoundPath> foundPaths;
-    cout << "min upper bound:" << endl;
-    cout << minUpperBound << endl;
+    //cout << "min upper bound:" << endl;
+    //cout << minUpperBound << endl;
     //cout << "all found paths size:" << endl;
     //cout << allFoundPaths.size() << endl;
 
@@ -131,8 +131,8 @@ vector<FoundPath> Mesh::findPaths(vector<Plane3d> planes, double distBound){
 	    }
 	}
     }
-    cout << "return paths size:" << endl;
-    cout << foundPaths.size() << endl;
+    //cout << "return paths size:" << endl;
+    //cout << foundPaths.size() << endl;
     return foundPaths;
 }
 
@@ -186,7 +186,7 @@ vector<FoundPath> Mesh::shortestPaths(const int epsilon, const int numThreads, d
     future<vector<FoundPath>> futures[numThreads];
 
     vector<Plane3d> planes;
-    cout << numThreads << endl;
+    //cout << numThreads << endl;
 
     for(int i=0; i<epsilon; i++){
 	for(int j=0; j<epsilon; j++){
@@ -236,8 +236,8 @@ vector<FoundPath> Mesh::shortestPaths(const int epsilon, const int numThreads, d
 	}
     }
 
-    cout << "ret size:" << endl;
-    cout << ret.size() << endl;
+    //cout << "ret size:" << endl;
+    //cout << ret.size() << endl;
     return ret;
 }
 
