@@ -244,7 +244,7 @@ class TestGraph(TestCase):
         target=[0.1+1.8*random.random(), 0.1+1.8*random.random(), 0.1+1.8*random.random()]
         self.mesh.set_target(target)
 
-        paths=self.mesh.get_paths(epsilon=8, threads=1, distance_bound=2)
+        paths=self.mesh.get_paths(search_planes=8, threads=1, width_bound=2)
         normals=[]
         for alpha_id in range(8):
             alpha=alpha_id*math.pi/8
@@ -266,11 +266,11 @@ class TestGraph(TestCase):
             self.assertLess(abs(np.dot(target-pt0, normal)), 10e-7)
             self.assertLess(abs(np.dot(target-pt1, normal)), 10e-7)
     '''
-    def test_distance_bound(self):
+    def test_width_bound(self):
         target=[0.1+1.8*random.random(), 0.1+1.8*random.random(), 0.1+1.8*random.random()]
         self.mesh.set_target(target)
 
-        paths=self.mesh.get_paths(epsilon=8, threads=1, distance_bound=0.0001)
+        paths=self.mesh.get_paths(search_planes=8, threads=1, width_bound=0.0001)
         print('len paths' + str(len(paths)))
         for path in paths:
             diff=path.points()[0]-path.points()[1]
@@ -280,7 +280,6 @@ class TestGraph(TestCase):
     def test_pruned_intervals(self):
         for i in range(200):
             target=[0.1+1.8*random.random(), 0.1+1.8*random.random(), 0.1+1.8*random.random()]
-            #print(target)
             self.mesh.set_target(target)
             alpha=math.pi*random.random()
             theta=math.pi*random.random()
@@ -293,14 +292,10 @@ class TestGraph(TestCase):
 
             all_vertices=list(itertools.chain.from_iterable([[tuple(v) for v in shape.vertices()] for shape in plane2d.shapes()]))
             intervals=sorted(set([math.atan2(v[1], v[0]) for v in all_vertices]))
-            #self.assertEqual(len(intervals), len(interval_bounds))
 
             plane2d = pathfinder.Plane2d(plane_intersection, plane3d)
-            paths = plane2d.find_paths(distance_bound=0.01)
-            #self.assertGreater(len(paths), 0)
-            #print(len(paths))
+            paths = plane2d.find_paths(width_bound=0.01)
 
-            #located_intervals_count=0
             intervals_found=[-1 for i in range(len(paths))]
 
             for path_idx, path in enumerate(paths):
@@ -316,7 +311,6 @@ class TestGraph(TestCase):
                 for interval_idx, interval in enumerate(intervals):
                     interval_start=interval
                           
-                    #interval_end=intervals[0]
                     if interval_idx==len(intervals)-1:
                         interval_end=intervals[0]
                         if path_angle_mid<interval_end or path_angle_mid>interval_start:
@@ -332,19 +326,6 @@ class TestGraph(TestCase):
             for path_idx, path in enumerate(paths):
                 interval_idx=intervals_found[path_idx]
                 interval_bounds=init_interval_bounds[interval_idx]
-                if path.lower_bound()<interval_bounds[0] or path.upper_bound()>interval_bounds[1]:
-                    print('--------')
-                    np.set_printoptions(precision=15)
-                    points=path.points()
-                    path_angle_start=math.atan2(points[0][1], points[0][0])
-                    path_angle_end=math.atan2(points[1][1], points[1][0])
-                    #shape_0=plane2d.shapes()[0]
-                    #for v in shape_0.vertices():
-                        #print(math.atan2(v[1], v[0]))
-                    print(path_angle_start)
-                    print(path_angle_end)
-                    #print(interval_start)
-                    #print(interval_end)
                 self.assertGreaterEqual(path.lower_bound(), interval_bounds[0])
                 self.assertLessEqual(path.upper_bound(), interval_bounds[1])
 

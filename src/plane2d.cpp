@@ -71,7 +71,7 @@ vector<FoundPath> Plane2d::FindPaths(double distBound){
     //cout << candidateIntervals.size() << endl;
     bool distBoundSatisfied=DivideCandidateIntervals(distBound, 0);
     int i=1;
-    /*while(!distBoundSatisfied){
+    while(!distBoundSatisfied){
 	//cout << i << endl;
 	PruneCandidateIntervals();
 	//cout << candidateIntervals.size() << endl;
@@ -80,7 +80,7 @@ vector<FoundPath> Plane2d::FindPaths(double distBound){
 	//distBoundSatisfied=true;
     }
 
-    cout << "refined intervals this many times:" << endl;
+    /*cout << "refined intervals this many times:" << endl;
     cout << i-1 << endl;*/
 
     vector<FoundPath> foundPaths;

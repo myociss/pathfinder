@@ -30,9 +30,9 @@ PYBIND11_MODULE(pathfinder, m){
     .def("slice", &Mesh::sliceIndv,
 	py::arg("rotation"))
     .def("get_paths", &Mesh::shortestPaths,
-	py::arg("epsilon"),
+	py::arg("search_planes"),
 	py::arg("threads"),
-	py::arg("distance_bound"));
+	py::arg("width_bound"));
 
   py::class_<FoundPath>(m, "FoundPath")
     .def("plane_id", &FoundPath::PlaneId)
@@ -63,7 +63,7 @@ PYBIND11_MODULE(pathfinder, m){
     .def("calc_intervals_init", &Plane2d::CalcLineIntervalsInit)
     .def("interval_bounds", &Plane2d::LineIntervalBounds)
     .def("find_paths", &Plane2d::FindPaths,
-	py::arg("distance_bound"))
+	py::arg("width_bound"))
     .def("interval_shape_ids", &Plane2d::IntervalShapeIds,
 	py::arg("interval_id"));
 

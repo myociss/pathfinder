@@ -77,21 +77,21 @@ bool Mesh::setTarget(array<double, 3> _target){
 }
 
 vector<Shape3d> Mesh::sliceIndv(array<double, 2> rotation){
-    vector<int> tetsChecked;
-    tetsChecked.reserve(tetrahedrons.size());
+    vector<int> planeLastChecked;
+    planeLastChecked.reserve(tetrahedrons.size());
     for(unsigned long int i=0; i<tetrahedrons.size(); i++){
-	tetsChecked.push_back(-1);
+	planeLastChecked.push_back(-1);
     }
 
     Plane3d plane(0, rotation[0], rotation[1], target);
-    return slice(plane, tetsChecked);
+    return slice(plane, planeLastChecked);
 }
 
 vector<FoundPath> Mesh::findPaths(vector<Plane3d> planes, double distBound){
-    vector<int> tetsChecked;
-    tetsChecked.reserve(tetrahedrons.size());
+    vector<int> planeLastChecked;
+    planeLastChecked.reserve(tetrahedrons.size());
     for(unsigned long int i=0; i<tetrahedrons.size(); i++){
-	tetsChecked.push_back(-1);
+	planeLastChecked.push_back(-1);
     }
 
     double minUpperBound=numeric_limits<double>::max();
@@ -100,7 +100,7 @@ vector<FoundPath> Mesh::findPaths(vector<Plane3d> planes, double distBound){
     vector<vector<FoundPath>> allFoundPaths;
 
     for(int i=0; i<planes.size(); ++i){
-	vector<Shape3d> planeSlice = slice(planes[i], tetsChecked);
+	vector<Shape3d> planeSlice = slice(planes[i], planeLastChecked);
 	Plane2d plane2d(planeSlice, planes[i]);
 	vector<FoundPath> planePaths=plane2d.FindPaths(distBound);
 	//cout << "plane paths size:" << endl;
@@ -136,19 +136,19 @@ vector<FoundPath> Mesh::findPaths(vector<Plane3d> planes, double distBound){
     return foundPaths;
 }
 
-vector<Shape3d> Mesh::slice(Plane3d plane, vector<int> &tetsChecked){
-    vector<Shape3d> slice = computeSliceComponent(plane, tetsChecked, targetTetId);
+vector<Shape3d> Mesh::slice(Plane3d plane, vector<int> &planeLastChecked){
+    vector<Shape3d> slice = computeSliceComponent(plane, planeLastChecked, targetTetId);
 
     for(unsigned long int i=0; i<faces.size(); i++){
-	if(faces[i].intersectsPlane(plane) && tetsChecked[faces[i].TetId()]!=plane.Id()){
-	    vector<Shape3d> sliceComponent = computeSliceComponent(plane, tetsChecked, faces[i].TetId());
+	if(faces[i].intersectsPlane(plane) && planeLastChecked[faces[i].TetId()]!=plane.Id()){
+	    vector<Shape3d> sliceComponent = computeSliceComponent(plane, planeLastChecked, faces[i].TetId());
 	    slice.insert(slice.end(), sliceComponent.begin(), sliceComponent.end());
 	}
     }
     return slice;
 }
 
-vector<Shape3d> Mesh::computeSliceComponent(Plane3d plane, vector<int> &tetsChecked, unsigned long int initTet){
+vector<Shape3d> Mesh::computeSliceComponent(Plane3d plane, vector<int> &planeLastChecked, unsigned long int initTet){
     
     vector<unsigned long int> tetStack;
     tetStack.push_back(initTet);
@@ -159,7 +159,7 @@ vector<Shape3d> Mesh::computeSliceComponent(Plane3d plane, vector<int> &tetsChec
 	Tetrahedron& tet = tetrahedrons[tetStack.back()];
 	tetStack.pop_back();
 	
-	if(tetsChecked[tet.Id()]!=plane.Id()){
+	if(planeLastChecked[tet.Id()]!=plane.Id()){
 
 	    vector<array<double, 3>> intersectionPoints = tet.intersectsPlane(plane);
 
@@ -173,7 +173,7 @@ vector<Shape3d> Mesh::computeSliceComponent(Plane3d plane, vector<int> &tetsChec
 		}
 	    }
 
-	    tetsChecked[tet.Id()]=plane.Id();
+	    planeLastChecked[tet.Id()]=plane.Id();
 	}
     }
 
